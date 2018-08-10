@@ -45,10 +45,11 @@ class SemioticHierarchy extends React.Component {
             }
             _.each( children, (child) => { this.unflatten( array, child ); } );
         }  
-        else { parent['children'] = []; } 
+        //else { parent['children'] = []; } 
 
         return tree;
     }
+
 
     componentDidMount() {
         console.log('in semiotic component mount', this.props.hierarchyData);
@@ -80,9 +81,7 @@ class SemioticHierarchy extends React.Component {
             type
         } = this.props;
         
-        console.log('hierarchy Data in sub component', this.state.nodeData);
-
-
+        console.log('hierarchy Data in sub component', this.state.edgeData);
         return (
             <div className="semiotic-hierarchy" style={{ padding: 10, height: height*.65, flex: 1, float: 'none', margin: '0 auto' }}>
                 <div style={{ height: height, width: width, float: 'none', margin: '0 auto' }}>
@@ -91,6 +90,9 @@ class SemioticHierarchy extends React.Component {
                         responsiveHeight
                         edges={this.state.edgeData}
                         nodes={this.state.nodeData}
+                        sourceAccessor={d => d.parent}
+                        targetAccessor={d => d.child}
+                        nodeIDAccessor={d => d.child}
                         nodeRenderMode={nodeRender}
                         edgeRenderMode={edgeRender}
                         nodeStyle={(d,i) => ({ fill: color[d.depth] || defaultColor , stroke: color[d.depth] || defaultColor })}
@@ -104,9 +106,8 @@ class SemioticHierarchy extends React.Component {
                             forceManyBody: -15,
                             edgeStrength: 1.5,
                             padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
-                            hierarchySum: d => d.valueMetric || 0
+                            //hierarchySum: d => d.valueMetric || 0
                         }}                
-                        nodeIDAccessor={d => d.child}
                         /*
                         tooltipContent={d => (
                             <div className="tooltip-content">
@@ -115,7 +116,8 @@ class SemioticHierarchy extends React.Component {
                             </div>
                         )}
                     */
-                    />
+
+/>
                 </div>
             </div>
         );

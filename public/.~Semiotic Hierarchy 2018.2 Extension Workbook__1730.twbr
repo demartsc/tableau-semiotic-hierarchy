@@ -1,0 +1,301 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20182.18.0520.1701                               -->
+<workbook source-build='2018.2.0 (20182.18.0520.1701)' source-platform='mac' version='18.1' xml:base='https://public.tableau.com' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <repository-location derived-from='https://public.tableau.com/workbooks/NivoChordIntegration?rev=7.3' id='NivoChordIntegration' path='/workbooks' revision='7.4' />
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <style-theme name='clean' />
+  <datasources>
+    <datasource hasconnection='false' inline='true' name='Parameters' version='18.1'>
+      <aliases enabled='yes' />
+      <column caption='CHORD PARMS' datatype='string' name='[Node Category Parameter]' param-domain-type='any' role='measure' type='nominal' value='&quot;{\&quot;Golf\&quot;:{\&quot;width\&quot;: 600, \&quot;height\&quot;: 500}, \&quot;Les Miserables\&quot;: {\&quot;dataSheet\&quot;:\&quot;Sheet 6\&quot;,\&quot;width\&quot;:634, \&quot;height\&quot;:404, \&quot;inField\&quot;:\&quot;Int Node\&quot;, \&quot;outField\&quot;:\&quot;Sec Node\&quot;, \&quot;valField\&quot;:\&quot;SUM(Total Relationship Ct)\&quot;, \&quot;enableLabel\&quot;:false}, \&quot;Phones\&quot;: {\&quot;inField\&quot;: \&quot;In\&quot;, \&quot;outField\&quot;: \&quot;Out\&quot;, \&quot;valField\&quot;: \&quot;SUM(Ct)\&quot;, \&quot;width\&quot;: 650, \&quot;height\&quot;: 503, \&quot;labelRotation\&quot;:0}, \&quot;Uber Rides\&quot;: {\&quot;width\&quot;: 600, \&quot;height\&quot;: 499}, \&quot;Hair Color\&quot;: {\&quot;labelRotation\&quot;:0,\&quot;colors\&quot;:[\&quot;\#000000\&quot;,\&quot;\#FDC219\&quot;,\&quot;\#00BFF3\&quot;,\&quot;\#F07AAE\&quot;], \&quot;width\&quot;: 600, \&quot;height\&quot;: 499}} &quot;'>
+        <calculation class='tableau' formula='&quot;{&quot;&quot;Golf&quot;&quot;:{&quot;&quot;width&quot;&quot;: 600, &quot;&quot;height&quot;&quot;: 500}, &quot;&quot;Les Miserables&quot;&quot;: {&quot;&quot;dataSheet&quot;&quot;:&quot;&quot;Sheet 6&quot;&quot;,&quot;&quot;width&quot;&quot;:634, &quot;&quot;height&quot;&quot;:404, &quot;&quot;inField&quot;&quot;:&quot;&quot;Int Node&quot;&quot;, &quot;&quot;outField&quot;&quot;:&quot;&quot;Sec Node&quot;&quot;, &quot;&quot;valField&quot;&quot;:&quot;&quot;SUM(Total Relationship Ct)&quot;&quot;, &quot;&quot;enableLabel&quot;&quot;:false}, &quot;&quot;Phones&quot;&quot;: {&quot;&quot;inField&quot;&quot;: &quot;&quot;In&quot;&quot;, &quot;&quot;outField&quot;&quot;: &quot;&quot;Out&quot;&quot;, &quot;&quot;valField&quot;&quot;: &quot;&quot;SUM(Ct)&quot;&quot;, &quot;&quot;width&quot;&quot;: 650, &quot;&quot;height&quot;&quot;: 503, &quot;&quot;labelRotation&quot;&quot;:0}, &quot;&quot;Uber Rides&quot;&quot;: {&quot;&quot;width&quot;&quot;: 600, &quot;&quot;height&quot;&quot;: 499}, &quot;&quot;Hair Color&quot;&quot;: {&quot;&quot;labelRotation&quot;&quot;:0,&quot;&quot;colors&quot;&quot;:[&quot;&quot;#000000&quot;&quot;,&quot;&quot;#FDC219&quot;&quot;,&quot;&quot;#00BFF3&quot;&quot;,&quot;&quot;#F07AAE&quot;&quot;], &quot;&quot;width&quot;&quot;: 600, &quot;&quot;height&quot;&quot;: 499}} &quot;' />
+      </column>
+    </datasource>
+    <datasource caption='flare' inline='true' name='federated.0vnzafd0sr63s8137np6i0117efy' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='flare' name='textscan.1p1s9n419vuu4b14oehe919nnbn1'>
+            <connection class='textscan' directory='/Users/demartsc/git/tableau-semiotic-hierarchy/public' filename='flare.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.1p1s9n419vuu4b14oehe919nnbn1' name='flare.csv' table='[flare#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='string' name='id' ordinal='0' />
+            <column datatype='integer' name='value' ordinal='1' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[flare.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>id</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[id]</local-name>
+            <parent-name>[flare.csv]</parent-name>
+            <remote-alias>id</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[value]</local-name>
+            <parent-name>[flare.csv]</parent-name>
+            <remote-alias>value</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column aggregation='Sum' caption='dot occurences' datatype='integer' name='[Calculation_120049106816626688]' role='dimension' type='ordinal'>
+        <calculation class='tableau' formula='LEN(id)-LEN(replace([id],&apos;.&apos;,&apos;&apos;))' />
+      </column>
+      <column aggregation='Sum' caption='last dot' datatype='integer' name='[Calculation_120049106816983041]' role='dimension' type='ordinal'>
+        <calculation class='tableau' formula='IF [Calculation_120049106816626688] = 0 THEN 0&#10;ELSE FINDNTH([id], &apos;.&apos;, [Calculation_120049106816626688])&#10;END' />
+      </column>
+      <column aggregation='Sum' caption='second to last dot' datatype='integer' name='[Calculation_120049106817122306]' role='dimension' type='ordinal'>
+        <calculation class='tableau' formula='IF [Calculation_120049106816626688] &lt;= 1 THEN 0&#10;ELSE FINDNTH([id],&apos;.&apos;,[Calculation_120049106816626688]-1)&#10;END' />
+      </column>
+      <column caption='parent' datatype='string' name='[Calculation_120049106817544195]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='MID([id],[Calculation_120049106817122306]+1,[Calculation_120049106816983041]-[Calculation_120049106817122306]-1)' />
+      </column>
+      <column caption='child' datatype='string' name='[Calculation_120049106817761284]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='MID([id],[Calculation_120049106816983041]+1,len([id]))' />
+      </column>
+      <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec'>
+        <calculation class='tableau' formula='1' />
+      </column>
+      <column caption='Id' datatype='string' name='[id]' role='dimension' type='nominal' />
+      <column caption='Value' datatype='integer' name='[value]' role='measure' type='quantitative' />
+      <extract count='-1' enabled='true' units='records'>
+        <connection access_mode='readonly' authentication='auth-none' author-locale='en_US' class='hyper' dbname='Data/Turf 2018.2 Extension Workbook.twb Files/flare.hyper' default-settings='yes' schema='Extract' sslmode='' tablename='Extract' update-time='08/10/2018 02:19:36 AM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <refresh>
+            <refresh-event add-from-file-path='' increment-value='%null%' refresh-type='create' rows-inserted='252' timestamp-start='2018-08-10 02:19:36.605' />
+          </refresh>
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>id</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[id]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>id</remote-alias>
+              <ordinal>0</ordinal>
+              <family>flare.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>252</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>value</remote-alias>
+              <ordinal>1</ordinal>
+              <family>flare.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>252</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' dim-percentage='0.456747' measure-ordering='alphabetic' measure-percentage='0.304498' parameter-percentage='0.238754' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Flare Data'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='flare' name='federated.0vnzafd0sr63s8137np6i0117efy' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0vnzafd0sr63s8137np6i0117efy'>
+            <column aggregation='Sum' caption='dot occurences' datatype='integer' name='[Calculation_120049106816626688]' role='dimension' type='ordinal'>
+              <calculation class='tableau' formula='LEN(id)-LEN(replace([id],&apos;.&apos;,&apos;&apos;))' />
+            </column>
+            <column aggregation='Sum' caption='last dot' datatype='integer' name='[Calculation_120049106816983041]' role='dimension' type='ordinal'>
+              <calculation class='tableau' formula='IF [Calculation_120049106816626688] = 0 THEN 0&#10;ELSE FINDNTH([id], &apos;.&apos;, [Calculation_120049106816626688])&#10;END' />
+            </column>
+            <column aggregation='Sum' caption='second to last dot' datatype='integer' name='[Calculation_120049106817122306]' role='dimension' type='ordinal'>
+              <calculation class='tableau' formula='IF [Calculation_120049106816626688] &lt;= 1 THEN 0&#10;ELSE FINDNTH([id],&apos;.&apos;,[Calculation_120049106816626688]-1)&#10;END' />
+            </column>
+            <column caption='parent' datatype='string' name='[Calculation_120049106817544195]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='MID([id],[Calculation_120049106817122306]+1,[Calculation_120049106816983041]-[Calculation_120049106817122306]-1)' />
+            </column>
+            <column caption='child' datatype='string' name='[Calculation_120049106817761284]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='MID([id],[Calculation_120049106816983041]+1,len([id]))' />
+            </column>
+            <column caption='Id' datatype='string' name='[id]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_120049106816626688]' derivation='None' name='[none:Calculation_120049106816626688:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_120049106816983041]' derivation='None' name='[none:Calculation_120049106816983041:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_120049106817122306]' derivation='None' name='[none:Calculation_120049106817122306:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_120049106817544195]' derivation='None' name='[none:Calculation_120049106817544195:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Calculation_120049106817761284]' derivation='None' name='[none:Calculation_120049106817761284:nk]' pivot='key' type='nominal' />
+            <column-instance column='[id]' derivation='None' name='[none:id:nk]' pivot='key' type='nominal' />
+            <column-instance column='[value]' derivation='Sum' name='[sum:value:qk]' pivot='key' type='quantitative' />
+            <column caption='Value' datatype='integer' name='[value]' role='measure' type='quantitative' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.0vnzafd0sr63s8137np6i0117efy].[none:id:nk]'>
+            <groupfilter function='union' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate'>
+              <groupfilter function='member' level='[none:id:nk]' member='&quot;flare&quot;' />
+              <groupfilter function='member' level='[none:id:nk]' member='&quot;flare.display&quot;' />
+              <groupfilter function='member' level='[none:id:nk]' member='&quot;flare.display.DirtySprite&quot;' />
+              <groupfilter function='member' level='[none:id:nk]' member='&quot;flare.display.LineSprite&quot;' />
+              <groupfilter function='member' level='[none:id:nk]' member='&quot;flare.display.RectSprite&quot;' />
+              <groupfilter function='member' level='[none:id:nk]' member='&quot;flare.display.TextSprite&quot;' />
+            </groupfilter>
+          </filter>
+          <slices>
+            <column>[federated.0vnzafd0sr63s8137np6i0117efy].[none:id:nk]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='header'>
+            <format attr='width' field='[federated.0vnzafd0sr63s8137np6i0117efy].[none:id:nk]' value='264' />
+            <format attr='width' field='[federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106817761284:nk]' value='132' />
+            <format attr='width' field='[federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106817544195:nk]' value='96' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <lod column='[federated.0vnzafd0sr63s8137np6i0117efy].[none:id:nk]' />
+              <lod column='[federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106816626688:ok]' />
+              <lod column='[federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106816983041:ok]' />
+              <lod column='[federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106817122306:ok]' />
+              <text column='[federated.0vnzafd0sr63s8137np6i0117efy].[sum:value:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>([federated.0vnzafd0sr63s8137np6i0117efy].[none:id:nk] / ([federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106817544195:nk] / [federated.0vnzafd0sr63s8137np6i0117efy].[none:Calculation_120049106817761284:nk]))</rows>
+        <cols />
+      </table>
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name='Example Dashboard'>
+      <repository-location derived-from='https://public.tableau.com/workbooks/NivoChordIntegration/HairColor?rev=' id='HairColor' path='/workbooks/NivoChordIntegration' revision='' />
+      <style />
+      <size maxheight='860' maxwidth='650' minheight='560' minwidth='420' />
+      <zones>
+        <zone h='100000' id='2' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='97772' id='12' param='horz' type='layout-flow' w='97538' x='1231' y='1114'>
+            <zone h='97772' id='9' param='horz' type='layout-flow' w='97538' x='1231' y='1114'>
+              <zone h='97772' id='5' param='horz' type='layout-flow' w='97538' x='1231' y='1114'>
+                <zone h='97772' id='3' type='layout-basic' w='97538' x='1231' y='1114'>
+                  <zone forceUpdate='true' h='71867' id='13' type='text' w='97538' x='1231' y='27019'>
+                    <formatted-text>
+                      <run fontsize='8'>This page is for demo purposes only... | @demartsc (and several others, see collaborators in below repo)</run>
+                      <run>Æ&#10;</run>
+                      <run fontsize='8'>git repo: </run>
+                      <run auto-url='true' fontsize='8' hyperlink='tabdoc:load-url url=&amp;quot;https://github.com/demartsc/tableau-semiotic-hierarchy&amp;quot;'>https://github.com/demartsc/tableau-semiotic-hierarchy</run>
+                      <run>Æ&#10;</run>
+                      <run fontsize='8'>flare sample data from: </run>
+                      <run auto-url='true' fontsize='8' hyperlink='tabdoc:load-url url=&amp;quot;https://bl.ocks.org/mbostock/4063570&amp;quot;'>https://bl.ocks.org/mbostock/4063570</run>
+                    </formatted-text>
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                  <zone h='25905' id='14' name='Flare Data' show-title='false' w='97538' x='1231' y='1114'>
+                    <zone-style>
+                      <format attr='border-color' value='#000000' />
+                      <format attr='border-style' value='none' />
+                      <format attr='border-width' value='0' />
+                      <format attr='margin' value='4' />
+                    </zone-style>
+                  </zone>
+                </zone>
+              </zone>
+            </zone>
+          </zone>
+          <zone-style>
+            <format attr='border-color' value='#000000' />
+            <format attr='border-style' value='none' />
+            <format attr='border-width' value='0' />
+            <format attr='margin' value='8' />
+          </zone-style>
+        </zone>
+      </zones>
+    </dashboard>
+  </dashboards>
+  <windows source-height='30'>
+    <window class='dashboard' maximized='true' name='Example Dashboard'>
+      <viewpoints>
+        <viewpoint name='Flare Data'>
+          <zoom type='fit-width' />
+        </viewpoint>
+      </viewpoints>
+      <active id='-1' />
+    </window>
+    <window class='worksheet' hidden='true' name='Flare Data'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+    </window>
+  </windows>
+</workbook>

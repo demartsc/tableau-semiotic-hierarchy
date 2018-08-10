@@ -5,14 +5,12 @@
   "dependencies": {
     "@material-ui/core": "^1.0.0",
     "@material-ui/icons": "^1.0.0",
-    "@turf/turf": "^5.1.6",
-    "mapbox-gl": "^0.47.0",
     "react": "^16.3.2",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.3.2",
     "react-scripts": "1.1.4",
     "react-spinkit": "^3.0.0",
-    "semiotic": "^1.12.0",
+    "semiotic": "^1.13.6",
     "typeface-roboto": "^0.0.54",
     "url-parse": "^1.4.3"
   },

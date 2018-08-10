@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import logo from './logo.svg';
 import './App.css';
+
+//semiotic
 import { ResponsiveNetworkFrame } from 'semiotic';
 
+//lodash
+import _ from 'lodash';
+
 import LoadingIndicatorComponent from './components/LoadingIndicatorComponent';
-import VoronoiMap from './components/VoronoiMap';
+import SemioticHierarchy from './components/SemioticHierarchy';
 import { ConfigScreen, CustomScreen } from './components/Configuration';
 
 import { withStyles } from '@material-ui/core/styles';
@@ -226,7 +231,7 @@ selectColumn0 (columnName) {
 selectColumn1 (columnName) {
   console.log(columnName);
 
-  let cols = this.state.numberColumns;
+  let cols = this.state.stringColumns;
   cols = cols.filter(e => e !== columnName);
 
   if (columnName !== this.state.tableauSettings.field0) {
@@ -234,7 +239,7 @@ selectColumn1 (columnName) {
     tableauExt.settings.saveAsync().then(() => {
       this.setState({
         demoData: dematrixifiedEdges1,
-        numberColumns: cols,
+        stringColumns: cols,
         tableauSettings: tableauExt.settings.getAll()
       });
     });
@@ -333,28 +338,36 @@ getSummaryData (selectedSheet) {
         }
 
         if (this.state.tableauSettings.field0 && t.columns[k].fieldName === this.state.tableauSettings.field0) {
-          console.log('in soure', t.columns[k].fieldName)
-          col_indexes['dimension'] = k;
-          delete col_indexes[t.columns[k].fieldName];
+          console.log('in soure', t.columns[k].fieldName, k);
+          col_indexes['parent'] = k;
+          if (t.columns[k].fieldName !== 'parent') {
+            delete col_indexes[t.columns[k].fieldName];
+          }
         }
 
 
         if (this.state.tableauSettings.field1 && t.columns[k].fieldName === this.state.tableauSettings.field1) {
           console.log('in target', t.columns[k].fieldName)
-          col_indexes['latitude'] = parseFloat(k);
-          delete col_indexes[t.columns[k].fieldName];
+          col_indexes['child'] = k;
+          if (t.columns[k].fieldName !== 'child') {
+            delete col_indexes[t.columns[k].fieldName];
+          }
         }
 
         if (this.state.tableauSettings.field2 && t.columns[k].fieldName === this.state.tableauSettings.field2) {
           console.log('in value', t.columns[k].fieldName)
-          col_indexes['longitude'] = parseFloat(k);
-          delete col_indexes[t.columns[k].fieldName];
+          col_indexes['valueMetric'] = parseFloat(k);
+          if (t.columns[k].fieldName !== 'valueMetric') {
+            delete col_indexes[t.columns[k].fieldName];
+          }
         }
 
         if (this.state.tableauSettings.field3 && t.columns[k].fieldName === this.state.tableauSettings.field3) {
           console.log('in color', t.columns[k].fieldName)
           col_indexes['colorMetric'] = parseFloat(k);
-          delete col_indexes[t.columns[k].fieldName];
+          if (t.columns[k].fieldName !== 'colorMetric') {
+            delete col_indexes[t.columns[k].fieldName];
+          }
         }
     }
 
@@ -365,8 +378,7 @@ getSummaryData (selectedSheet) {
       data.push(this.convertRowToObject(t.data[j], col_indexes));
     }
 
-    // console.log(data);
-    // console.log(JSON.stringify(data));
+    console.log('flat data', data);
 
     this.setState({
       isLoading: false,
@@ -386,12 +398,15 @@ getSummaryData (selectedSheet) {
 
 clearSheet () {
   console.log("triggered erase");
+  // erase all the settings, there has got be a better way. 
   tableauExt.settings.erase('sheet');
   tableauExt.settings.erase('field0');
   tableauExt.settings.erase('field1');
   tableauExt.settings.erase('field2');
   tableauExt.settings.erase('field3');
   tableauExt.settings.erase('configuration');
+
+  // save async the erased settings
   tableauExt.settings.saveAsync().then(() => {
     this.setState({
       selectedSheet: undefined,
@@ -428,7 +443,7 @@ convertRowToObject(row, attrs_map) {
   let name = "";
   for (name in attrs_map) {
     let id = attrs_map[name];
-    o[name] = row[id].value;
+    o[name] = row[id].value === "%null%" ? null : row[id].value;
   }
   return o;
 };
@@ -579,8 +594,8 @@ render() {
             width = {this.state.width}
             adjustColor = {0}
             configStyles = {configStyles.field0Select}
-            configTitle = "Step 2: Pick the dimension field"
-            listTitle = "Pick the dimension"
+            configTitle = "Step 2: Pick the parent field"
+            listTitle = "Pick the parent"
           />
         );
       }
@@ -588,15 +603,15 @@ render() {
       if (!this.state.tableauSettings.field1) {
         return (
           <ConfigScreen
-            sheetNames = {this.state.numberColumns}
+            sheetNames = {this.state.stringColumns}
             selectSheet = {this.selectColumn1}
             demoData = {this.state.demoData}
             adjustColor = {2}
             height = {this.state.height}
             width = {this.state.width}
             configStyles = {configStyles.field1Select}
-            configTitle = "Step 3: Pick the latitude"
-            listTitle = "Pick the latitude"
+            configTitle = "Step 3: Pick the child"
+            listTitle = "Pick the child"
           />
         );
       }
@@ -611,8 +626,8 @@ render() {
             height = {this.state.height}
             width = {this.state.width}
             configStyles = {configStyles.field2Select}
-            configTitle = "Step 4: Pick the longitude"
-            listTitle = "Pick the longitude"
+            configTitle = "Step 4: Pick the value by metric"
+            listTitle = "Pick the value metric"
           />
         );
       }
@@ -700,25 +715,20 @@ render() {
       );
     }
 
-    console.log(this.state.data);
+    console.log('this', this, this.state.data);
     return (
       <div className="App">
-        <div style={{ height: this.state.height, width: this.state.width, float: 'none', margin: '0 auto' }}>
-          <VoronoiMap
-            data={this.state.data}
-          />
-        </div>
-
-        <Button
-          variant="outlined"
-          color="primary"
-          size="large"
-          className={classes.button}
-          onClick={this.clearSheet}
-        >
-          <Delete className={classNames(classes.leftIcon, classes.iconSmall)} />
-            Erase
-        </Button>
+        <SemioticHierarchy
+          className={classes.chart}
+          color={this.state.color}
+          defaultColor={defaultColor}
+          width={this.state.width}
+          height={this.state.height}
+          nodeRender={this.state.nodeRender}
+          edgeRender={this.state.edgeRender}
+          hoverAnnotation={this.state.hoverAnnotation}
+          hierarchyData={this.state.data}
+        />
       </div>
     );
 

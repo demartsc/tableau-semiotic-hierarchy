@@ -339,8 +339,8 @@ getSummaryData (selectedSheet) {
 
         if (this.state.tableauSettings.field0 && t.columns[k].fieldName === this.state.tableauSettings.field0) {
           console.log('in soure', t.columns[k].fieldName, k);
-          col_indexes['parent'] = k;
-          if (t.columns[k].fieldName !== 'parent') {
+          col_indexes['name'] = k;
+          if (t.columns[k].fieldName !== 'name') {
             delete col_indexes[t.columns[k].fieldName];
           }
         }

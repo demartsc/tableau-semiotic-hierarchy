@@ -724,10 +724,30 @@ render() {
           defaultColor={defaultColor}
           width={this.state.width}
           height={this.state.height}
+          hierarchyData={this.state.data}
+
+          //networkTypeProps
+          networkType={"tree"}
+          networkProjection={"vertical"}
+
+          //render mode props
           nodeRender={this.state.nodeRender}
           edgeRender={this.state.edgeRender}
+
+          //edge styling props
+          edgeShow
+          edgeColor={"#94D0C0"}
+          edgeOpacity={.75}
+          //edgeWidthField || edgeWidthStroke
+
+          //node styling props
+          nodeShow
+          nodeColor={"#8175AA"}
+          nodeOpacity={.75}
+          //nodeWidthField || nodeWidthStroke
+        
+          //interactivity props
           hoverAnnotation={this.state.hoverAnnotation}
-          hierarchyData={this.state.data}
         />
       </div>
     );

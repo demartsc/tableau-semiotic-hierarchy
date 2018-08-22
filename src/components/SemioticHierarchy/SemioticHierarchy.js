@@ -79,10 +79,16 @@ class SemioticHierarchy extends React.Component {
             nodeRender,
             edgeRender,
             hoverAnnotation,
-            type
+            networkType,
+            networkProjection, 
+            edgeColor,
+            edgeOpacity,
+            nodeColor,
+            nodeOpacity
         } = this.props;
         
         console.log('hierarchy Data in sub component', JSON.stringify(this.state.edgeData));
+
         return (
             <div className="semiotic-hierarchy" style={{ padding: 10, height: height*.65, flex: 1, float: 'none', margin: '0 auto' }}>
                 <div style={{ height: height*.95, width: width*.95, float: 'none', margin: '0 auto' }}>
@@ -90,44 +96,53 @@ class SemioticHierarchy extends React.Component {
                         responsiveWidth
                         responsiveHeight
                         edges={this.state.edgeData}
-                        nodeIDAccessor={d => d.name}
+                        nodeIDAccessor={d => d.child}
                         nodeSizeAccessor={3} //{d => d.depth}
                         nodeRenderMode={nodeRender}
                         edgeRenderMode={edgeRender}
-                        nodeStyle={(d,i) => ({ fill: color[d.depth] || defaultColor , stroke: color[d.depth] || defaultColor })}
-                        edgeStyle={(d,i) => ({ fill: "none", stroke: defaultColor, opacity: 1 })}
-                        // edgeType={d => (
-                        //     console.log('d', ' M' + d.source.y + ',' + d.source.x
-                        //             + ' C' + (d.source.y + d.target.y) / 2 + ',' + d.source.x
-                        //             + '  ' + (d.source.y + d.target.y) / 2 + d.target.x
-                        //             + '  ' + d.target.y + ',' +  d.target.x ),
-                        //     <path 
-                        //         d = { ' M' + d.source.y + ',' + d.source.x
-                        //             + ' C' + (d.source.y + d.target.y) / 2 + ',' + d.source.x
-                        //             + '  ' + (d.source.y + d.target.y) / 2 + d.target.x
-                        //             + '  ' + d.target.y + ',' +  d.target.x }
-                        //         sytle = {{ stroke: "red", fill: "none" }}
-                        //     />
-                            // <line 
-                            //     x1={d.source.x}
-                            //     x2={d.target.x}
-                            //     y1={d.source.y}
-                            //     y2={d.target.y}
-                            //     style={{ stroke: "red" }}
-                            // />
-                        // )} 
-
+                        nodeStyle={(d,i) => ({ 
+                            fill: nodeColor, 
+                            stroke: nodeColor, 
+                            opacity: nodeOpacity
+                        })}
+                        edgeStyle={(d,i) => ({ 
+                            fill: edgeColor, 
+                            stroke: edgeColor, 
+                            opacity: edgeOpacity
+                        })}
                         edgeWidthAccessor={d => d.valueMetric || 1}
                         hoverAnnotation={hoverAnnotation}
                         networkType={{
-                            type: "tree",
-                            projection: "vertical",
+                            type: networkType,
+                            projection: networkProjection,
                             nodePadding: 1,
-                            forceManyBody: -15,
-                            edgeStrength: 1.5,
-                            padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
+                            forceManyBody: -50,
+                            edgeStrength: 1,
+                            iterations: 500,
+                            padding: networkType === "treemap" ? 3 : networkType === "circlepack" ? 2 : 0,
                             //hierarchySum: d => d.valueMetric || 0
                         }}                
+                        // edgeType={d => 
+                            // console.log('d', ' M' + d.source.y + ',' + d.source.x
+                            //         + ' C' + (d.source.y + d.target.y) / 2 + ',' + d.source.x
+                            //         + '  ' + (d.source.y + d.target.y) / 2 + d.target.x
+                            //         + '  ' + d.target.y + ',' +  d.target.x ),
+                            // <path 
+                            //     d = { ' M' + d.source.y + ',' + d.source.x
+                            //         + ' C' + (d.source.y + d.target.y) / 2 + ',' + d.source.x
+                            //         + '  ' + (d.source.y + d.target.y) / 2 + d.target.x
+                            //         + '  ' + d.target.y + ',' +  d.target.x }
+                            //     sytle = {{ stroke: "red", fill: "none" }}
+                            // />
+                        //     <path 
+                        //         x1={d.source.x}
+                        //         x2={d.target.x}
+                        //         y1={d.source.y}
+                        //         y2={d.target.y}
+                        //         style={{ stroke: "red" }}
+                        //     />
+                        // } 
+
                         /*
                         tooltipContent={d => (
                             <div className="tooltip-content">

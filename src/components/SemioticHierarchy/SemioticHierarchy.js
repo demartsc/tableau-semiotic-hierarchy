@@ -27,6 +27,7 @@ class SemioticHierarchy extends React.Component {
     constructor (props) {
       super(props);
       this.state = {
+        root: "",
         edgeData: [],
         nodeData: []
       }  
@@ -34,15 +35,15 @@ class SemioticHierarchy extends React.Component {
 
     // unflatten function was obtained from stack overflow link below and modified slightly for use herein
     // https://stackoverflow.com/questions/18017869/build-tree-array-from-flat-array-in-javascript
-    unflatten = ( array, parent, tree ) => {
+    unflatten = ( array, parent, seed, tree ) => {
         tree = typeof tree !== 'undefined' ? tree : [];
         parent = typeof parent !== 'undefined' ? parent : { id: 0 };
     
         var children = _.filter( array, function(child){ return child.name == parent.child; });
     
         if( !_.isEmpty( children )  ){
-            if( parent.child == 'flare' ) {
-                tree = Object.assign({}, parent, {"name": "flare", "children": children});
+            if( parent.child == seed ) {
+                tree = Object.assign({}, parent, {"name": seed, "children": children});
             }
             else {
                 parent['children'] = children;
@@ -55,13 +56,19 @@ class SemioticHierarchy extends React.Component {
     componentDidMount() {
         console.log('in semiotic component mount', this.props.hierarchyData);
 
-        let edgeData = this.unflatten(this.props.hierarchyData,{child: 'flare'});
+        //find the root node in the data set provided
+        //need to handle if there are more than one of these!!
+        let root = _.filter(this.props.hierarchyData, (o) => { return o.name == null; });
+        console.log('root array', root[0].child, root);
+
+        let edgeData = this.unflatten(this.props.hierarchyData, { child: root[0].child }, root[0].child);
         console.log('edgeData', edgeData);
 
         let nodeData = _.uniqBy(this.props.hierarchyData, 'child'); //_.filter(_.uniqBy(this.props.hierarchyData, 'child'), (o) => { return o.child !== 'flare'; });
         console.log('nodeData', nodeData);
 
         this.setState({
+            root: root,
             edgeData: edgeData,
             nodeData: nodeData
         })
@@ -116,10 +123,11 @@ class SemioticHierarchy extends React.Component {
                             type: networkType,
                             projection: networkProjection,
                             nodePadding: 1,
-                            forceManyBody: -50,
-                            edgeStrength: 1,
-                            iterations: 500,
+                            forceManyBody: networkType === "force" ? -250 : -50,
+                            edgeStrength: networkType === "force" ? 2 : 1,
+                            iterations: networkType === "force" ? 500 : 1,
                             padding: networkType === "treemap" ? 3 : networkType === "circlepack" ? 2 : 0,
+                            distanceMax: networkType === "force" ? 500 : 1,
                             //hierarchySum: d => d.valueMetric || 0
                         }}                
                         // edgeType={d => 

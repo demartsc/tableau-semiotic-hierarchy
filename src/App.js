@@ -727,7 +727,7 @@ render() {
           hierarchyData={this.state.data}
 
           //networkTypeProps
-          networkType={"tree"}
+          networkType={"force"}
           networkProjection={"vertical"}
 
           //render mode props
@@ -737,6 +737,7 @@ render() {
           //edge styling props
           edgeShow
           edgeColor={"#94D0C0"}
+          edgeStrokeColor={"#94D0C0"}
           edgeOpacity={.75}
           //edgeWidthField || edgeWidthStroke
 
@@ -744,6 +745,8 @@ render() {
           nodeShow
           nodeColor={"#8175AA"}
           nodeOpacity={.75}
+          nodeStrokeColor={"#8175AA"}
+          nodeStrokeOpacity={.75}
           //nodeWidthField || nodeWidthStroke
         
           //interactivity props

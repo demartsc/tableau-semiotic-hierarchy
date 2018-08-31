@@ -6,7 +6,6 @@ class AppWrapper extends Component {
 
   render() {
     const configState = parse(window.location.href).hash === '#true';
-    console.log('configState',configState);
 
     return(
       <App

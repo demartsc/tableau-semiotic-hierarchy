@@ -42,6 +42,15 @@ class ConfigScreen extends React.Component {
     super(props);
   }
 
+  // for call back to work with field included
+  handleClick = event => {
+    console.log('handleClick', this.props);
+    // update this if to include the minimum required fields
+    // if (this.props.tableauSettings.ChoroFillScale && this.props.tableauSettings.ChoroFillScaleColors) {
+      this.props.customCallBack(this.props.field)
+    // }
+  }
+  
   render() {
     const {
       classes,
@@ -55,11 +64,13 @@ class ConfigScreen extends React.Component {
       colors,
       colorHex,
       color,
+      edgeType,
       edgeRender,
       nodeRender,
       edgeColor,
       padAngle,
-      hoverAnnotation } = this.props;
+      hoverAnnotation, 
+      tableauSettings } = this.props;
 
     console.log('we are in custom', this.props);
     return (
@@ -78,31 +89,22 @@ class ConfigScreen extends React.Component {
               {configTitle}
             </Typography>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="color-helper">Color Pallete</InputLabel>
+              <InputLabel htmlFor="edgeType-helper">edgeType</InputLabel>
               <Select
-                value={color}
+                value={tableauSettings.edgeType}
                 onChange={handleChange}
-                input={<Input name="color" id="color-helper" />}
+                input={<Input name="edgeType" id="edgeType-helper" />}
               >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {
-                colors.map(clr => (
-                  <MenuItem
-                    key={clr.palleteName}
-                    value={clr.hexValues}
-                  >
-                  {clr.palleteName}
-                  </MenuItem>
-                ))}
+                 <MenuItem value={"none"}>None</MenuItem>
+                 <MenuItem value={"linearc"}>Line Arc</MenuItem>
+                 <MenuItem value={"curve"}>Curve</MenuItem>
               </Select>
-              <FormHelperText>Select your color pallete</FormHelperText>
+              <FormHelperText>The way edges will be drawn</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="edgeRender-helper">edgeRender</InputLabel>
               <Select
-                value={edgeRender}
+                value={tableauSettings.edgeRender}
                 onChange={handleChange}
                 input={<Input name="edgeRender" id="edgeRender-helper" />}
               >
@@ -115,7 +117,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="nodeRender-helper">nodeRender</InputLabel>
               <Select
-                value={nodeRender}
+                value={tableauSettings.nodeRender}
                 onChange={handleChange}
                 input={<Input name="nodeRender" id="nodeRender-helper" />}
               >
@@ -128,7 +130,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="edgeColor-helper">edgeColor</InputLabel>
               <Select
-                value={edgeColor}
+                value={tableauSettings.edgeColor}
                 onChange={handleChange}
                 input={<Input name="edgeColor" id="edgeColor-helper" />}
               >
@@ -140,7 +142,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="padAngle-helper">padAngle</InputLabel>
               <Select
-                value={padAngle}
+                value={parseFloat(tableauSettings.padAngle)}
                 onChange={handleChange}
                 input={<Input name="padAngle" id="padAngle-helper" />}
               >
@@ -154,7 +156,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="hoverAnnotation-helper">hoverAnnotation</InputLabel>
               <Select
-                value={hoverAnnotation}
+                value={tableauSettings.hoverAnnotation === "true"}
                 onChange={handleChange}
                 input={<Input name="hoverAnnotation" id="hoverAnnotation-helper" />}
               >
@@ -172,7 +174,7 @@ class ConfigScreen extends React.Component {
                 color="primary"
                 size="large"
                 className={classes.button}
-                onClick={customCallBack}
+                onClick={this.handleClick}
               >
                 <Save className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Save

@@ -91,11 +91,11 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="edgeType-helper">edgeType</InputLabel>
               <Select
-                value={tableauSettings.edgeType}
+                value={tableauSettings.edgeType || "normal"}
                 onChange={handleChange}
                 input={<Input name="edgeType" id="edgeType-helper" />}
               >
-                 <MenuItem value={"none"}>None</MenuItem>
+                 <MenuItem value={"normal"}>Normal</MenuItem>
                  <MenuItem value={"linearc"}>Line Arc</MenuItem>
                  <MenuItem value={"curve"}>Curve</MenuItem>
               </Select>
@@ -104,7 +104,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="edgeRender-helper">edgeRender</InputLabel>
               <Select
-                value={tableauSettings.edgeRender}
+                value={tableauSettings.edgeRender || "normal"}
                 onChange={handleChange}
                 input={<Input name="edgeRender" id="edgeRender-helper" />}
               >
@@ -117,7 +117,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="nodeRender-helper">nodeRender</InputLabel>
               <Select
-                value={tableauSettings.nodeRender}
+                value={tableauSettings.nodeRender || "normal"}
                 onChange={handleChange}
                 input={<Input name="nodeRender" id="nodeRender-helper" />}
               >
@@ -128,21 +128,9 @@ class ConfigScreen extends React.Component {
               <FormHelperText>The way nodes will be rendered</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="edgeColor-helper">edgeColor</InputLabel>
-              <Select
-                value={tableauSettings.edgeColor}
-                onChange={handleChange}
-                input={<Input name="edgeColor" id="edgeColor-helper" />}
-              >
-                 <MenuItem value={"source"}>Source</MenuItem>
-                 <MenuItem value={"target"}>Target</MenuItem>
-              </Select>
-              <FormHelperText>Color edges based on source or target</FormHelperText>
-            </FormControl>
-            <FormControl className={classes.formControl}>
               <InputLabel htmlFor="padAngle-helper">padAngle</InputLabel>
               <Select
-                value={parseFloat(tableauSettings.padAngle)}
+                value={parseFloat(tableauSettings.padAngle || 0.01)}
                 onChange={handleChange}
                 input={<Input name="padAngle" id="padAngle-helper" />}
               >

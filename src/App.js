@@ -518,7 +518,6 @@ render() {
               handleChange={this.handleChange}
               customCallBack={this.customCallBack}
               field={'configuration'}
-              color={tableauSettingsState.color || ""}
               tableauSettings={tableauSettingsState}
             />
           );
@@ -607,17 +606,17 @@ render() {
           edgeType={tableauSettingsState.edgeType}
 
           //edge styling props
-          edgeFillColor={"#94D0C0"}
+          edgeFillColor={DataBlick[0]}
           edgeFillOpacity={0}
-          edgeStrokeColor={"#94D0C0"}
-          edgeStrokeOpacity={.75}
+          edgeStrokeColor={DataBlick[0]}
+          edgeStrokeOpacity={.15}
           //edgeWidthField || edgeWidthStroke
 
           //node styling props
-          nodeFillColor={"#8175AA"}
-          nodeFillOpacity={.75}
-          nodeStrokeColor={"#8175AA"}
-          nodeStrokeOpacity={.75}
+          nodeFillColor={DataBlick[2]}
+          nodeFillOpacity={.10}
+          nodeStrokeColor={DataBlick[0]}
+          nodeStrokeOpacity={.5}
           //nodeWidthField || nodeWidthStroke
         
           //interactivity props

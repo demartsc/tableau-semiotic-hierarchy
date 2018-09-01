@@ -67,6 +67,11 @@ class SemioticHierarchy extends React.Component {
                 a['child'] = a[this.props.tableauSettings.ConfigChildField];
                 delete a[this.props.tableauSettings.ConfigChildField];
             }
+            
+            if (this.props.tableauSettings.ConfigValueField !== "valueMetric") {
+                a['valueMetric'] = a[this.props.tableauSettings.ConfigValueField];
+                delete a[this.props.tableauSettings.ConfigValueField];
+            }
         });
 
         console.log('in semiotic component mount', hierarchyDataPreped, this.props.hierarchyData);
@@ -119,7 +124,7 @@ class SemioticHierarchy extends React.Component {
                         responsiveHeight
                         edges={this.state.edgeData}
                         nodeIDAccessor={d => d.child}
-                        nodeSizeAccessor={3} //{d => d.depth}
+                        //nodeSizeAccessor={d => d.depth} // this breaks the treemap and circlepack
                         nodeRenderMode={nodeRender}
                         edgeRenderMode={edgeRender}
                         edgeType={edgeType}

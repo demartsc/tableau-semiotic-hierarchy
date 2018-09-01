@@ -588,36 +588,34 @@ render() {
     }
 
     // left off here config should be good, now we need to get component working from new config
-    console.log('this', this, this.state.data);
     return (
       <div className="App">
         <SemioticHierarchy
-          className={classes.chart}
-          color={this.state.color}
-          defaultColor={defaultColor}
+          className={'semiotic-hierarchy-chart'}
           width={this.state.width}
           height={this.state.height}
-          hierarchyData={this.state.data}
+          hierarchyData={this.state.ConfigSheetData}
+          tableauSettings={tableauSettingsState}
 
           //networkTypeProps
-          networkType={"force"}
+          networkType={semioticTypes[tableauSettingsState.ConfigType]}
           networkProjection={"vertical"}
 
           //render mode props
-          nodeRender={this.state.nodeRender}
-          edgeRender={this.state.edgeRender}
+          nodeRender={tableauSettingsState.nodeRender}
+          edgeRender={tableauSettingsState.edgeRender}
+          edgeType={tableauSettingsState.edgeType}
 
           //edge styling props
-          edgeShow
-          edgeColor={"#94D0C0"}
+          edgeFillColor={"#94D0C0"}
+          edgeFillOpacity={0}
           edgeStrokeColor={"#94D0C0"}
-          edgeOpacity={.75}
+          edgeStrokeOpacity={.75}
           //edgeWidthField || edgeWidthStroke
 
           //node styling props
-          nodeShow
-          nodeColor={"#8175AA"}
-          nodeOpacity={.75}
+          nodeFillColor={"#8175AA"}
+          nodeFillOpacity={.75}
           nodeStrokeColor={"#8175AA"}
           nodeStrokeOpacity={.75}
           //nodeWidthField || nodeWidthStroke

@@ -7,9 +7,6 @@ import { ResponsiveNetworkFrame } from 'semiotic';
 //lodash
 import _ from 'lodash';
 
-//d3
-import { linkHorizontal, linkVertical } from 'd3-shape';
-
 //material ui
 import { withStyles } from '@material-ui/core/styles';
 import { stackedArea } from '../../../node_modules/semiotic/lib/svg/lineDrawing';
@@ -54,17 +51,34 @@ class SemioticHierarchy extends React.Component {
     }
 
     componentDidMount() {
-        console.log('in semiotic component mount', this.props.hierarchyData);
+        const hierarchyDataPreped = _.cloneDeep(this.props.hierarchyData);
 
+        //now that we are in here we can rename fields as we need to in order avoid errors
+        _.forEach(hierarchyDataPreped, (a) => {
+            a['ConfigParentField'] = this.props.tableauSettings.ConfigParentField;
+            a['ConfigChildField'] = this.props.tableauSettings.ConfigChildField;
+
+            if (this.props.tableauSettings.ConfigParentField !== "name") {
+                a['name'] = a[this.props.tableauSettings.ConfigParentField];
+                delete a[this.props.tableauSettings.ConfigParentField];    
+            }
+
+            if (this.props.tableauSettings.ConfigChildField !== "child") {
+                a['child'] = a[this.props.tableauSettings.ConfigChildField];
+                delete a[this.props.tableauSettings.ConfigChildField];
+            }
+        });
+
+        console.log('in semiotic component mount', hierarchyDataPreped, this.props.hierarchyData);
         //find the root node in the data set provided
         //need to handle if there are more than one of these!!
-        let root = _.filter(this.props.hierarchyData, (o) => { return o.name == null; });
+        let root = _.filter(hierarchyDataPreped, (o) => { return o.name == null; });
         console.log('root array', root[0].child, root);
 
-        let edgeData = this.unflatten(this.props.hierarchyData, { child: root[0].child }, root[0].child);
+        let edgeData = this.unflatten(hierarchyDataPreped, { child: root[0].child }, root[0].child);
         console.log('edgeData', edgeData);
 
-        let nodeData = _.uniqBy(this.props.hierarchyData, 'child'); //_.filter(_.uniqBy(this.props.hierarchyData, 'child'), (o) => { return o.child !== 'flare'; });
+        let nodeData = _.uniqBy(this.props.hierarchyData, 'child'); 
         console.log('nodeData', nodeData);
 
         this.setState({
@@ -75,23 +89,24 @@ class SemioticHierarchy extends React.Component {
     }
   
     render() {
+        console.log('semitoic component', this.props);
         const {
-            classes,
-            color,
-            defaultColor,
             height,
             width,
-            hierarchyType,
-            hierarchyData,
             nodeRender,
+            nodeFillColor, 
+            nodeFillOpacity, 
+            nodeStrokeColor, 
+            nodeStrokeOpacity,
             edgeRender,
+            edgeType,
+            edgeFillColor, 
+            edgeFillOpacity, 
+            edgeStrokeColor, 
+            edgeStrokeOpacity,
             hoverAnnotation,
             networkType,
             networkProjection, 
-            edgeColor,
-            edgeOpacity,
-            nodeColor,
-            nodeOpacity
         } = this.props;
         
         console.log('hierarchy Data in sub component', JSON.stringify(this.state.edgeData));
@@ -107,15 +122,18 @@ class SemioticHierarchy extends React.Component {
                         nodeSizeAccessor={3} //{d => d.depth}
                         nodeRenderMode={nodeRender}
                         edgeRenderMode={edgeRender}
+                        edgeType={edgeType}
                         nodeStyle={(d,i) => ({ 
-                            fill: nodeColor, 
-                            stroke: nodeColor, 
-                            opacity: nodeOpacity
+                            fill: nodeFillColor,
+                            fillOpacity: nodeFillOpacity,
+                            stroke: nodeStrokeColor, 
+                            strokeOpacity: nodeStrokeOpacity
                         })}
                         edgeStyle={(d,i) => ({ 
-                            fill: edgeColor, 
-                            stroke: edgeColor, 
-                            opacity: edgeOpacity
+                            fill: edgeFillColor,
+                            fillOpacity: edgeFillOpacity,
+                            stroke: edgeStrokeColor, 
+                            strokeOpacity: edgeStrokeOpacity
                         })}
                         edgeWidthAccessor={d => d.valueMetric || 1}
                         hoverAnnotation={hoverAnnotation}
@@ -128,29 +146,8 @@ class SemioticHierarchy extends React.Component {
                             iterations: networkType === "force" ? 500 : 1,
                             padding: networkType === "treemap" ? 3 : networkType === "circlepack" ? 2 : 0,
                             distanceMax: networkType === "force" ? 500 : 1,
-                            //hierarchySum: d => d.valueMetric || 0
+                            hierarchySum: d => d.valueMetric || 0
                         }}                
-                        // edgeType={d => 
-                            // console.log('d', ' M' + d.source.y + ',' + d.source.x
-                            //         + ' C' + (d.source.y + d.target.y) / 2 + ',' + d.source.x
-                            //         + '  ' + (d.source.y + d.target.y) / 2 + d.target.x
-                            //         + '  ' + d.target.y + ',' +  d.target.x ),
-                            // <path 
-                            //     d = { ' M' + d.source.y + ',' + d.source.x
-                            //         + ' C' + (d.source.y + d.target.y) / 2 + ',' + d.source.x
-                            //         + '  ' + (d.source.y + d.target.y) / 2 + d.target.x
-                            //         + '  ' + d.target.y + ',' +  d.target.x }
-                            //     sytle = {{ stroke: "red", fill: "none" }}
-                            // />
-                        //     <path 
-                        //         x1={d.source.x}
-                        //         x2={d.target.x}
-                        //         y1={d.source.y}
-                        //         y2={d.target.y}
-                        //         style={{ stroke: "red" }}
-                        //     />
-                        // } 
-
                         /*
                         tooltipContent={d => (
                             <div className="tooltip-content">
@@ -159,8 +156,7 @@ class SemioticHierarchy extends React.Component {
                             </div>
                         )}
                     */
-
-/>
+                    />
                 </div>
             </div>
         );

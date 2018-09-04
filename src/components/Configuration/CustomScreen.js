@@ -17,6 +17,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 // icons
 import Save from '@material-ui/icons/Save';
@@ -102,6 +103,19 @@ class ConfigScreen extends React.Component {
               <FormHelperText>The way edges will be drawn</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="networkProjection-helper">networkProjection</InputLabel>
+              <Select
+                value={tableauSettings.networkProjection || "vertical"}
+                onChange={handleChange}
+                input={<Input name="networkProjection" id="networkProjection-helper" />}
+              >
+                 <MenuItem value={"vertical"}>Vertical</MenuItem>
+                 <MenuItem value={"horizontal"}>Horizontal</MenuItem>
+                 <MenuItem value={"radial"}>Radial</MenuItem>
+              </Select>
+              <FormHelperText>Layout of the hierarchy</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
               <InputLabel htmlFor="edgeRender-helper">edgeRender</InputLabel>
               <Select
                 value={tableauSettings.edgeRender || "normal"}
@@ -152,6 +166,33 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={true}>True</MenuItem>
               </Select>
               <FormHelperText>Show annotation on hover</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="colorConfig-helper">colorConfig</InputLabel>
+              <Select
+                value={tableauSettings.colorConfig || "solid"}
+                onChange={handleChange}
+                input={<Input name="colorConfig" id="colorConfig-helper" />}
+              >
+                 <MenuItem value={"solid"}>Single Color</MenuItem>
+                 <MenuItem value={"scale"}>Color Scale</MenuItem>
+                 <MenuItem value={"field"}>Color Field</MenuItem>
+              </Select>
+              <FormHelperText>The way color will be applied</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="nodeColor-helper"></InputLabel>
+              <TextField  
+                id="nodeColor-helper"
+                name="nodeColor"
+                label="Node Fill Color(s)"
+                placeholder="#CCCCCC or #CCCCCC,#DDDDDD"
+                className={classes.textField}
+                value={tableauSettings.nodeColor}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Node Fill</FormHelperText>
             </FormControl>
           </Grid>
 

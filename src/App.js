@@ -238,9 +238,9 @@ class App extends Component {
     tableauExt.settings.erase('isLoading');
     tableauExt.settings.erase('isConfigType');
     tableauExt.settings.erase('isConfigSheet');
-    tableauExt.settings.erase('isChoroJoinField');
-    tableauExt.settings.erase('isChoroFillField');
-    tableauExt.settings.erase('isChoroFillScale');
+    tableauExt.settings.erase('isConfigParentField');
+    tableauExt.settings.erase('isConfigChildField');
+    tableauExt.settings.erase('isConfigValueField');
     tableauExt.settings.erase('configuration');
   
     // save async the erased settings
@@ -495,15 +495,38 @@ render() {
           );
         }
 
-        // now that we have sheet, pick the child field
-        if ( !this.state.isConfigValueField ) {
+        // now that we have sheet, pick the color field
+        if ( !this.state.isConfigColorField ) {
+          const tempArrary = this.state.ConfigSheetStringColumns;
+          tempArrary.push("None");
+
+          console.log('tempArrary', tempArrary);
           return (
             <ConfigScreen
-              sheetNames = {this.state.ConfigSheetNumberColumns}
+              sheetNames = {tempArrary}
               selectSheet = {this.configCallBack}
               height = {this.state.height}
               width = {this.state.width}
-              configTitle = "Step 4: Pick the Value"
+              configTitle = "Step 4: Pick the Color"
+              listTitle = "Pick the value"
+              field="ConfigColorField"
+              selectedValue={tableauSettingsState.ConfigColorField || ""}
+            />
+          );
+        }
+
+        // now that we have sheet, pick the value field
+        if ( !this.state.isConfigValueField ) {
+          const tempArraryNum = this.state.ConfigSheetNumberColumns;
+          tempArraryNum.push("None");
+
+          return (
+            <ConfigScreen
+              sheetNames = {tempArraryNum}
+              selectSheet = {this.configCallBack}
+              height = {this.state.height}
+              width = {this.state.width}
+              configTitle = "Step 5: Pick the Value"
               listTitle = "Pick the value"
               field="ConfigValueField"
               selectedValue={tableauSettingsState.ConfigValueField || ""}
@@ -598,7 +621,7 @@ render() {
 
           //networkTypeProps
           networkType={semioticTypes[tableauSettingsState.ConfigType]}
-          networkProjection={"vertical"}
+          networkProjection={tableauSettingsState.networkProjection}
 
           //render mode props
           nodeRender={tableauSettingsState.nodeRender}
@@ -609,13 +632,13 @@ render() {
           edgeFillColor={DataBlick[0]}
           edgeFillOpacity={0}
           edgeStrokeColor={DataBlick[0]}
-          edgeStrokeOpacity={.15}
+          edgeStrokeOpacity={.25}
           //edgeWidthField || edgeWidthStroke
 
           //node styling props
-          nodeFillColor={DataBlick[2]}
-          nodeFillOpacity={.10}
-          nodeStrokeColor={DataBlick[0]}
+          nodeFillColor={tableauSettingsState.nodeColor}
+          nodeFillOpacity={.35}
+          nodeStrokeColor={tableauSettingsState.nodeColor}
           nodeStrokeOpacity={.5}
           //nodeWidthField || nodeWidthStroke
         

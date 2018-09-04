@@ -4,6 +4,11 @@ import PropTypes from 'prop-types';
 //semiotic
 import { ResponsiveNetworkFrame } from 'semiotic';
 
+//d3
+import * as d3Scale from "d3-scale";
+import * as d3Array from "d3-array";
+import * as d3Interpolate from "d3-interpolate"
+
 //lodash
 import _ from 'lodash';
 
@@ -26,7 +31,9 @@ class SemioticHierarchy extends React.Component {
       this.state = {
         root: "",
         edgeData: [],
-        nodeData: []
+        nodeData: [],
+        nodeSizeScale: undefined,
+        nodeColorScale: undefined
       }  
     }
 
@@ -57,6 +64,8 @@ class SemioticHierarchy extends React.Component {
         _.forEach(hierarchyDataPreped, (a) => {
             a['ConfigParentField'] = this.props.tableauSettings.ConfigParentField;
             a['ConfigChildField'] = this.props.tableauSettings.ConfigChildField;
+            a['ConfigColorField'] = this.props.tableauSettings.ConfigColorField;
+            a['ConfigValueField'] = this.props.tableauSettings.ConfigValueField;
 
             if (this.props.tableauSettings.ConfigParentField !== "name") {
                 a['name'] = a[this.props.tableauSettings.ConfigParentField];
@@ -68,6 +77,11 @@ class SemioticHierarchy extends React.Component {
                 delete a[this.props.tableauSettings.ConfigChildField];
             }
             
+            if (this.props.tableauSettings.ConfigColorField !== "colorHex") {
+                a['colorHex'] = a[this.props.tableauSettings.ConfigColorField];
+                delete a[this.props.tableauSettings.ConfigColorField];
+            }
+
             if (this.props.tableauSettings.ConfigValueField !== "valueMetric") {
                 a['valueMetric'] = a[this.props.tableauSettings.ConfigValueField];
                 delete a[this.props.tableauSettings.ConfigValueField];
@@ -86,15 +100,38 @@ class SemioticHierarchy extends React.Component {
         let nodeData = _.uniqBy(this.props.hierarchyData, 'child'); 
         console.log('nodeData', nodeData);
 
+        const nodeSizeScale = d3Scale.scaleLinear()
+            .domain(d3Array.extent(nodeData, (d) => {if (d[this.props.tableauSettings.ConfigValueField]) { return parseFloat(d[this.props.tableauSettings.ConfigValueField]);}}))
+            .range([this.props.markerMinRadius || 1, this.props.markerMaxRadius || 40])
+        ;
+
+        // not using this yet, but we will need it to enable value based colors
+        const nodeColorScale = d3Scale.scaleLinear()
+            .domain(d3Array.extent(nodeData, (d) => {if (d[this.props.tableauSettings.ConfigValueField]) { return parseFloat(d[this.props.tableauSettings.ConfigValueField]);}}))
+            .interpolate(d3Interpolate.interpolateHcl)
+            .range(_.split(this.props.nodeFillColor,','))
+          ;
+
+        console.log('nodeSize'
+            , this.props.tableauSettings.ConfigValueField
+            , _.split(this.props.nodeFillColor,',')[0]
+            , this.props.nodeFillColor
+            , this.props.tableauSettings.nodeColor
+            , d3Array.extent(nodeData, (d) => {if (d[this.props.tableauSettings.ConfigValueField]) { return parseFloat(d[this.props.tableauSettings.ConfigValueField]);}})
+            , nodeColorScale(3555)
+        );
+    
         this.setState({
             root: root,
             edgeData: edgeData,
-            nodeData: nodeData
+            nodeData: nodeData, 
+            nodeSizeScale: nodeSizeScale,
+            nodeColorScale: nodeColorScale
         })
     }
   
     render() {
-        console.log('semitoic component', this.props);
+        //console.log('semitoic component', this.props);
         const {
             height,
             width,
@@ -114,7 +151,26 @@ class SemioticHierarchy extends React.Component {
             networkProjection, 
         } = this.props;
         
-        console.log('hierarchy Data in sub component', JSON.stringify(this.state.edgeData));
+        //console.log('hierarchy Data in sub component', JSON.stringify(this.state.edgeData));
+
+          // check color props and then submit the correct props to Semiotic
+        if (this.props.tableauSettings.ConfigColorField === "None") {
+
+        } else {
+            // let colorNodeProps = 
+            // { 
+            //     fill:  d.colorHex,
+            //     fillOpacity: nodeFillOpacity,
+            //     stroke: d.colorHex, 
+            //     strokeOpacity: nodeStrokeOpacity
+            // }
+            // edgeStyle={(d,i) => ({ 
+            //     fill: edgeFillColor,
+            //     fillOpacity: edgeFillOpacity,
+            //     stroke: d.target.colorHex || "#BDBDBD", 
+            //     strokeOpacity: edgeStrokeOpacity
+            // })}
+        }
 
         return (
             <div className="semiotic-hierarchy" style={{ padding: 10, height: height*.65, flex: 1, float: 'none', margin: '0 auto' }}>
@@ -124,20 +180,31 @@ class SemioticHierarchy extends React.Component {
                         responsiveHeight
                         edges={this.state.edgeData}
                         nodeIDAccessor={d => d.child}
-                        //nodeSizeAccessor={d => d.depth} // this breaks the treemap and circlepack
+                        nodeSizeAccessor={
+                                this.props.tableauSettings.ConfigType === "Circlepack" ? undefined 
+                            :   this.props.tableauSettings.ConfigType === "Treemap" ? undefined
+                            :   this.props.tableauSettings.ConfigValueField === "None" ? undefined
+                            :   d => this.state.nodeSizeScale(d.valueMetric || 0)
+                        } // this breaks the treemap and circlepack
                         nodeRenderMode={nodeRender}
                         edgeRenderMode={edgeRender}
                         edgeType={edgeType}
                         nodeStyle={(d,i) => ({ 
-                            fill: nodeFillColor,
+                            fill: this.props.tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeFillColor,',')[0]
+                                : this.props.tableauSettings.colorConfig === "scale" && this.props.tableauSettings.ConfigValueField !== "None" ? this.state.nodeColorScale(d.valueMetric || 0)
+                                : this.props.tableauSettings.colorConfig === "field" && this.props.tableauSettings.ConfigColorField !== "None" ? d.colorHex 
+                                : _.split(this.props.nodeFillColor,',')[0],
                             fillOpacity: nodeFillOpacity,
-                            stroke: nodeStrokeColor, 
+                            stroke: this.props.tableauSettings.colorConfig === "solid" ? _.split(this.props.strokeFillColor,',')[0]
+                                : this.props.tableauSettings.colorConfig === "scale" && this.props.tableauSettings.ConfigValueField !== "None" ? this.state.nodeColorScale(d.valueMetric || 0)
+                                : this.props.tableauSettings.colorConfig === "field" && this.props.tableauSettings.ConfigColorField !== "None" ? d.colorHex 
+                                : _.split(this.props.strokeFillColor,',')[0],
                             strokeOpacity: nodeStrokeOpacity
                         })}
                         edgeStyle={(d,i) => ({ 
                             fill: edgeFillColor,
                             fillOpacity: edgeFillOpacity,
-                            stroke: edgeStrokeColor, 
+                            stroke: d.target.colorHex || "#BDBDBD", 
                             strokeOpacity: edgeStrokeOpacity
                         })}
                         edgeWidthAccessor={d => d.valueMetric || 1}

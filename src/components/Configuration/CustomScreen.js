@@ -194,6 +194,46 @@ class ConfigScreen extends React.Component {
               />
               <FormHelperText>Node Fill</FormHelperText>
             </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="nodeSize-helper">nodeSize</InputLabel>
+              <Select
+                value={tableauSettings.nodeSize || "none"}
+                onChange={handleChange}
+                input={<Input name="nodeSize" id="nodeSize-helper" />}
+              >
+                 <MenuItem value={"none"}>None</MenuItem>
+                 <MenuItem value={"value"}>Value</MenuItem>
+              </Select>
+              <FormHelperText>Toggle node size from value field</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="markerMinRadius-helper"></InputLabel>
+              <TextField  
+                id="markerMinRadius-helper"
+                name="markerMinRadius"
+                label="Minimum Radius for Markers"
+                placeholder="1"
+                className={classes.textField}
+                value={tableauSettings.markerMinRadius}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Minimum radius for map markers</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="markerMaxRadius-helper"></InputLabel>
+              <TextField  
+                id="markerMaxRadius-helper"
+                name="markerMaxRadius"
+                label="Maximum Radius for Markers"
+                placeholder="25"
+                className={classes.textField}
+                value={tableauSettings.markerMaxRadius}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Maximum radius for map markers</FormHelperText>
+            </FormControl>
           </Grid>
 
           <Grid item xs={6} >

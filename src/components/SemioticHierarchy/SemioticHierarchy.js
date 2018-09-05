@@ -102,7 +102,7 @@ class SemioticHierarchy extends React.Component {
 
         const nodeSizeScale = d3Scale.scaleLinear()
             .domain(d3Array.extent(nodeData, (d) => {if (d[this.props.tableauSettings.ConfigValueField]) { return parseFloat(d[this.props.tableauSettings.ConfigValueField]);}}))
-            .range([this.props.markerMinRadius || 1, this.props.markerMaxRadius || 40])
+            .range([this.props.tableauSettings.markerMinRadius*1 || 1, this.props.tableauSettings.markerMaxRadius*1 || 25])
         ;
 
         // not using this yet, but we will need it to enable value based colors
@@ -181,7 +181,8 @@ class SemioticHierarchy extends React.Component {
                         edges={this.state.edgeData}
                         nodeIDAccessor={d => d.child}
                         nodeSizeAccessor={
-                                this.props.tableauSettings.ConfigType === "Circlepack" ? undefined 
+                                this.props.tableauSettings.nodeSize === "none" ? undefined
+                            :   this.props.tableauSettings.ConfigType === "Circlepack" ? undefined 
                             :   this.props.tableauSettings.ConfigType === "Treemap" ? undefined
                             :   this.props.tableauSettings.ConfigValueField === "None" ? undefined
                             :   d => this.state.nodeSizeScale(d.valueMetric || 0)
@@ -208,7 +209,6 @@ class SemioticHierarchy extends React.Component {
                             strokeOpacity: edgeStrokeOpacity
                         })}
                         edgeWidthAccessor={d => d.valueMetric || 1}
-                        hoverAnnotation={hoverAnnotation}
                         networkType={{
                             type: networkType,
                             projection: networkProjection,
@@ -220,14 +220,17 @@ class SemioticHierarchy extends React.Component {
                             distanceMax: networkType === "force" ? 500 : 1,
                             hierarchySum: d => d.valueMetric || 0
                         }}                
-                        /*
+
+                        // interactivity
+                        hoverAnnotation={this.props.hoverAnnotation}
                         tooltipContent={d => (
+                            console.log('tooltip', d),
                             <div className="tooltip-content">
-                            {d.parent ? <p>{d.parent.data.name}</p> : undefined}
-                            <p>{d.data.name}</p>
+                                {d.parent ? <p>Parent: {d.parent.child}</p> : undefined}
+                            <p>Child: {d.child}</p>
+                            <p>Value: {d.data.valueMetric}</p>
                             </div>
                         )}
-                    */
                     />
                 </div>
             </div>

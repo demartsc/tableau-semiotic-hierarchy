@@ -624,14 +624,15 @@ render() {
           networkProjection={tableauSettingsState.networkProjection}
 
           //render mode props
+          nodeSize={tableauSettingsState.nodeSize}
           nodeRender={tableauSettingsState.nodeRender}
           edgeRender={tableauSettingsState.edgeRender}
           edgeType={tableauSettingsState.edgeType}
 
           //edge styling props
-          edgeFillColor={DataBlick[0]}
+          edgeFillColor={DataBlick[2]}
           edgeFillOpacity={0}
-          edgeStrokeColor={DataBlick[0]}
+          edgeStrokeColor={DataBlick[2]}
           edgeStrokeOpacity={.25}
           //edgeWidthField || edgeWidthStroke
 
@@ -643,7 +644,7 @@ render() {
           //nodeWidthField || nodeWidthStroke
         
           //interactivity props
-          hoverAnnotation={this.state.hoverAnnotation}
+          hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
         />
       </div>
     );

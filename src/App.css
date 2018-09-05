@@ -22,6 +22,26 @@
   font-size: large;
 }
 
+.tooltip-content {
+  background: white;
+  border: 1px solid black;
+  color: black;
+  padding: 10px;
+  z-index: 999999;
+  min-width: 120px;
+}
+
+.tooltip-content:before {
+  background: inherit;
+  content: "";
+  padding: 0px;
+  transform: rotate(45deg);
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  z-index: 99;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

@@ -429,7 +429,7 @@ render() {
 
         return (
           <ConfigScreen
-            sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap"]}
+            sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap", "Partition"]}
             selectSheet = {this.configCallBack}
             customChange = {this.demoChange}
             height = {this.state.height}

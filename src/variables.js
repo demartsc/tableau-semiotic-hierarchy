@@ -43,5 +43,6 @@ export const semioticTypes = {
   ["Dendogram"]: "cluster",
   ["Network"]: "force",
   ["Circlepack"]: "circlepack",
-  ["Treemap"]: "treemap"
+  ["Treemap"]: "treemap",
+  ["Partition"]: "partition",
 }

@@ -1,9 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-//semiotic
-import { ResponsiveNetworkFrame } from 'semiotic';
-
 //material ui
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -23,15 +20,19 @@ function ConfigScreen(props) {
   const {
     classes,
     selectSheet,
+    customChange,
     sheetNames,
-    height,
-    demoData,
-    adjustColor,
-    configStyles,
     configTitle,
-    listTitle } = props;
+    listTitle, 
+    field,
+    selectedValue,
+    helperText,
+    helpJSX } = props;
 
-  //console.log('configStyles', configStyles);
+
+  const helper = helpJSX || <Typography variant="subheading" align="center" > Placeholder for help info </Typography>;
+
+  console.log('configScreen', props);
   return (
     <div className="sheetScreen" style={{padding : 10 }}>
       <Grid
@@ -50,61 +51,29 @@ function ConfigScreen(props) {
           </Typography>
         </Grid>
 
-        <Grid item xs={6} >
+        <Grid item xs={3} >
           <div className="SheetPicker" >
             <RadioButtonsGroup
               sheets={sheetNames}
               title={listTitle}
+              helperText={helperText}
               sheetCallBack={selectSheet}
+              customChange={customChange}
+              field={field}
+              selectedValue={selectedValue}
             />
           </div>
         </Grid>
-        <Grid item xs={6} >
+        <Grid item xs={9} >
           <Grid
             container
             alignItems="stretch"
             justify="space-between"
             direction="column"
-            spacing={8} >
-            {/*
-            <Grid item xs={12}>
-              <Paper>
-                <Typography
-                  variant="display2"
-                  align="left" >
-                  Data
-                </Typography>
-              </Paper>
-            </Grid>
+            spacing={2} >
 
-            <Grid item style={{ height:'25%' }}>
-              <Paper>
-                <Typography
-                  variant="subheading"
-                  align="center" >
-                  Drop sheet with data here
-                </Typography>
-              </Paper>
-            </Grid>
-            */}
-            {/* left off here, the chord is still not sized dynamically */}
             <Grid item xs={12} >
-                <div className="Chord" style={{ padding: 10, height: height*.65, flex: 1, float: 'none', margin: '0 auto' }}>
-                  <ResponsiveNetworkFrame
-                    responsiveWidth
-                    responsiveHeight
-                    edges={demoData}
-                    nodeRenderMode={"sketchy"}
-                    edgeRenderMode={"sketchy"}
-                    nodeStyle={(d,i) => ({ fill: configStyles.nodeFill[d.index-adjustColor], stroke: configStyles.nodeStroke })}
-                    edgeStyle={(d,i) => ({ fill: configStyles.edgeFill[d.target.index-adjustColor], stroke: configStyles.edgeStroke, opacity: configStyles.edgeOpacity })}
-                    nodeSizeAccessor={5}
-                    sourceAccessor={d => d.source}
-                    targetAccessor={d => d.target}
-                    edgeWidthAccessor={d => d.value}
-                    networkType={{ type: "chord", padAngle: 0.01 }}
-                  />
-                </div>
+                {helper}
             </Grid>
           </Grid>
         </Grid>

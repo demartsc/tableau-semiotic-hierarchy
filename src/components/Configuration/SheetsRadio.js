@@ -38,7 +38,7 @@ class RadioButtonsGroup extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      value: '',
+      value: this.props.selectedValue || '',
     };
   }
 
@@ -47,13 +47,26 @@ class RadioButtonsGroup extends React.Component {
   };
 
   handleClick = event => {
+    console.log('handleClick', this.props.field, this.state.value);
     if (this.state.value) {
-      this.props.sheetCallBack(this.state.value)
+      this.props.sheetCallBack(this.props.field, this.state.value)
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    // if we get a new field, reset value to existing tableau setting
+    if (this.props.field !== nextProps.field || this.state.value !== nextProps.selectedValue) {
+      console.log('sheetRadioUpdate', this.props, this.state);
+      this.setState({
+        value: nextProps.selectedValue || ""
+      })
     }
   }
 
   render() {
-    const { classes, sheets, title } = this.props;
+    const { classes, sheets, title, helperText, customChange } = this.props;
+
+    const changeCallBack = customChange || this.handleChange;
 
     return (
       <div className={classes.root}>
@@ -63,7 +76,7 @@ class RadioButtonsGroup extends React.Component {
             <RadioGroup
               className={classes.group}
               value={this.state.value}
-              onChange={this.handleChange}
+              onChange={changeCallBack}
             >
             {sheets.map(sheetName => (
               <FormControlLabel
@@ -74,7 +87,7 @@ class RadioButtonsGroup extends React.Component {
               />
             ))}
             </RadioGroup>
-            <FormHelperText>You can display an error</FormHelperText>
+            <FormHelperText>{helperText || "You can display an error"}</FormHelperText>
           </FormControl>
         </div>
       <div>

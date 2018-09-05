@@ -17,6 +17,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 // icons
 import Save from '@material-ui/icons/Save';
@@ -42,6 +43,15 @@ class ConfigScreen extends React.Component {
     super(props);
   }
 
+  // for call back to work with field included
+  handleClick = event => {
+    console.log('handleClick', this.props);
+    // update this if to include the minimum required fields
+    // if (this.props.tableauSettings.ChoroFillScale && this.props.tableauSettings.ChoroFillScaleColors) {
+      this.props.customCallBack(this.props.field)
+    // }
+  }
+  
   render() {
     const {
       classes,
@@ -55,11 +65,13 @@ class ConfigScreen extends React.Component {
       colors,
       colorHex,
       color,
+      edgeType,
       edgeRender,
       nodeRender,
       edgeColor,
       padAngle,
-      hoverAnnotation } = this.props;
+      hoverAnnotation, 
+      tableauSettings } = this.props;
 
     console.log('we are in custom', this.props);
     return (
@@ -78,31 +90,35 @@ class ConfigScreen extends React.Component {
               {configTitle}
             </Typography>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="color-helper">Color Pallete</InputLabel>
+              <InputLabel htmlFor="edgeType-helper">edgeType</InputLabel>
               <Select
-                value={color}
+                value={tableauSettings.edgeType || "normal"}
                 onChange={handleChange}
-                input={<Input name="color" id="color-helper" />}
+                input={<Input name="edgeType" id="edgeType-helper" />}
               >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {
-                colors.map(clr => (
-                  <MenuItem
-                    key={clr.palleteName}
-                    value={clr.hexValues}
-                  >
-                  {clr.palleteName}
-                  </MenuItem>
-                ))}
+                 <MenuItem value={"normal"}>Normal</MenuItem>
+                 <MenuItem value={"linearc"}>Line Arc</MenuItem>
+                 <MenuItem value={"curve"}>Curve</MenuItem>
               </Select>
-              <FormHelperText>Select your color pallete</FormHelperText>
+              <FormHelperText>The way edges will be drawn</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="networkProjection-helper">networkProjection</InputLabel>
+              <Select
+                value={tableauSettings.networkProjection || "vertical"}
+                onChange={handleChange}
+                input={<Input name="networkProjection" id="networkProjection-helper" />}
+              >
+                 <MenuItem value={"vertical"}>Vertical</MenuItem>
+                 <MenuItem value={"horizontal"}>Horizontal</MenuItem>
+                 <MenuItem value={"radial"}>Radial</MenuItem>
+              </Select>
+              <FormHelperText>Layout of the hierarchy</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="edgeRender-helper">edgeRender</InputLabel>
               <Select
-                value={edgeRender}
+                value={tableauSettings.edgeRender || "normal"}
                 onChange={handleChange}
                 input={<Input name="edgeRender" id="edgeRender-helper" />}
               >
@@ -115,7 +131,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="nodeRender-helper">nodeRender</InputLabel>
               <Select
-                value={nodeRender}
+                value={tableauSettings.nodeRender || "normal"}
                 onChange={handleChange}
                 input={<Input name="nodeRender" id="nodeRender-helper" />}
               >
@@ -126,21 +142,9 @@ class ConfigScreen extends React.Component {
               <FormHelperText>The way nodes will be rendered</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="edgeColor-helper">edgeColor</InputLabel>
-              <Select
-                value={edgeColor}
-                onChange={handleChange}
-                input={<Input name="edgeColor" id="edgeColor-helper" />}
-              >
-                 <MenuItem value={"source"}>Source</MenuItem>
-                 <MenuItem value={"target"}>Target</MenuItem>
-              </Select>
-              <FormHelperText>Color edges based on source or target</FormHelperText>
-            </FormControl>
-            <FormControl className={classes.formControl}>
               <InputLabel htmlFor="padAngle-helper">padAngle</InputLabel>
               <Select
-                value={padAngle}
+                value={parseFloat(tableauSettings.padAngle || 0.01)}
                 onChange={handleChange}
                 input={<Input name="padAngle" id="padAngle-helper" />}
               >
@@ -154,7 +158,7 @@ class ConfigScreen extends React.Component {
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="hoverAnnotation-helper">hoverAnnotation</InputLabel>
               <Select
-                value={hoverAnnotation}
+                value={tableauSettings.hoverAnnotation === "true"}
                 onChange={handleChange}
                 input={<Input name="hoverAnnotation" id="hoverAnnotation-helper" />}
               >
@@ -162,6 +166,73 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={true}>True</MenuItem>
               </Select>
               <FormHelperText>Show annotation on hover</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="colorConfig-helper">colorConfig</InputLabel>
+              <Select
+                value={tableauSettings.colorConfig || "solid"}
+                onChange={handleChange}
+                input={<Input name="colorConfig" id="colorConfig-helper" />}
+              >
+                 <MenuItem value={"solid"}>Single Color</MenuItem>
+                 <MenuItem value={"scale"}>Color Scale</MenuItem>
+                 <MenuItem value={"field"}>Color Field</MenuItem>
+              </Select>
+              <FormHelperText>The way color will be applied</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="nodeColor-helper"></InputLabel>
+              <TextField  
+                id="nodeColor-helper"
+                name="nodeColor"
+                label="Node Fill Color(s)"
+                placeholder="#CCCCCC or #CCCCCC,#DDDDDD"
+                className={classes.textField}
+                value={tableauSettings.nodeColor}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Node Fill</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="nodeSize-helper">nodeSize</InputLabel>
+              <Select
+                value={tableauSettings.nodeSize || "none"}
+                onChange={handleChange}
+                input={<Input name="nodeSize" id="nodeSize-helper" />}
+              >
+                 <MenuItem value={"none"}>None</MenuItem>
+                 <MenuItem value={"value"}>Value</MenuItem>
+              </Select>
+              <FormHelperText>Toggle node size from value field</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="markerMinRadius-helper"></InputLabel>
+              <TextField  
+                id="markerMinRadius-helper"
+                name="markerMinRadius"
+                label="Minimum Radius for Markers"
+                placeholder="1"
+                className={classes.textField}
+                value={tableauSettings.markerMinRadius}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Minimum radius for map markers</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="markerMaxRadius-helper"></InputLabel>
+              <TextField  
+                id="markerMaxRadius-helper"
+                name="markerMaxRadius"
+                label="Maximum Radius for Markers"
+                placeholder="25"
+                className={classes.textField}
+                value={tableauSettings.markerMaxRadius}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Maximum radius for map markers</FormHelperText>
             </FormControl>
           </Grid>
 
@@ -172,7 +243,7 @@ class ConfigScreen extends React.Component {
                 color="primary"
                 size="large"
                 className={classes.button}
-                onClick={customCallBack}
+                onClick={this.handleClick}
               >
                 <Save className={classNames(classes.leftIcon, classes.iconSmall)} />
                 Save

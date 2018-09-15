@@ -638,7 +638,7 @@ render() {
 
           //node styling props
           nodeFillColor={tableauSettingsState.nodeColor}
-          nodeFillOpacity={.35}
+          nodeFillOpacity={tableauSettingsState.nodeFillOpacity || .35}
           nodeStrokeColor={tableauSettingsState.nodeColor}
           nodeStrokeOpacity={.5}
           //nodeWidthField || nodeWidthStroke

@@ -195,6 +195,20 @@ class ConfigScreen extends React.Component {
               <FormHelperText>Node Fill</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="nodeFillOpacity-helper"></InputLabel>
+              <TextField  
+                id="nodeFillOpacity-helper"
+                name="nodeFillOpacity"
+                label="Node Fill Opacity"
+                placeholder=".35"
+                className={classes.textField}
+                value={tableauSettings.nodeFillOpacity}
+                onChange={handleChange}
+                margin="normal"
+              />
+              <FormHelperText>Node Fill Opacity (0 -> 1)</FormHelperText>
+            </FormControl>
+            <FormControl className={classes.formControl}>
               <InputLabel htmlFor="nodeSize-helper">nodeSize</InputLabel>
               <Select
                 value={tableauSettings.nodeSize || "none"}

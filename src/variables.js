@@ -4,6 +4,7 @@ export const JewelBright = ["#EB1E2C","#FD6F30","#F9A729","#F9D23C","#F5BB68","#
 export const defaultColor = ["#D3D3D3"]
 export const demoColors = ["#000000"] // colorlogical
 export const semioticDefault = ['#00a2ce','#4d430c','#b3331d','#b6a756']
+export const rainbow = ['#1BA3C6', '#34BFB7', '#25AB74', '#65A734', '#D1BB21', '#F89F1A', '#EA541E', '#EC374D', '#F86A96', '#DD6CBA', '#966EC3', '#4F7CBA']
 
 export const colors = [
   {palleteName: "Default Color", hexValues: defaultColor},

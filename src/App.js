@@ -87,6 +87,8 @@ class App extends Component {
 
     this.unregisterEventFn = undefined;
 
+    this.clickCallBack = this.clickCallBack.bind(this);
+    this.hoverCallBack = this.hoverCallBack.bind(this);
     this.filterChanged = this.filterChanged.bind(this);
     this.getSummaryData = this.getSummaryData.bind(this);
     this.configCallBack = this.configCallBack.bind(this);
@@ -96,6 +98,44 @@ class App extends Component {
     this.clearSheet = this.clearSheet.bind(this);
     this.clearSplash = this.clearSplash.bind(this);
     this.configure = this.configure.bind(this);
+  }
+
+
+  clickCallBack = d => {
+    console.log('in on click callback', d);
+      // go through each worksheet and select marks
+    if ( d ) {
+      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
+        console.log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
+        // filter
+        // if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
+        //   worksheet.applyFilterAsync(
+        //     tableauExt.settings.get("ConfigChildField"), 
+        //     [d.id],
+        //     window.tableau.FilterUpdateType.Replace
+        //   ).then(e => console.log('filter applied response', e)); // response is void per tableau-extensions.js
+        // }
+      });
+    }
+  }
+  
+  hoverCallBack = d => {
+    console.log('in on hover callback', d);
+      // go through each worksheet and select marks
+    if ( d ) {
+      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
+      console.log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
+      
+      // select marks
+      // worksheet.selectMarksByValueAsync(
+      //   [{
+      //     'fieldName': tableauExt.settings.get("ConfigChildField"),
+      //     'value': [d.id],
+      //   }],
+      //   window.tableau.SelectionUpdateType.Replace
+      // ).then(e => console.log('select marks response: ' + worksheet.name, e)); // response is void per tableau-extensions.js
+      });
+    }
   }
 
   demoChange = event => {
@@ -618,6 +658,8 @@ render() {
           height={this.state.height}
           hierarchyData={this.state.ConfigSheetData}
           tableauSettings={tableauSettingsState}
+          clickCallBack={this.clickCallBack}
+          hoverCallBack={this.hoverCallBack}
 
           //networkTypeProps
           networkType={semioticTypes[tableauSettingsState.ConfigType]}

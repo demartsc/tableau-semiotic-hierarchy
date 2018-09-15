@@ -256,6 +256,8 @@ class SemioticHierarchy extends React.Component {
                         // interactivity
                         hoverAnnotation={this.props.hoverAnnotation}
                         tooltipContent={d => popOver(d)}
+                        customClickBehavior={(d) => this.props.clickCallBack(d)}
+                        customHoverBehavior={(d) => this.props.hoverCallBack(d)}
                     />
                 </div>
             </div>

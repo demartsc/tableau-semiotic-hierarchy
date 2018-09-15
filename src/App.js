@@ -658,8 +658,6 @@ render() {
           height={this.state.height}
           hierarchyData={this.state.ConfigSheetData}
           tableauSettings={tableauSettingsState}
-          clickCallBack={this.clickCallBack}
-          hoverCallBack={this.hoverCallBack}
 
           //networkTypeProps
           networkType={semioticTypes[tableauSettingsState.ConfigType]}
@@ -687,6 +685,8 @@ render() {
         
           //interactivity props
           hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
+          clickCallBack={this.clickCallBack}
+          hoverCallBack={this.hoverCallBack}
         />
       </div>
     );

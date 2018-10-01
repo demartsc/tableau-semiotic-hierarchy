@@ -13,6 +13,7 @@ import _ from 'lodash';
 // Custom config components
 import SplashScreen from './components/SplashScreen';
 import PickType from './components/Configuration/PickType';
+import PickSheets from './components/Configuration/PickSheets';
 import DragNDrop from './components/DragNDrop/DragNDrop';
 import Stepper from './components/Configuration/Stepper';
 // import PickSheets from './components/PickSheets';
@@ -626,14 +627,35 @@ render() {
                 sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap", "Partition"]}
                 selectSheet = {this.configCallBack}
                 customChange = {this.demoChange}
-                // height = {this.state.height}
-                // width = {this.state.width}
-                // title = "Step 1: Select the Type of Hierarchy Visual"
-                // listTitle = "Pick a configuration"
-                // helperText = "Powered by Semiotic"
                 field="ConfigType"
                 selectedValue={this.state.demoType || ""}
                 helpJSX={semioticHelp}
+            />
+            <StepButtons
+              onNextClick={this.onNextStep}
+              onPrevClick={this.onPrevStep}
+              stepIndex={this.state.stepIndex}
+              maxStepCount={stepNames.length}
+              nextText={this.state.stepIndex !== stepNames.length ? 'Next' : 'Save'}
+              backText="Back"
+            />
+          </React.Fragment>
+        );
+      }
+      
+      if (this.state.stepIndex === 2) {
+        // Placeholder sheet names. TODO: Bind to worksheet data
+        return (
+          <React.Fragment>
+            <Stepper 
+              stepIndex={this.state.stepIndex} 
+              steps={stepNames}
+            />
+            <PickSheets
+                sheetNames = {this.state.sheetNames}
+                configCallBack = {this.configCallBack}
+                ChoroSheet={tableauSettingsState.ChoroSheet || ""}
+                MarkSheet={tableauSettingsState.MarkSheet || ""}
             />
             <StepButtons
               onNextClick={this.onNextStep}

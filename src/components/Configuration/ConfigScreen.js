@@ -12,73 +12,94 @@ import RadioButtonsGroup from './SheetsRadio';
 
 const styles = {
   root: {
-    flexGrow: 1,
-  },
+    flexGrow: 1
+  }
 };
 
 function ConfigScreen(props) {
   const {
     classes,
     selectSheet,
-    customChange,
     sheetNames,
     configTitle,
     listTitle, 
     field,
-    selectedValue,
-    helperText,
-    helpJSX } = props;
-
-
-  const helper = helpJSX || <Typography variant="subheading" align="center" > Placeholder for help info </Typography>;
+    selectedValue } = props;
 
   console.log('configScreen', props);
   return (
-    <div className="sheetScreen" style={{padding : 10 }}>
-      <Grid
-        container
-        alignItems="center"
-        justify="space-between"
-        direction="row"
-        spacing={8} >
+    <React.Fragment>
+      <div className="sheetScreen" style={{padding : 10, paddingBottom: 100 }}>
+        <Grid
+          container
+          alignItems="center"
+          justify="space-between"
+          direction="row"
+          spacing={8} >
 
 
-        <Grid item xs={12} >
-          <Typography
-            variant="display1"
-            align="left" >
-            {configTitle}
-          </Typography>
-        </Grid>
+          <Grid item xs={12} >
+            <Typography
+              variant="display1"
+              align="left" >
+              {configTitle}
+            </Typography>
+          </Grid>
 
-        <Grid item xs={3} >
-          <div className="SheetPicker" >
-            <RadioButtonsGroup
-              sheets={sheetNames}
-              title={listTitle}
-              helperText={helperText}
-              sheetCallBack={selectSheet}
-              customChange={customChange}
-              field={field}
-              selectedValue={selectedValue}
-            />
-          </div>
-        </Grid>
-        <Grid item xs={9} >
-          <Grid
-            container
-            alignItems="stretch"
-            justify="space-between"
-            direction="column"
-            spacing={2} >
+          <Grid item xs={6} >
+            <div className="SheetPicker" >
+              <RadioButtonsGroup
+                sheets={sheetNames}
+                title={listTitle}
+                sheetCallBack={selectSheet}
+                field={field}
+                selectedValue={selectedValue}
+              />
+            </div>
+          </Grid>
+          <Grid item xs={6} >
+            <Grid
+              container
+              alignItems="stretch"
+              justify="space-between"
+              direction="column"
+              spacing={8} >
+              {/*
+              <Grid item xs={12}>
+                <Paper>
+                  <Typography
+                    variant="display2"
+                    align="left" >
+                    Data
+                  </Typography>
+                </Paper>
+              </Grid>
 
-            <Grid item xs={12} >
-                {helper}
+              <Grid item style={{ height:'25%' }}>
+                <Paper>
+                  <Typography
+                    variant="subheading"
+                    align="center" >
+                    Drop sheet with data here
+                  </Typography>
+                </Paper>
+              </Grid>
+              */}
+              {/* left off here, the chord is still not sized dynamically */}
+              {/* <Grid item xs={12} >
+                <Paper>
+                  <Typography
+                    variant="subheading"
+                    align="center" >
+                    Placeholder for help info
+                  </Typography>
+                </Paper>
+              </Grid> */}
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </div>
+      </div>
+    </React.Fragment>
     );
 }
 

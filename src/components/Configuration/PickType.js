@@ -1,0 +1,41 @@
+import React from 'react';
+
+import { withStyles } from '@material-ui/core/styles';
+import { ConfigScreen } from '../Configuration';
+import { OptionColumn } from './CustomizeUIElements';
+import RadioButtonsGroup from './SheetsRadio';
+import Typography from '@material-ui/core/Typography';
+
+const styles = {
+    root: {
+      flexGrow: 1
+    }
+  };
+  
+const PickType = (props) => (
+    <React.Fragment>
+    <div class="content-container">
+      <h1 className="title">{props.title}</h1>
+      <div className="clearfix">
+        <OptionColumn className="grid--5">
+            <div className="SheetPicker" >
+                <RadioButtonsGroup
+                    sheets={props.sheetNames}
+                    title={props.listTitle}
+                    helperText={props.helperText}
+                    sheetCallBack={props.selectSheet}
+                    customChange={props.customChange}
+                    field={props.field}
+                    selectedValue={props.selectedValue}
+                />
+            </div>
+        </OptionColumn>
+        <OptionColumn className="grid--7">
+            {props.helpJSX || <Typography variant="subheading" align="center" > Placeholder for help info </Typography>}
+        </OptionColumn>
+      </div>
+    </div>
+  </React.Fragment>
+);
+
+export default  withStyles(styles)(PickType);

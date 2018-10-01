@@ -9,10 +9,37 @@ import { flareData } from './data/flare.js';
 //lodash
 import _ from 'lodash';
 
-// local components
+
+// Custom config components
+import SplashScreen from './components/SplashScreen';
+import PickType from './components/Configuration/PickType';
+import DragNDrop from './components/DragNDrop/DragNDrop';
+import Stepper from './components/Configuration/Stepper';
+// import PickSheets from './components/PickSheets';
+import StepButtons from './components/Configuration/StepButtons';
+import initialData from './components/DragNDrop/initial-data';
+// import CustomizeOptions from './components/CustomizeOptions';
+import { ConfigScreen, CustomScreen } from './components/Configuration';
+
+// Viz components
 import LoadingIndicatorComponent from './components/LoadingIndicatorComponent';
 import SemioticHierarchy from './components/SemioticHierarchy';
-import { ConfigScreen, CustomScreen } from './components/Configuration';
+
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import classNames from 'classnames';
+
+// Tableau Styles and Tableau
+import './assets/tableau/vendor/slick.js/slick/slick.css';
+import './assets/tableau/css/style.min.css';
+import { tableau } from './tableau-extensions-1.latest';
+
+// tableau settings handler
+import * as TableauSettings from './TableauSettings';
+
+// utils and variables
 import { 
   defaultColor, 
   DataBlick,
@@ -22,14 +49,6 @@ import {
   convertRowToObject
 } from './utils';
 
-import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-
-import { tableau } from './tableau-extensions-1.latest';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
-
 // icons
 import Save from '@material-ui/icons/Save';
 import Delete from '@material-ui/icons/Delete';
@@ -37,6 +56,8 @@ import Delete from '@material-ui/icons/Delete';
 //logos
 import dbLogo from './assets/dblogo.png';
 import ssLogo from './assets/sslogo.jpg';
+import semLogo from './assets/semiotic_logo_horizontal.png'
+
 
 // begin constants to move to another file later
 // material ui styles
@@ -57,6 +78,7 @@ const styles = theme => ({
     fontSize: 20,
   },
 });
+
 
 const tableauExt = window.tableau.extensions;
 
@@ -83,6 +105,8 @@ class App extends Component {
       sheetNames: [],
       tableauSettings: [],
       demoType: "tree",
+      stepIndex: 1,
+      isMissingData: true,
     };
 
     this.unregisterEventFn = undefined;
@@ -98,8 +122,26 @@ class App extends Component {
     this.clearSheet = this.clearSheet.bind(this);
     this.clearSplash = this.clearSplash.bind(this);
     this.configure = this.configure.bind(this);
+    this.onNextStep = this.onNextStep.bind(this);
+    this.onPrevStep = this.onPrevStep.bind(this);
   }
 
+
+  onNextStep() {
+    if ( this.state.stepIndex === 4 ) {
+      this.customCallBack('configuration');
+    } else {
+      this.setState((previousState, currentProps) => {
+        return { stepIndex: previousState.stepIndex + 1 }
+      });
+    }
+  }
+  
+  onPrevStep() {
+    this.setState((previousState, currentProps) => {
+      return {stepIndex: previousState.stepIndex - 1}
+    });
+  }
 
   clickCallBack = d => {
     console.log('in on click callback', d);
@@ -145,40 +187,92 @@ class App extends Component {
 
   handleChange (event) {
     console.log('event', event);
-    tableauExt.settings.set(event.target.name, event.target.value);
-    tableauExt.settings.saveAsync().then(() => {
-      this.setState({ 
-        tableauSettings: tableauExt.settings.getAll()
+    if (TableauSettings.ShouldUse) {
+  
+      // create a single k/v pair
+      let kv = {};
+      kv[event.target.name] = event.target.value;
+      // update the settings
+      TableauSettings.updateAndSave(kv, settings => {
+        this.setState({
+          tableauSettings: settings,
+        });
       });
-    });
+  
+    } else {
+      tableauExt.settings.set(event.target.name, event.target.value);
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          tableauSettings: tableauExt.settings.getAll()
+        });
+      });
+    }
   };
-  
+
   configCallBack (field, columnName) {
+    // field = ChoroSheet, sheet = Data
     console.log('configCallBack', field, columnName);
-    tableauExt.settings.set('is' + field, true);
-    tableauExt.settings.set(field, columnName);
-    tableauExt.settings.saveAsync().then(() => {
-      this.setState({ 
-        ['is' + field]: true,
-        tableauSettings: tableauExt.settings.getAll()
-      });
-    });
-  }
   
+    // if we are in config call back from a sheet selection, go get the data
+    // this only works in the #true instance, must use update lifecycle method to catch both
+    // if (field.indexOf("Sheet") >= 0) {
+    //   this.getSummaryData(columnName, field);
+    // }
+  
+    if (TableauSettings.ShouldUse) {
+      TableauSettings.updateAndSave({
+        // ['is' + field]: true,
+        [field]: columnName,
+      }, settings => {
+        this.setState({
+          // ['is' + field]: true,
+          tableauSettings: settings,
+        });
+      });
+  
+    } else {
+      //tableauExt.settings.set('is' + field, true);
+      tableauExt.settings.set(field, columnName);
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          // ['is' + field]: true,
+          tableauSettings: tableauExt.settings.getAll()
+        });
+      });
+    }
+  }
+    
   customCallBack (confSetting) {
     console.log('in custom call back', confSetting);
-    tableauExt.settings.set(confSetting, true);
-    tableauExt.settings.saveAsync().then(() => {
-      this.setState({ 
-        [confSetting]: true, 
-        tableauSettings: tableauExt.settings.getAll()
-      });
-      if (confSetting === "configuration" ) {      
-        tableauExt.ui.closeDialog("false");
-      }
-    });
-  }
+    if (TableauSettings.ShouldUse) {
+      TableauSettings.updateAndSave({
+        [confSetting]: true
+      }, settings => {
   
+        this.setState({
+          [confSetting]: true,
+          tableauSettings: settings,
+        });
+  
+        if (confSetting === "configuration" ) {
+          tableauExt.ui.closeDialog("false");
+        }
+      })
+  
+    } else {
+      tableauExt.settings.set(confSetting, true);
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          [confSetting]: true,
+          tableauSettings: tableauExt.settings.getAll()
+        });
+        if (confSetting === "configuration" ) {
+          tableauExt.ui.closeDialog("false");
+        }
+      });
+    }
+  }
+
   // needs to be updated to handle if more than one data set is selected
   // find all sheets in array and then call get summary, for now hardcoding
   filterChanged (e) {
@@ -203,14 +297,26 @@ class App extends Component {
     let sheetName = selectedSheet;
     let sheetObject = tableauExt.dashboardContent.dashboard.worksheets.find(worksheet => worksheet.name === sheetName);
   
+  if (TableauSettings.ShouldUse) {
+    TableauSettings.updateAndSave({
+      isLoading: true
+    }, settings => {
+      this.setState({
+        isLoading: true,
+        tableauSettings: settings,
+      })
+    });
+
+  } else {
     this.setState({ isLoading: true });
     tableauExt.settings.set('isLoading', true);
-      tableauExt.settings.saveAsync().then(() => {
-        this.setState({ 
-          tableauSettings: tableauExt.settings.getAll()
-        });
+    tableauExt.settings.saveAsync().then(() => {
+      this.setState({
+        tableauSettings: tableauExt.settings.getAll()
       });
-  
+    });
+  }
+
     //working here on pulling out summmary data
     //may want to limit to a single row when getting column names
     sheetObject.getSummaryDataAsync(options).then((t) => {
@@ -250,7 +356,22 @@ class App extends Component {
       // log flat data for testing
       console.log('flat data', data);
   
-      // placeholder for two sets of data until we figure out the async issue
+    if (TableauSettings.ShouldUse) {
+      TableauSettings.updateAndSave({
+        isLoading: false
+      }, settings => {
+        this.setState({
+          isLoading: false,
+          [fieldName + 'Columns']: col_names,
+          [fieldName + 'StringColumns']: col_names_S,
+          [fieldName + 'NumberColumns']: col_names_N,
+          [fieldName + 'Data']: data,
+          tableauSettings: settings,
+          isMissingData: false,
+        });
+      }, true);
+
+    } else {
       this.setState({ isLoading: false });
       tableauExt.settings.set('isLoading', false);
       tableauExt.settings.saveAsync().then(() => {
@@ -263,9 +384,10 @@ class App extends Component {
           tableauSettings: tableauExt.settings.getAll()
         });
       });
-      console.log('getData() state', this.state);
-    });
-  
+    }
+    console.log('getData() state', this.state);
+  });
+
     this.unregisterEventFn = sheetObject.addEventListener(
       window.tableau.TableauEventType.FilterChanged,
       this.filterChanged
@@ -274,25 +396,36 @@ class App extends Component {
   
   clearSheet () {
     console.log("triggered erase");
-    // erase all the settings, there has got be a better way. 
-    tableauExt.settings.erase('isLoading');
-    tableauExt.settings.erase('isConfigType');
-    tableauExt.settings.erase('isConfigSheet');
-    tableauExt.settings.erase('isConfigParentField');
-    tableauExt.settings.erase('isConfigChildField');
-    tableauExt.settings.erase('isConfigValueField');
-    tableauExt.settings.erase('configuration');
+    if (TableauSettings.ShouldUse) {
   
-    // save async the erased settings
-    // wip - should be able to get rid of state as this is all captured in tableu settings (written to state)
-    tableauExt.settings.saveAsync().then(() => {
-      this.setState({
-        tableauSettings: tableauExt.settings.getAll(),
-        configuration: false,
-        isSplash: true,
+      TableauSettings.eraseAndSave([
+        'isLoading',
+        'configuration',
+      ], settings => {
+        this.setState({
+          tableauSettings: settings,
+          configuration: false,
+          isSplash: true,
+        });
       });
-    });
+  
+    } else {
+      // erase all the settings, there has got be a better way.
+      tableauExt.settings.erase('isLoading');
+      tableauExt.settings.erase('configuration');
+  
+      // save async the erased settings
+      // wip - should be able to get rid of state as this is all captured in tableu settings (written to state)
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          tableauSettings: tableauExt.settings.getAll(),
+          configuration: false,
+          isSplash: true,
+        });
+      });
+    }
   };
+  
   
   clearSplash () {
     this.setState({
@@ -304,9 +437,9 @@ class App extends Component {
     this.clearSheet();
     const popUpUrl = window.location.href + '#true';
     const popUpOptions = {
-      height: 600,
-      width: 800,
-    };
+      height: 570,
+      width: 720,
+      };
   
     tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {
       console.log('configuring', closePayload, tableauExt.settings.getAll());
@@ -335,6 +468,16 @@ class App extends Component {
     const thisWidth = window.innerWidth;
     //console.log("size", thisHeight, thisWidth);
   
+    let _this = this;
+    window.addEventListener('resize', function() {
+      const thisWidth = window.innerWidth;
+      const thisHeight = window.innerHeight;
+      _this.setState({
+        width: thisWidth,
+        height: thisHeight
+      });
+    }, true);
+
     tableauExt.initializeAsync({'configure': this.configure}).then(() => {
       let unregisterHandlerFunctions = [];
   
@@ -370,6 +513,9 @@ class App extends Component {
   
       console.log('checking field in getAll()', tableauExt.settings.getAll());
   
+      // Initialize the current saved settings global
+      TableauSettings.init();
+
       this.setState({
         isLoading: false,
         height: thisHeight,
@@ -410,80 +556,97 @@ componentDidUpdate() {
 }
 
 render() {
-    const { classes } = this.props;
+  const { classes } = this.props;
 
-    //short cut this cause we use it ALOT
-    const tableauSettingsState = this.state.tableauSettings; 
+  // create these variables so they are blank if not populated by user
+  let markMeasuresObject = {}, choroMeasuresObject = {};
 
-    //loading screen jsx
-    if (this.state.isLoading || tableauSettingsState.isLoading === "true") {
-      return (<LoadingIndicatorComponent msg='Loading' />);
-    }
+  //short cut this cause we use it ALOT
+  const tableauSettingsState = this.state.tableauSettings; 
+
+  // console.log some stuff to see what is going on
+  console.log('in render', this.state.configuration, tableauSettingsState,  this.state);
+
+  //loading screen jsx
+  if (this.state.isLoading || tableauSettingsState.isLoading === "true") {
+    return (<LoadingIndicatorComponent msg='Loading' />);
+  }
 
     // config screen jsx
     if (this.state.isConfig) {
-      // want to use tableauExt.settings here, but it is undefined initially and causes and error
-      //first thing we do is determine the type of implementation
-      //1. Dendogram / Cluster
-      //2. Tidy Tree / Tree
-      //3. Network / force
-      //4. Circlepack / circlepack
-      //5. Treemap / treemap
-      //if (tableauSettingsState.isConfigType && tableauSettingsState.isConfigType === "true" ) {
-      if (!this.state.isConfigType) {
+      let stepNames = ["Select Graph Type", "Select Sheet", "Drag & Drop Measures", "Customize the Graph"]
+      
+      console.log(this.state.stepIndex)
+
+      if (this.state.stepIndex === 1) {
         const flareDataParsed = JSON.parse(flareData);
         const type = semioticTypes[this.state.demoType];
         console.log('configType', tableauSettingsState.ConfigType, flareDataParsed );
 
         const semioticHelp = 
-          <ResponsiveNetworkFrame
-            edges={flareDataParsed}
-            edgeType='curve'
-            nodeIDAccessor={"name"}
-            nodeStyle={(d, i) => ({
-              fill: type === "circlepack" ? "#ccc" : type === "treemap" ? "#ccc" : DataBlick[d.depth-1],
-              fillOpacity: 0.25,
-              stroke: DataBlick[d.depth-1],
-              strokeOpacity: 0.6
-            })}
-            edgeStyle={(d, i) => ({
-              fill: "#fff",
-              fillOpacity: 0,
-              stroke: DataBlick[d.source.depth],
-              opacity: 0.5
-            })} 
-            networkType={{
-              type: type,
-              projection: "radial",
-              nodePadding: 1,
-              forceManyBody: type === "force" ? -250 : -15,
-              edgeStrength: type === "force" ? 2 : 1.5,
-              distanceMax: type === "force" ? 500 : 1,
-              iterations: type === "force" ? 1000 : 0,
-              padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
-              hierarchySum: d => d.value
-            }}
-            margin={50}
-          />
-        ;
+              <ResponsiveNetworkFrame
+                edges={flareDataParsed}
+                edgeType='curve'
+                nodeIDAccessor={"name"}
+                nodeStyle={(d, i) => ({
+                  fill: type === "circlepack" ? "#ccc" : type === "treemap" ? "#ccc" : DataBlick[d.depth-1],
+                  fillOpacity: 0.25,
+                  stroke: DataBlick[d.depth-1],
+                  strokeOpacity: 0.6
+                })}
+                edgeStyle={(d, i) => ({
+                  fill: "#fff",
+                  fillOpacity: 0,
+                  stroke: DataBlick[d.source.depth],
+                  opacity: 0.5
+                })} 
+                networkType={{
+                  type: type,
+                  projection: "radial",
+                  nodePadding: 1,
+                  forceManyBody: type === "force" ? -250 : -15,
+                  edgeStrength: type === "force" ? 2 : 1.5,
+                  distanceMax: type === "force" ? 500 : 1,
+                  iterations: type === "force" ? 1000 : 0,
+                  padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
+                  hierarchySum: d => d.value
+                }}
+                margin={50}
+              />
+            ;
 
+        // Placeholder sheet names. TODO: Bind to worksheet data
         return (
-          <ConfigScreen
-            sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap", "Partition"]}
-            selectSheet = {this.configCallBack}
-            customChange = {this.demoChange}
-            height = {this.state.height}
-            width = {this.state.width}
-            configTitle = "Step 1: Select the Type of Hierarchy Visual"
-            listTitle = "Pick a configuration"
-            helperText = "Powered by Semiotic"
-            field="ConfigType"
-            selectedValue={this.state.demoType || ""}
-            helpJSX={semioticHelp}
-          />
+          <React.Fragment>
+            <Stepper 
+              stepIndex={this.state.stepIndex} 
+              steps={stepNames}
+            />
+            <PickType
+                sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap", "Partition"]}
+                selectSheet = {this.configCallBack}
+                customChange = {this.demoChange}
+                // height = {this.state.height}
+                // width = {this.state.width}
+                // title = "Step 1: Select the Type of Hierarchy Visual"
+                // listTitle = "Pick a configuration"
+                // helperText = "Powered by Semiotic"
+                field="ConfigType"
+                selectedValue={this.state.demoType || ""}
+                helpJSX={semioticHelp}
+            />
+            <StepButtons
+              onNextClick={this.onNextStep}
+              onPrevClick={this.onPrevStep}
+              stepIndex={this.state.stepIndex}
+              maxStepCount={stepNames.length}
+              nextText={this.state.stepIndex !== stepNames.length ? 'Next' : 'Save'}
+              backText="Back"
+            />
+          </React.Fragment>
         );
       }
-
+      
       //we need to identify the data and fill metric/scale
       if ( tableauSettingsState.ConfigType ) {
 
@@ -592,62 +755,24 @@ render() {
     if (this.state.isSplash) {
       return (
         <div className="splashScreen" style={{padding : 5 }}>
-          <Grid
-            container
-            direction="column"
-            alignItems="center"
-            justify="center"
-            spacing={8} >
-
-            <Grid item >
-              <Typography
-                variant="display2"
-                align="center" >
-                A
-              </Typography>
-            </Grid>
-            <Grid item >
-              <img alt="" src={dbLogo} style={{display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '33%', height: 'auto'}}/>
-            </Grid>
-            <Grid item >
-              <Typography
-                variant="display2"
-                align="center" >
-                +
-              </Typography>
-            </Grid>
-            <Grid item >
-              <img alt="" src={ssLogo} style={{display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '100%', height: 'auto'}}/>
-            </Grid>
-            <Grid item >
-              <Typography
-                variant="display2"
-                align="center"
-                style={{margin:'auto'}} >
-                Tableau Extension
-              </Typography>
-              <br/>
-            </Grid>
-            <Grid
-              container
-              direction="row"
-              alignItems="center"
-              justify="center"
-              spacing={8} >
-              <Button
-                variant="outlined"
-                color="primary"
-                size="large"
-                className={classes.button}
-                onClick={this.configure}
-              >
-              Configure the Extension
-            </Button>
-            </Grid>
-          </Grid>
+          <SplashScreen 
+            configure={this.configure} 
+            title="Semiotic Hierarchy Charts in Tableau"
+            desc="Leverage the brillance of Semiotic's hierarchy network chart library, directly within Tableau!"
+            ctaText="Configure"
+            poweredBy={
+              <React.Fragment>
+                <p className="info">Brought to you by: </p>
+                <a href="http://www.datablick.com/" target="_blank"><img src={dbLogo} /></a> <a href="https://starschema.com/" target="_blank"><img src={ssLogo} /></a>
+                <p className="info">Powered by: </p>
+                <a href="https://emeeks.github.io/semiotic/#/" target="_blank"><img src={semLogo} /></a>
+            </React.Fragment>
+          }
+          />
         </div>
       );
     }
+
 
     // left off here config should be good, now we need to get component working from new config
     return (

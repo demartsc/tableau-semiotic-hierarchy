@@ -17,20 +17,20 @@ const PickType = (props) => (
     <div class="content-container">
       <h1 className="title">{props.title}</h1>
       <div className="clearfix">
-        <OptionColumn className="grid--5">
+        <OptionColumn className="grid--4">
             <div className="SheetPicker" >
                 <RadioButtonsGroup
-                    sheets={props.sheetNames}
-                    title={props.listTitle}
-                    helperText={props.helperText}
-                    sheetCallBack={props.selectSheet}
-                    customChange={props.customChange}
-                    field={props.field}
-                    selectedValue={props.selectedValue}
+                  sheets={props.sheetNames}
+                  title={props.listTitle}
+                  helperText={props.helperText}
+                  sheetCallBack={props.selectSheet}
+                  customChange={props.customChange}
+                  field={props.field}
+                  selectedValue={props.selectedValue}
                 />
             </div>
         </OptionColumn>
-        <OptionColumn className="grid--7">
+        <OptionColumn className="grid--8">
             {props.helpJSX || <Typography variant="subheading" align="center" > Placeholder for help info </Typography>}
         </OptionColumn>
       </div>

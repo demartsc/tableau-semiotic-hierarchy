@@ -23,7 +23,7 @@ export const OptionWrapper = styled.div`
 `;
 
 export const OptionColumn = styled.div`
-  height: 330px;
+  height: 375px;
   overflow: auto;
   border: 1px solid lightgrey;
   border-radius: 2px;

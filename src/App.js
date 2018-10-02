@@ -580,41 +580,42 @@ render() {
       console.log(this.state.stepIndex)
 
       if (this.state.stepIndex === 1) {
+        const hgt = 375, wdth = 400;
         const flareDataParsed = JSON.parse(flareData);
         const type = semioticTypes[this.state.demoType];
-        console.log('configType', tableauSettingsState.ConfigType, flareDataParsed );
+        console.log('configType', semioticTypes[this.state.demoType], tableauSettingsState.ConfigType, flareDataParsed );
 
         const semioticHelp = 
-              <ResponsiveNetworkFrame
-                edges={flareDataParsed}
-                edgeType='curve'
-                nodeIDAccessor={"name"}
-                nodeStyle={(d, i) => ({
-                  fill: type === "circlepack" ? "#ccc" : type === "treemap" ? "#ccc" : DataBlick[d.depth-1],
-                  fillOpacity: 0.25,
-                  stroke: DataBlick[d.depth-1],
-                  strokeOpacity: 0.6
-                })}
-                edgeStyle={(d, i) => ({
-                  fill: "#fff",
-                  fillOpacity: 0,
-                  stroke: DataBlick[d.source.depth],
-                  opacity: 0.5
-                })} 
-                networkType={{
-                  type: type,
-                  projection: "radial",
-                  nodePadding: 1,
-                  forceManyBody: type === "force" ? -250 : -15,
-                  edgeStrength: type === "force" ? 2 : 1.5,
-                  distanceMax: type === "force" ? 500 : 1,
-                  iterations: type === "force" ? 1000 : 0,
-                  padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
-                  hierarchySum: d => d.value
-                }}
-                margin={50}
-              />
-            ;
+          <ResponsiveNetworkFrame
+            edges={flareDataParsed}
+            edgeType='curve'
+            nodeIDAccessor={"name"}
+            nodeStyle={(d, i) => ({
+              fill: type === "circlepack" ? "#ccc" : type === "treemap" ? "#ccc" : DataBlick[d.depth-1],
+              fillOpacity: 0.25,
+              stroke: DataBlick[d.depth-1],
+              strokeOpacity: 0.6
+            })}
+            edgeStyle={(d, i) => ({
+              fill: "#fff",
+              fillOpacity: 0,
+              stroke: DataBlick[d.source.depth],
+              opacity: 0.5
+            })} 
+            networkType={{
+              type: type,
+              projection: "radial",
+              nodePadding: 1,
+              forceManyBody: type === "force" ? -250 : -15,
+              edgeStrength: type === "force" ? 2 : 1.5,
+              distanceMax: type === "force" ? 500 : 1,
+              iterations: type === "force" ? 1000 : 0,
+              padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
+              hierarchySum: d => d.value
+            }}
+            margin={50}
+          />
+        ;
 
         // Placeholder sheet names. TODO: Bind to worksheet data
         return (
@@ -628,6 +629,7 @@ render() {
                 selectSheet = {this.configCallBack}
                 customChange = {this.demoChange}
                 field="ConfigType"
+                listTitle = "Select a graph type"
                 selectedValue={this.state.demoType || ""}
                 helpJSX={semioticHelp}
             />

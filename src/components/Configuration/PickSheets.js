@@ -14,7 +14,7 @@ const PickSheets = (props) => (
                 selectSheet = {props.configCallBack}
                 configTitle = "Select a Data Sheet"
                 listTitle = "Available Sheets"
-                field="ConfigSheet"
+                field={props.field}
                 selectedValue={props.ConfigSheet || ""}
           />
         </OptionColumn>

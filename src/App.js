@@ -692,6 +692,7 @@ render() {
             <PickSheets
                 sheetNames = {this.state.sheetNames}
                 configCallBack = {this.configCallBack}
+                field={"ConfigSheet"}
                 ConfigSheet={tableauSettingsState.ConfigSheet || ""}
             />
             <StepButtons

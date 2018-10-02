@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { withStyles } from '@material-ui/core/styles';
-import { ConfigScreen } from '../Configuration';
 import { OptionColumn } from './CustomizeUIElements';
 import RadioButtonsGroup from './SheetsRadio';
 import Typography from '@material-ui/core/Typography';
@@ -26,7 +25,7 @@ const PickType = (props) => (
                   sheetCallBack={props.selectSheet}
                   customChange={props.customChange}
                   field={props.field}
-                  selectedValue={props.selectedValue}
+                  selectedValue={props.selectedValue || ""}
                 />
             </div>
         </OptionColumn>

@@ -49,14 +49,17 @@ class RadioButtonsGroup extends React.Component {
     };
   }
 
-  handleChange = event => {
-    this.setState({ value: event.target.value });
-  };
+  // handleChange = event => {
+  //   this.setState({ value: event.target.value });
+  // };
 
   handleClick = event => {
-    console.log('handleClick', this.props.field, this.state.value);
-    if (this.state.value) {
-      this.props.sheetCallBack(this.props.field, this.state.value)
+    console.log('handleClick', this.props.field, event.target.value);
+    if ( event.target.value ) {
+      this.props.sheetCallBack(this.props.field, event.target.value);
+    }
+    if ( this.props.customChange ) {
+      this.props.customChange(event);
     }
   }
 
@@ -74,7 +77,7 @@ class RadioButtonsGroup extends React.Component {
   render() {
     const { classes, sheets, title, helperText, customChange } = this.props;
 
-    const changeCallBack = customChange || this.handleChange;
+    // const changeCallBack = customChange || this.handleChange;
 
     console.log('sheetRadio', this.props, this.state);
     return (
@@ -85,7 +88,7 @@ class RadioButtonsGroup extends React.Component {
             <RadioGroup
               className={classes.group}
               value={this.state.value}
-              onChange={changeCallBack}
+              onChange={this.handleClick}
             >
             {sheets.map(sheetName => (
               <FormControlLabel

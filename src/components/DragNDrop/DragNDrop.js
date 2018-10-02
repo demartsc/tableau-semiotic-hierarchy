@@ -80,7 +80,7 @@ class DragNDrop extends React.Component {
     return (
       <React.Fragment>
         <div class="content-container">
-          <h1 className="title">{this.props.title}</h1>
+          {/* <h1 className="title">{this.props.title}</h1> */}
           <DragDropContext
             onDragStart={this.onDragStart}
             onDragUpdate={this.onDragUpdate}

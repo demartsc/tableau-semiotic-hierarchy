@@ -84,8 +84,8 @@ export default class Column extends React.Component {
     this.filterMeasureBySheet = this.filterMeasureBySheet.bind(this);
 
     this.state = {
-      filteredMeasures: this.filterMeasureBySheet('mark'),
-      selectedSheet: 'mark'
+      filteredMeasures: this.filterMeasureBySheet('config'),
+      selectedSheet: 'config'
     }
   }
   
@@ -144,7 +144,7 @@ export default class Column extends React.Component {
                 {...provided.droppableProps}
                 isDraggingOver={snapshot.isDraggingOver}
               >
-                <MeasureSwitchButton 
+                {/* <MeasureSwitchButton 
                   active={this.state.selectedSheet === 'mark'} 
                   data-tag="mark"
                   onClick={this.onMeasureSwitchClicked}> Mark sheet
@@ -153,7 +153,7 @@ export default class Column extends React.Component {
                   active={this.state.selectedSheet === 'choro'} 
                   data-tag="choro"
                   onClick={this.onMeasureSwitchClicked}> Choro sheet
-                </MeasureSwitchButton>
+                </MeasureSwitchButton> */}
                 <SearchInput placeholder="Search field" onChange={this.filterMeasureByName} />
                 {this.state.filteredMeasures.map((measure, index) => <Field key={measure.id} measure={measure} index={index} />)}
                 {provided.placeholder}

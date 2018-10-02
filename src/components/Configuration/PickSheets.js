@@ -8,14 +8,14 @@ const PickSheets = (props) => (
     <div className="content-container">
       <h1 className="title">{props.title}</h1>
       <div className="clearfix">
-        <OptionColumn className="grid--6">
+        <OptionColumn className="grid--12">
           <ConfigScreen
                 sheetNames = {props.sheetNames}
                 selectSheet = {props.configCallBack}
-                configTitle = "Choropleth Sheet"
+                configTitle = "Select a Data Sheet"
                 listTitle = "Available Sheets"
-                field="ChoroSheet"
-                selectedValue={props.ChoroSheet || ""}
+                field="ConfigSheet"
+                selectedValue={props.ConfigSheet || ""}
           />
         </OptionColumn>
       </div> 

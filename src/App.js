@@ -12,13 +12,18 @@ import _ from 'lodash';
 
 // Custom config components
 import SplashScreen from './components/SplashScreen';
-import PickType from './components/Configuration/PickType';
-import PickSheets from './components/Configuration/PickSheets';
+import { 
+  PickType, 
+  PickSheets, 
+  CustomizeHierarchy, 
+  Stepper, 
+  StepButtons,
+} from './components/Configuration'
+
+// drag and drop 
 import DragNDrop from './components/DragNDrop/DragNDrop';
-import Stepper from './components/Configuration/Stepper';
-// import PickSheets from './components/PickSheets';
-import StepButtons from './components/Configuration/StepButtons';
 import initialData from './components/DragNDrop/initial-data';
+
 // import CustomizeOptions from './components/CustomizeOptions';
 import { ConfigScreen, CustomScreen } from './components/Configuration';
 
@@ -110,6 +115,7 @@ class App extends Component {
       isMissingData: true,
     };
 
+    TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
     this.unregisterEventFn = undefined;
 
     this.clickCallBack = this.clickCallBack.bind(this);
@@ -117,6 +123,7 @@ class App extends Component {
     this.filterChanged = this.filterChanged.bind(this);
     this.getSummaryData = this.getSummaryData.bind(this);
     this.configCallBack = this.configCallBack.bind(this);
+    this.eraseCallBack = this.eraseCallBack.bind(this);
     this.customCallBack = this.customCallBack.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.demoChange = this.demoChange.bind(this);
@@ -243,6 +250,32 @@ class App extends Component {
     }
   }
     
+  eraseCallBack (field) {
+    console.log("triggered erase", field);
+    if (TableauSettings.ShouldUse) {
+  
+      TableauSettings.eraseAndSave([
+        field,
+      ], settings => {
+        this.setState({
+          tableauSettings: settings,
+        });
+      });
+  
+    } else {
+      // erase all the settings, there has got be a better way.
+      tableauExt.settings.erase(field);
+  
+      // save async the erased settings
+      // wip - should be able to get rid of state as this is all captured in tableu settings (written to state)
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          tableauSettings: tableauExt.settings.getAll(),
+        });
+      });
+    }
+  };
+
   customCallBack (confSetting) {
     console.log('in custom call back', confSetting);
     if (TableauSettings.ShouldUse) {
@@ -560,7 +593,7 @@ render() {
   const { classes } = this.props;
 
   // create these variables so they are blank if not populated by user
-  let markMeasuresObject = {}, choroMeasuresObject = {};
+  let configMeasuresObject = {};
 
   //short cut this cause we use it ALOT
   const tableauSettingsState = this.state.tableauSettings; 
@@ -580,41 +613,44 @@ render() {
       console.log(this.state.stepIndex)
 
       if (this.state.stepIndex === 1) {
-        const hgt = 375, wdth = 400;
         const flareDataParsed = JSON.parse(flareData);
         const type = semioticTypes[this.state.demoType];
         console.log('configType', semioticTypes[this.state.demoType], tableauSettingsState.ConfigType, flareDataParsed );
 
         const semioticHelp = 
+        <div style={{ paddingTop: 20, height: 350*.95, width: 350*.95, float: 'none', margin: '0 auto' }}>
           <ResponsiveNetworkFrame
-            edges={flareDataParsed}
-            edgeType='curve'
-            nodeIDAccessor={"name"}
-            nodeStyle={(d, i) => ({
-              fill: type === "circlepack" ? "#ccc" : type === "treemap" ? "#ccc" : DataBlick[d.depth-1],
-              fillOpacity: 0.25,
-              stroke: DataBlick[d.depth-1],
-              strokeOpacity: 0.6
-            })}
-            edgeStyle={(d, i) => ({
-              fill: "#fff",
-              fillOpacity: 0,
-              stroke: DataBlick[d.source.depth],
-              opacity: 0.5
-            })} 
-            networkType={{
-              type: type,
-              projection: "radial",
-              nodePadding: 1,
-              forceManyBody: type === "force" ? -250 : -15,
-              edgeStrength: type === "force" ? 2 : 1.5,
-              distanceMax: type === "force" ? 500 : 1,
-              iterations: type === "force" ? 1000 : 0,
-              padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
-              hierarchySum: d => d.value
-            }}
-            margin={50}
-          />
+              responsiveWidth
+              responsiveHeight
+              edges={flareDataParsed}
+              edgeType='curve'
+              nodeIDAccessor={"name"}
+              nodeStyle={(d, i) => ({
+                fill: type === "circlepack" ? "#ccc" : type === "treemap" ? "#ccc" : DataBlick[d.depth-1],
+                fillOpacity: 0.25,
+                stroke: DataBlick[d.depth-1],
+                strokeOpacity: 0.6
+              })}
+              edgeStyle={(d, i) => ({
+                fill: "#fff",
+                fillOpacity: 0,
+                stroke: DataBlick[d.source.depth],
+                opacity: 0.5
+              })} 
+              networkType={{
+                type: type,
+                projection: "radial",
+                nodePadding: 1,
+                forceManyBody: type === "force" ? -250 : -15,
+                edgeStrength: type === "force" ? 2 : 1.5,
+                distanceMax: type === "force" ? 500 : 1,
+                iterations: type === "force" ? 1000 : 0,
+                padding: type === "treemap" ? 3 : type === "circlepack" ? 2 : 0,
+                hierarchySum: d => d.value
+              }}
+              margin={10}
+            />
+          </div>
         ;
 
         // Placeholder sheet names. TODO: Bind to worksheet data
@@ -656,8 +692,7 @@ render() {
             <PickSheets
                 sheetNames = {this.state.sheetNames}
                 configCallBack = {this.configCallBack}
-                ChoroSheet={tableauSettingsState.ChoroSheet || ""}
-                MarkSheet={tableauSettingsState.MarkSheet || ""}
+                ConfigSheet={tableauSettingsState.ConfigSheet || ""}
             />
             <StepButtons
               onNextClick={this.onNextStep}
@@ -671,6 +706,85 @@ render() {
         );
       }
       
+      if (this.state.stepIndex === 3) {
+        initialData.columns.measures.measures = this.state.ConfigSheetColumns || [];
+
+        if ( this.state.ConfigSheetColumns ) {
+          configMeasuresObject = this.state.ConfigSheetColumns.map((column) => {
+            return {id: column, content: column, sheet: 'config'};
+          });
+        }
+
+        let tmpMeasures = Object.assign({}, initialData, {"measures": configMeasuresObject});
+
+        // Get stored fields
+        let selectedFields = {
+          ConfigParentField: tableauSettingsState.ConfigParentField,
+          ConfigChildField: tableauSettingsState.ConfigChildField,
+          ConfigColorField: tableauSettingsState.ConfigColorField,
+          ConfigValueField: tableauSettingsState.ConfigValueField,
+        }
+
+        // Assign selected fields to tmpMeasures
+        Object.keys(selectedFields).forEach(fieldName => {
+          if (selectedFields[fieldName]) {
+            tmpMeasures.drop_area[fieldName].measureId = selectedFields[fieldName];
+          } else if (selectedFields[fieldName] === undefined) {
+            tmpMeasures.drop_area[fieldName].measureId = null;
+          }
+        });
+
+        return (
+          <React.Fragment>
+            <Stepper 
+              stepIndex={this.state.stepIndex} 
+              steps={stepNames}
+            />
+            <DragNDrop
+              title="Drag & Drop measures"
+              initialData={tmpMeasures}
+              configCallBack={this.configCallBack}
+              eraseCallBack={this.eraseCallBack}
+            />
+            <StepButtons
+              onNextClick={this.onNextStep}
+              onPrevClick={this.onPrevStep}
+              stepIndex={this.state.stepIndex}
+              maxStepCount={stepNames.length}
+              nextText={this.state.stepIndex !== stepNames.length ? 'Next' : 'Save'}
+              backText="Back"
+            />
+          </React.Fragment>
+        ); 
+      }
+      
+      if (this.state.stepIndex === 4) {
+        return (
+          <React.Fragment>
+            <Stepper 
+              stepIndex={this.state.stepIndex} 
+              steps={stepNames}
+            />
+            <CustomizeHierarchy
+              title="Customize Hierarchy"
+              configTitle = "Customize your hierarchy chart"
+              handleChange={this.handleChange}
+              customCallBack={this.customCallBack}
+              field={'configuration'}
+              tableauSettings={tableauSettingsState}
+            />
+            <StepButtons
+              onNextClick={this.onNextStep}
+              onPrevClick={this.onPrevStep}
+              stepIndex={this.state.stepIndex}
+              maxStepCount={stepNames.length}
+              nextText={this.state.stepIndex !== stepNames.length ? 'Next' : 'Save'}
+              backText="Back"
+            />
+          </React.Fragment>
+        ); 
+      }
+
       //we need to identify the data and fill metric/scale
       if ( tableauSettingsState.ConfigType ) {
 

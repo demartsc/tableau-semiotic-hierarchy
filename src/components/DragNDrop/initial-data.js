@@ -13,78 +13,50 @@ const initialData = {
       measures: []
       //measures: ['measure1', 'measure2', 'measure3', 'measure4']
     },
-    mark_options: {
-      id: 'mark_options',
-      title: 'Mark options',
+    config_options: {
+      id: 'config_options',
+      title: 'Config options',
       type: 'options',
-      areaIds: ['MarkLonField', 'MarkLatField', 'MarkNameField', 'MarkFillField', 'MarkSizeField']
+      areaIds: ['ConfigParentField', 'ConfigChildField', 'ConfigColorField', 'ConfigValueField']
     },
-    choro_options: {
-      id: 'choro_options',
-      title: 'Choro options',
+    blank_options: {
+      id: 'blank_options',
+      title: 'Blank options',
       type: 'options',
-      areaIds: ['ChoroJoinField', 'ChoroNameField', 'ChoroFillField']
+      areaIds: []
     }
   },
   drop_area: {
-    MarkLonField: {
-      id: 'MarkLonField',
-      title: 'Longitude',
+    ConfigParentField: {
+      id: 'ConfigParentField',
+      title: 'Parent',
       type: 'single_drop',
       icon: 'LongitudeIcon',
       measureId: null
     },
-    MarkLatField: {
-      id: 'MarkLatField',
-      title: 'Latitude',
+    ConfigChildField: {
+      id: 'ConfigChildField',
+      title: 'Child',
       type: 'single_drop',
       icon: 'LatitudeIcon',
       measureId: null
     },
-    MarkNameField: {
-      id: 'MarkNameField',
-      title: 'Geo Name',
-      type: 'single_drop',
-      icon: 'GeoNameIcon',
-      measureId: null
-    },
-    MarkFillField: {
-      id: 'MarkFillField',
-      title: 'Fill By',
+    ConfigColorField: {
+      id: 'ConfigColorField',
+      title: 'Color By',
       type: 'single_drop',
       icon: 'FillByIcon',
       measureId: null
     },
-    MarkSizeField: {
-      id: 'MarkSizeField',
+    ConfigValueField: {
+      id: 'ConfigValueField',
       title: 'Size by',
       type: 'single_drop',
       icon: 'SizeByIcon',
       measureId: null
     },
-    ChoroJoinField: {
-      id: 'ChoroJoinField',
-      title: 'Geo Dimension',
-      type: 'single_drop',
-      icon: 'GeoIcon',
-      measureId: null
-    },
-    ChoroNameField: {
-      id: 'ChoroNameField',
-      title: 'Geo Name',
-      type: 'single_drop',
-      icon: 'GeoNameIcon',
-      measureId: null
-    },
-    ChoroFillField: {
-      id: 'ChoroFillField',
-      title: 'Fill By',
-      type: 'single_drop',
-      icon: 'FillByIcon',
-      measureId: null
-    },
   },
-  columnOrder: ['measures', 'mark_options', 'choro_options']
+  columnOrder: ['measures', 'config_options', 'blank_options']
 }
 
 export default initialData;

@@ -599,7 +599,7 @@ render() {
   const tableauSettingsState = this.state.tableauSettings; 
 
   // console.log some stuff to see what is going on
-  console.log('in render', this.state.configuration, tableauSettingsState,  this.state);
+  console.log('in render', this.state.width, this.state.height, this.state.configuration, tableauSettingsState,  this.state);
 
   //loading screen jsx
   if (this.state.isLoading || tableauSettingsState.isLoading === "true") {
@@ -785,109 +785,6 @@ render() {
           </React.Fragment>
         ); 
       }
-
-      //we need to identify the data and fill metric/scale
-      if ( tableauSettingsState.ConfigType ) {
-
-        // next we pull the data sheet
-        if ( !this.state.isConfigSheet ) {
-          return (
-            <ConfigScreen
-              sheetNames = {this.state.sheetNames}
-              selectSheet = {this.configCallBack}
-              height = {this.state.height}
-              width = {this.state.width}
-              configTitle = "Step 1: Start by Picking a Sheet"
-              listTitle = "Pick the sheet with data"
-              field="ConfigSheet"
-              selectedValue={tableauSettingsState.ConfigSheet || ""}
-            />
-          );
-        }
-
-        // now that we have sheet, pick the parent field
-        if ( !this.state.isConfigParentField ) {
-          return (
-            <ConfigScreen
-              sheetNames = {this.state.ConfigSheetStringColumns}
-              selectSheet = {this.configCallBack}
-              height = {this.state.height}
-              width = {this.state.width}
-              configTitle = "Step 2: Pick the Parent Dimension"
-              listTitle = "Pick the parent"
-              field="ConfigParentField"
-              selectedValue={tableauSettingsState.ConfigParentField || ""}
-            />
-          );
-        }
-
-        // now that we have sheet, pick the child field
-        if ( !this.state.isConfigChildField ) {
-          return (
-            <ConfigScreen
-              sheetNames = {this.state.ConfigSheetStringColumns}
-              selectSheet = {this.configCallBack}
-              height = {this.state.height}
-              width = {this.state.width}
-              configTitle = "Step 3: Pick the Child Dimension"
-              listTitle = "Pick the child"
-              field="ConfigChildField"
-              selectedValue={tableauSettingsState.ConfigChildField || ""}
-            />
-          );
-        }
-
-        // now that we have sheet, pick the color field
-        if ( !this.state.isConfigColorField ) {
-          const tempArrary = this.state.ConfigSheetStringColumns;
-          tempArrary.push("None");
-
-          console.log('tempArrary', tempArrary);
-          return (
-            <ConfigScreen
-              sheetNames = {tempArrary}
-              selectSheet = {this.configCallBack}
-              height = {this.state.height}
-              width = {this.state.width}
-              configTitle = "Step 4: Pick the Color"
-              listTitle = "Pick the value"
-              field="ConfigColorField"
-              selectedValue={tableauSettingsState.ConfigColorField || ""}
-            />
-          );
-        }
-
-        // now that we have sheet, pick the value field
-        if ( !this.state.isConfigValueField ) {
-          const tempArraryNum = this.state.ConfigSheetNumberColumns;
-          tempArraryNum.push("None");
-
-          return (
-            <ConfigScreen
-              sheetNames = {tempArraryNum}
-              selectSheet = {this.configCallBack}
-              height = {this.state.height}
-              width = {this.state.width}
-              configTitle = "Step 5: Pick the Value"
-              listTitle = "Pick the value"
-              field="ConfigValueField"
-              selectedValue={tableauSettingsState.ConfigValueField || ""}
-            />
-          );
-        }
-
-        if (!this.state.configuration) {
-          return (
-            <CustomScreen
-              configTitle = "Step 6: Customize your hierarchy!"
-              handleChange={this.handleChange}
-              customCallBack={this.customCallBack}
-              field={'configuration'}
-              tableauSettings={tableauSettingsState}
-            />
-          );
-        }    
-      }
     }
 
     // splash screen jsx
@@ -915,11 +812,11 @@ render() {
 
     // left off here config should be good, now we need to get component working from new config
     return (
-      <div className="App">
+      <div className="App" >
         <SemioticHierarchy
           className={'semiotic-hierarchy-chart'}
-          width={this.state.width}
-          height={this.state.height}
+          width={this.state.width * .925}
+          height={this.state.height * .925}
           hierarchyData={this.state.ConfigSheetData}
           tableauSettings={tableauSettingsState}
 

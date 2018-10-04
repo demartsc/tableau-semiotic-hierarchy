@@ -22,6 +22,148 @@ const styles = {
   },
 };
 
+// Minimum and maximum fallback sizes for markers
+const MIN_MARKER_RADIUS = 1;
+const MAX_MARKER_RADIUS = 25;
+
+// unflatten function was obtained from stack overflow link below and modified slightly for use herein
+// https://stackoverflow.com/questions/18017869/build-tree-array-from-flat-array-in-javascript
+function unflatten ( array, parent, seed, tree ) {
+    tree = typeof tree !== 'undefined' ? tree : [];
+    parent = typeof parent !== 'undefined' ? parent : { id: 0 };
+
+    var children = _.filter( array, function(child){ return child.name == parent.child; });
+
+    if( !_.isEmpty( children )  ){
+        if( parent.child == seed ) {
+            tree = Object.assign({}, parent, {"name": seed, "children": children});
+        }
+        else {
+            parent['children'] = children;
+        }
+        _.each( children, (child) => { unflatten( array, child ); } );
+    }  
+    return tree;
+}
+
+
+// hierarchyDataPreped
+// (the original code contained a bug which would result
+// in worldDataMissing always being an empty array)
+function buildhierarchyDataPreped(hierarchyData, ConfigParentField, ConfigChildField, ConfigColorField, ConfigValueField) {
+    const hierarchyDataPreped = _.cloneDeep(hierarchyData);
+
+    //now that we are in here we can rename fields as we need to in order avoid errors
+    _.forEach(hierarchyDataPreped, (a) => {
+        a['ConfigParentField'] = ConfigParentField;
+        a['ConfigChildField'] = ConfigChildField;
+        a['ConfigColorField'] = ConfigColorField;
+        a['ConfigValueField'] = ConfigValueField;
+
+        if (ConfigParentField !== "name") {
+            a['name'] = a[ConfigParentField];
+            delete a[ConfigParentField];    
+        }
+
+        if (ConfigChildField !== "child") {
+            a['child'] = a[ConfigChildField];
+            delete a[ConfigChildField];
+        }
+        
+        if (ConfigColorField !== "colorHex") {
+            a['colorHex'] = a[ConfigColorField];
+            delete a[ConfigColorField];
+        }
+
+        if (ConfigValueField !== "valueMetric") {
+            a['valueMetric'] = parseFloat(a[ConfigValueField]);
+            delete a[ConfigValueField];
+        }
+    });
+
+    console.log('in semiotic component mount', hierarchyDataPreped, hierarchyData);
+
+    return hierarchyDataPreped;
+}
+
+
+//find the root node in the data set provided
+//need to handle if there are more than one of these!!
+function getRoot(hierarchyDataPreped) {
+    if (!hierarchyDataPreped) {
+        return () => {};
+    }
+
+    console.log('in get root', hierarchyDataPreped);
+    let root = _.filter(hierarchyDataPreped, (o) => { return o.name == null; });
+    console.log('root array', root[0].child, root);
+
+    return root;
+}
+
+function buildEdgeData (hierarchyDataPreped, root) {
+    if (!hierarchyDataPreped) {
+        return () => {};
+    }
+  
+    console.log('edgeData', hierarchyDataPreped);
+    let edgeData = unflatten(hierarchyDataPreped, { ...root[0] }, root[0].child);
+    console.log('edgeData', edgeData);
+
+    return edgeData;
+}
+
+function buildNodeData (hierarchyDataPreped) {
+    if (!hierarchyDataPreped) {
+        return () => {};
+    }
+
+    let nodeData = _.uniqBy(hierarchyDataPreped, 'child'); 
+    console.log('nodeData', nodeData);
+
+    return nodeData;
+}
+
+function buildNodeSizeScale(nodeData, markerMinRadius, markerMaxRadius) {
+    if (!nodeData) {
+      return () => {};
+    }
+    function remapper(d) {
+      return parseFloat(d["valueMetric"] || 0) || 0;
+    }
+    return d3Scale.scaleLinear()
+      .domain(d3Array.extent(nodeData, remapper))
+      .range([
+        markerMinRadius || MIN_MARKER_RADIUS,
+        markerMaxRadius || MAX_MARKER_RADIUS,
+      ]);
+}
+
+function buildNodeColorScale(nodeData, nodeFillColor) {
+    if (!nodeData) {
+      return () => {};
+    }
+    function remapper(d) {
+      return parseFloat(d["valueMetric"] || 0) || 0;
+    }
+    return d3Scale.scaleLinear()
+      .domain(d3Array.extent(nodeData, remapper))
+      .range(_.split(nodeFillColor,','))
+    ;
+}
+
+// Create a memoized version of each call which will (hopefully) cache the calls.
+// NOTE: passing the whole "props" to these functions will make them sub-optimal as
+// the memoize depends on passing an equal object to get the cached result.
+let memoized = {
+    buildhierarchyDataPreped: _.memoize(buildhierarchyDataPreped),
+    getRoot: _.memoize(getRoot),
+    buildNodeData: _.memoize(buildNodeData),
+    buildEdgeData: _.memoize(buildEdgeData),
+    buildNodeSizeScale: _.memoize(buildNodeSizeScale),
+    buildNodeColorScale: _.memoize(buildNodeColorScale),
+};
+
 class SemioticHierarchy extends React.Component {
     constructor (props) {
       super(props);
@@ -34,97 +176,40 @@ class SemioticHierarchy extends React.Component {
       }  
     }
 
-    // unflatten function was obtained from stack overflow link below and modified slightly for use herein
-    // https://stackoverflow.com/questions/18017869/build-tree-array-from-flat-array-in-javascript
-    unflatten = ( array, parent, seed, tree ) => {
-        tree = typeof tree !== 'undefined' ? tree : [];
-        parent = typeof parent !== 'undefined' ? parent : { id: 0 };
-    
-        var children = _.filter( array, function(child){ return child.name == parent.child; });
-    
-        if( !_.isEmpty( children )  ){
-            if( parent.child == seed ) {
-                tree = Object.assign({}, parent, {"name": seed, "children": children});
-            }
-            else {
-                parent['children'] = children;
-            }
-            _.each( children, (child) => { this.unflatten( array, child ); } );
-        }  
-        return tree;
+  // Previously in componentDidMount, this prepares our data if possible,
+  // and returns a dict that corresponds to the old componentDidMount() state changes
+    preprocessData() {
+        const {
+            hierarchyData,
+            tableauSettings,
+        } = this.props;
+
+        let hierarchyDataPreped = memoized.buildhierarchyDataPreped(
+            hierarchyData, 
+            tableauSettings.ConfigParentField, 
+            tableauSettings.ConfigChildField, 
+            tableauSettings.ConfigColorField, 
+            tableauSettings.ConfigValueField
+        );
+
+        let root = memoized.getRoot(hierarchyDataPreped);
+        let nodeData = memoized.buildNodeData(hierarchyDataPreped);
+        let edgeData = memoized.buildEdgeData(hierarchyDataPreped, root);
+
+        let nodeSizeScale = memoized.buildNodeSizeScale(nodeData, tableauSettings.markerMinRadius, tableauSettings.markerMaxRadius);
+        let nodeColorScale = memoized.buildNodeColorScale(nodeData, tableauSettings.nodeFillColor);
+
+        return ({
+            hierarchyDataPreped: hierarchyDataPreped, 
+            nodeData: nodeData,
+            edgeData: edgeData,
+            nodeSizeScale: nodeSizeScale, 
+            nodeColorScale: nodeColorScale,
+        });
     }
 
     componentDidMount() {
-        const hierarchyDataPreped = _.cloneDeep(this.props.hierarchyData);
-
-        //now that we are in here we can rename fields as we need to in order avoid errors
-        _.forEach(hierarchyDataPreped, (a) => {
-            a['ConfigParentField'] = this.props.tableauSettings.ConfigParentField;
-            a['ConfigChildField'] = this.props.tableauSettings.ConfigChildField;
-            a['ConfigColorField'] = this.props.tableauSettings.ConfigColorField;
-            a['ConfigValueField'] = this.props.tableauSettings.ConfigValueField;
-
-            if (this.props.tableauSettings.ConfigParentField !== "name") {
-                a['name'] = a[this.props.tableauSettings.ConfigParentField];
-                delete a[this.props.tableauSettings.ConfigParentField];    
-            }
-
-            if (this.props.tableauSettings.ConfigChildField !== "child") {
-                a['child'] = a[this.props.tableauSettings.ConfigChildField];
-                delete a[this.props.tableauSettings.ConfigChildField];
-            }
-            
-            if (this.props.tableauSettings.ConfigColorField !== "colorHex") {
-                a['colorHex'] = a[this.props.tableauSettings.ConfigColorField];
-                delete a[this.props.tableauSettings.ConfigColorField];
-            }
-
-            if (this.props.tableauSettings.ConfigValueField !== "valueMetric") {
-                a['valueMetric'] = parseFloat(a[this.props.tableauSettings.ConfigValueField]);
-                delete a[this.props.tableauSettings.ConfigValueField];
-            }
-        });
-
-        console.log('in semiotic component mount', hierarchyDataPreped, this.props.hierarchyData);
-        //find the root node in the data set provided
-        //need to handle if there are more than one of these!!
-        let root = _.filter(hierarchyDataPreped, (o) => { return o.name == null; });
-        console.log('root array', root[0].child, root);
-
-        let edgeData = this.unflatten(hierarchyDataPreped, { ...root[0] }, root[0].child);
-        console.log('edgeData', edgeData);
-
-        let nodeData = _.uniqBy(hierarchyDataPreped, 'child'); 
-        console.log('nodeData', nodeData);
-
-        const nodeSizeScale = d3Scale.scaleLinear()
-            .domain(d3Array.extent(nodeData, (d) => {if (d.valueMetric) { return parseFloat(d.valueMetric);}}))
-            .range([this.props.tableauSettings.markerMinRadius*1 || 1, this.props.tableauSettings.markerMaxRadius*1 || 25])
-        ;
-
-        // not using this yet, but we will need it to enable value based colors
-        const nodeColorScale = d3Scale.scaleLinear()
-            .domain(d3Array.extent(nodeData, (d) => {if (d[this.props.tableauSettings.ConfigValueField]) { return parseFloat(d[this.props.tableauSettings.ConfigValueField]);}}))
-            .interpolate(d3Interpolate.interpolateHcl)
-            .range(_.split(this.props.nodeFillColor,','))
-          ;
-
-        console.log('nodeSize'
-            , this.props.tableauSettings.ConfigValueField
-            , _.split(this.props.nodeFillColor,',')[0]
-            , this.props.nodeFillColor
-            , this.props.tableauSettings.nodeColor
-            , d3Array.extent(nodeData, (d) => {if (d[this.props.tableauSettings.ConfigValueField]) { return parseFloat(d[this.props.tableauSettings.ConfigValueField]);}})
-            , nodeColorScale(3555)
-        );
-    
-        this.setState({
-            root: root,
-            edgeData: edgeData,
-            nodeData: nodeData, 
-            nodeSizeScale: nodeSizeScale,
-            nodeColorScale: nodeColorScale
-        })
+        console.log('component mounted');
     }
   
     render() {
@@ -149,7 +234,16 @@ class SemioticHierarchy extends React.Component {
             tableauSettings,
         } = this.props;
         
-        //console.log('hierarchy Data in sub component', JSON.stringify(this.state.edgeData));
+        // pull in memoized stuff for use in render function
+        let {
+            hierarchyDataPreped, 
+            nodeData,
+            edgeData,
+            nodeSizeScale, 
+            nodeColorScale,
+        } = this.preprocessData();
+
+        console.log('hierarchy Data in sub component', hierarchyDataPreped, edgeData);
 
         // create the custom tooltip for semiotic
         const popOver = (d) => {
@@ -208,28 +302,29 @@ class SemioticHierarchy extends React.Component {
             <div className="semiotic-hierarchy" style={{ padding: 10, height: height*.65, flex: 1, float: 'none', margin: '0 auto' }}>
                 <div style={{ height: height*.95, width: width*.95, float: 'none', margin: '0 auto' }}>
                     <ResponsiveNetworkFrame
-                        responsiveWidth
-                        responsiveHeight
-                        edges={this.state.edgeData}
+                        size={[width*.925,height*.925]}
+                        // responsiveWidth
+                        // responsiveHeight
+                        edges={edgeData}
                         nodeIDAccessor={d => d.child}
                         nodeSizeAccessor={
                                 tableauSettings.nodeSize === "none" ? undefined
                             :   tableauSettings.ConfigType === "Circlepack" ? undefined 
                             :   tableauSettings.ConfigType === "Treemap" ? undefined
                             :   tableauSettings.ConfigValueField === "None" ? undefined
-                            :   d => this.state.nodeSizeScale(d.valueMetric)
+                            :   d => nodeSizeScale(d.valueMetric)
                         } // this breaks the treemap and circlepack
                         nodeRenderMode={nodeRender}
                         edgeRenderMode={edgeRender}
                         edgeType={edgeType}
                         nodeStyle={(d,i) => ({ 
                             fill: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeFillColor,',')[0]
-                                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.state.nodeColorScale(d.valueMetric || 0)
+                                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
                                 : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
                                 : _.split(this.props.nodeFillColor,',')[0],
                             fillOpacity: nodeFillOpacity,
                             stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.strokeFillColor,',')[0]
-                                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.state.nodeColorScale(d.valueMetric || 0)
+                                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
                                 : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
                                 : _.split(this.props.strokeFillColor,',')[0],
                             strokeOpacity: nodeStrokeOpacity

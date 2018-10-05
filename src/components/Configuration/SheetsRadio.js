@@ -32,26 +32,37 @@ const styles = theme => ({
   iconSmall: {
     fontSize: 20,
   },
+  radio: {
+    '&$checked': {
+      color: 'rgb(232, 118, 44)'
+    }
+  },
+  checked: {}
 });
 
 class RadioButtonsGroup extends React.Component {
   constructor (props) {
     super(props);
+    console.log('props', this.props);
     this.state = {
-      value: this.props.selectedValue || '',
+      value: this.props.selectedValue || ""
     };
   }
 
-  handleChange = event => {
-    this.setState({ value: event.target.value });
-  };
+  // handleChange = event => {
+  //   this.setState({ value: event.target.value });
+  // };
 
   handleClick = event => {
-    console.log('handleClick', this.props.field, this.state.value);
-    if (this.state.value) {
-      this.props.sheetCallBack(this.props.field, this.state.value)
+    console.log('handleClick', this.props.field, event.target.value);
+    if ( event.target.value ) {
+      this.props.sheetCallBack(this.props.field, event.target.value);
+    }
+    if ( this.props.customChange ) {
+      this.props.customChange(event);
     }
   }
+
 
   componentWillUpdate(nextProps, nextState) {
     // if we get a new field, reset value to existing tableau setting
@@ -62,12 +73,13 @@ class RadioButtonsGroup extends React.Component {
       })
     }
   }
-
+  
   render() {
     const { classes, sheets, title, helperText, customChange } = this.props;
 
-    const changeCallBack = customChange || this.handleChange;
+    // const changeCallBack = customChange || this.handleChange;
 
+    console.log('sheetRadio', this.props, this.state);
     return (
       <div className={classes.root}>
         <div>
@@ -76,21 +88,21 @@ class RadioButtonsGroup extends React.Component {
             <RadioGroup
               className={classes.group}
               value={this.state.value}
-              onChange={changeCallBack}
+              onChange={this.handleClick}
             >
             {sheets.map(sheetName => (
               <FormControlLabel
                 key={sheetName}
                 value={sheetName}
-                control={<Radio color="primary" />}
+                control={<Radio color="primary" classes={{root: classes.radio, checked: classes.checked}} />}
                 label={sheetName}
               />
             ))}
             </RadioGroup>
-            <FormHelperText>{helperText || "You can display an error"}</FormHelperText>
+            {/* <FormHelperText>You can display an error</FormHelperText> */}
           </FormControl>
         </div>
-      <div>
+      {/* <div>
         <Button
           variant="outlined"
           color="primary"
@@ -101,7 +113,7 @@ class RadioButtonsGroup extends React.Component {
           <Save className={classNames(classes.leftIcon, classes.iconSmall)} />
           Save
         </Button>
-      </div>
+      </div> */}
     </div>
     );
   }

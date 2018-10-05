@@ -8,22 +8,16 @@ const initialData = {
   columns: {
     measures: {
       id: 'measures',
-      title: 'Measures',
+      title: 'Fields',
       type: 'measures',
       measures: []
       //measures: ['measure1', 'measure2', 'measure3', 'measure4']
     },
     config_options: {
       id: 'config_options',
-      title: 'Config options',
+      title: 'Hierarchy Fields',
       type: 'options',
       areaIds: ['ConfigParentField', 'ConfigChildField', 'ConfigColorField', 'ConfigValueField']
-    },
-    blank_options: {
-      id: 'blank_options',
-      title: 'Blank options',
-      type: 'options',
-      areaIds: []
     }
   },
   drop_area: {
@@ -56,7 +50,7 @@ const initialData = {
       measureId: null
     },
   },
-  columnOrder: ['measures', 'config_options', 'blank_options']
+  columnOrder: ['measures', 'config_options']
 }
 
 export default initialData;

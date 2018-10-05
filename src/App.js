@@ -124,6 +124,7 @@ class App extends Component {
     this.clickCallBack = this.clickCallBack.bind(this);
     this.hoverCallBack = this.hoverCallBack.bind(this);
     this.filterChanged = this.filterChanged.bind(this);
+    this.marksSelected = this.marksSelected.bind(this);
     this.getSummaryData = this.getSummaryData.bind(this);
     this.configCallBack = this.configCallBack.bind(this);
     this.eraseCallBack = this.eraseCallBack.bind(this);
@@ -309,7 +310,52 @@ class App extends Component {
     }
   }
 
-  // needs to be updated to handle if more than one data set is selected
+  // on mark selection highlight the nodes in the hierarchy as well
+  marksSelected (e) {
+    console.log('mark selected event', e);
+    e.getMarksAsync().then(marks => {
+      
+      // loop through marks table and adjust the class for opacity
+      let marksDataTable = marks.data[0];
+      let col_indexes = {};
+      let data = [];
+  
+      //console the select marks table
+      console.log('marks', marksDataTable);
+  
+      //write column names to array
+      for (let k = 0; k < marksDataTable.columns.length; k++) {
+          col_indexes[marksDataTable.columns[k].fieldName] = k;
+      }
+  
+      for (let j = 0, len = marksDataTable.data.length; j < len; j++) {
+        //console.log(this.convertRowToObject(tableauData[j], col_indexes));
+        data.push(convertRowToObject(marksDataTable.data[j], col_indexes));
+      }
+  
+      // selected marks is being triggered, but this approach will not work with semiotic
+      // console.log('refs test', this.refs);
+      // now we reconcile marks to hierarchy data and adjust opacity accordingly
+      // for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
+        // if ( this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`] ) {
+        //   //if we find the data in the marks array then set to 1
+        //   if ( data.length === 0 ) {
+        //     this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`].style.opacity=parseFloat(this.state.tableauSettings.fillOpacity || .5);
+        //   }
+        //   else if (_.find(data, (o) => { return o[this.state.tableauSettings.ChoroJoinField] === this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]})) {
+        //     this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`].style.opacity=1;
+        //   }
+        //   else { // else set to .1
+        //     this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`].style.opacity=.1;
+        //   }
+        // }
+      // }
+  
+      console.log('marks data', data, this.state['ConfigSheetData']);
+    }, err => {console.log('marks error', err);}
+    );
+  }
+
   // find all sheets in array and then call get summary, for now hardcoding
   filterChanged (e) {
     console.log('filter changed', e);
@@ -428,7 +474,12 @@ class App extends Component {
       window.tableau.TableauEventType.FilterChanged,
       this.filterChanged
     );
-  }
+
+    this.unregisterEventFn = sheetObject.addEventListener(
+      window.tableau.TableauEventType.MarkSelectionChanged,
+      this.marksSelected
+    );
+    }
   
   clearSheet () {
     console.log("triggered erase");
@@ -837,6 +888,7 @@ render() {
     // left off here config should be good, now we need to get component working from new config
     return (
       <SemioticHierarchy
+        ref={"SemioticHierarchy"}
         className={'semiotic-hierarchy-chart'}
         width={this.state.width * .925}
         height={this.state.height * .925}

@@ -17,23 +17,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import TextField from '@material-ui/core/TextField';
 
-// icons
-import Save from '@material-ui/icons/Save';
-
+import { InputLabelWithTooltip, OptionWrapper, OptionTitle, TextField } from './CustomizeUIElements';
 
 const styles = theme => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
   formControl: {
     margin: theme.spacing.unit,
     minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing.unit * 2,
+    display: 'inherit',
   },
 });
 
@@ -75,22 +66,15 @@ class ConfigScreen extends React.Component {
 
     console.log('we are in custom', this.props);
     return (
-      <div className="sheetScreen" style={{padding : 10 }}>
-        <Grid
-          container
-          alignItems="center"
-          justify="space-between"
-          direction="row"
-          spacing={8} >
-
-          <Grid item xs={12} >
-            <Typography
-              variant="display1"
-              align="left" >
-              {configTitle}
-            </Typography>
+      <div className="sheetScreen">
+        <OptionWrapper>
+          <OptionTitle>{this.props.configTitle}</OptionTitle>
+          <div class="content-container">
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="edgeType-helper">edgeType</InputLabel>
+              <InputLabelWithTooltip 
+                  title="Edge Type"
+                  tooltipText="Select the style of edge for your viz"
+                />
               <Select
                 value={tableauSettings.edgeType || "normal"}
                 onChange={handleChange}
@@ -100,10 +84,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"linearc"}>Line Arc</MenuItem>
                  <MenuItem value={"curve"}>Curve</MenuItem>
               </Select>
-              <FormHelperText>The way edges will be drawn</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="networkProjection-helper">networkProjection</InputLabel>
+              <InputLabelWithTooltip 
+                    title="Viz Layout"
+                    tooltipText="Select the layout for your viz (vertical, horizontal or radial"
+                  />
               <Select
                 value={tableauSettings.networkProjection || "vertical"}
                 onChange={handleChange}
@@ -113,10 +99,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"horizontal"}>Horizontal</MenuItem>
                  <MenuItem value={"radial"}>Radial</MenuItem>
               </Select>
-              <FormHelperText>Layout of the hierarchy</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="edgeRender-helper">edgeRender</InputLabel>
+              <InputLabelWithTooltip 
+                      title="Edge Render Type"
+                      tooltipText="Select from Semoitic's Render Modes"
+                    />
               <Select
                 value={tableauSettings.edgeRender || "normal"}
                 onChange={handleChange}
@@ -126,10 +114,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"sketchy"}>Sketchy</MenuItem>
                  <MenuItem value={"painty"}>Painty</MenuItem>
               </Select>
-              <FormHelperText>The way edges will be rendered</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="nodeRender-helper">nodeRender</InputLabel>
+              <InputLabelWithTooltip 
+                title="Node Render Type"
+                tooltipText="Select from Semoitic's Render Modes"
+              />
               <Select
                 value={tableauSettings.nodeRender || "normal"}
                 onChange={handleChange}
@@ -139,24 +129,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"sketchy"}>Sketchy</MenuItem>
                  <MenuItem value={"painty"}>Painty</MenuItem>
               </Select>
-              <FormHelperText>The way nodes will be rendered</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="padAngle-helper">padAngle</InputLabel>
-              <Select
-                value={parseFloat(tableauSettings.padAngle || 0.01)}
-                onChange={handleChange}
-                input={<Input name="padAngle" id="padAngle-helper" />}
-              >
-                 <MenuItem value={0}>0</MenuItem>
-                 <MenuItem value={0.01}>0.01</MenuItem>
-                 <MenuItem value={0.2}>0.2</MenuItem>
-                 <MenuItem value={0.4}>0.4</MenuItem>
-              </Select>
-              <FormHelperText>Spacing between arcs in the chord</FormHelperText>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="hoverAnnotation-helper">hoverAnnotation</InputLabel>
+              <InputLabelWithTooltip 
+                  title="Show Tooltip"
+                  tooltipText="Toggle whether to show the tooltip"
+              />
               <Select
                 value={tableauSettings.hoverAnnotation === "true"}
                 onChange={handleChange}
@@ -165,10 +143,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={false}>False</MenuItem>
                  <MenuItem value={true}>True</MenuItem>
               </Select>
-              <FormHelperText>Show annotation on hover</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="colorConfig-helper">colorConfig</InputLabel>
+              <InputLabelWithTooltip 
+                    title="Color Config"
+                    tooltipText="The way color will be applied"
+              />
               <Select
                 value={tableauSettings.colorConfig || "solid"}
                 onChange={handleChange}
@@ -178,10 +158,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"scale"}>Color Scale</MenuItem>
                  <MenuItem value={"field"}>Color Field</MenuItem>
               </Select>
-              <FormHelperText>The way color will be applied</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="nodeColor-helper"></InputLabel>
+              <InputLabelWithTooltip 
+                title="Color"
+                tooltipText="For single, enter 1 hex code for scale enter two, e.g., #ccc,#ddd"
+              />
               <TextField  
                 id="nodeColor-helper"
                 name="nodeColor"
@@ -192,10 +174,12 @@ class ConfigScreen extends React.Component {
                 onChange={handleChange}
                 margin="normal"
               />
-              <FormHelperText>Node Fill</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="nodeFillOpacity-helper"></InputLabel>
+              <InputLabelWithTooltip 
+                title="Node Fill Opacity"
+                tooltipText="A decimal from 0 to 1 that will control node opacity"
+              />
               <TextField  
                 id="nodeFillOpacity-helper"
                 name="nodeFillOpacity"
@@ -206,10 +190,12 @@ class ConfigScreen extends React.Component {
                 onChange={handleChange}
                 margin="normal"
               />
-              <FormHelperText>Node Fill Opacity (0 -> 1)</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="nodeSize-helper">nodeSize</InputLabel>
+              <InputLabelWithTooltip 
+                  title="Node Size"
+                  tooltipText="Toggle node size from value field"
+              />
               <Select
                 value={tableauSettings.nodeSize || "none"}
                 onChange={handleChange}
@@ -218,10 +204,12 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"none"}>None</MenuItem>
                  <MenuItem value={"value"}>Value</MenuItem>
               </Select>
-              <FormHelperText>Toggle node size from value field</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="markerMinRadius-helper"></InputLabel>
+              <InputLabelWithTooltip 
+                title="Minimum Node Size"
+                tooltipText="Minimum radius for nodes (e.g., 1)"
+              />
               <TextField  
                 id="markerMinRadius-helper"
                 name="markerMinRadius"
@@ -232,10 +220,12 @@ class ConfigScreen extends React.Component {
                 onChange={handleChange}
                 margin="normal"
               />
-              <FormHelperText>Minimum radius for map markers</FormHelperText>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="markerMaxRadius-helper"></InputLabel>
+              <InputLabelWithTooltip 
+                title="Maximum Node Size"
+                tooltipText="Maximum radius for nodes (e.g., 10)"
+              />
               <TextField  
                 id="markerMaxRadius-helper"
                 name="markerMaxRadius"
@@ -246,25 +236,9 @@ class ConfigScreen extends React.Component {
                 onChange={handleChange}
                 margin="normal"
               />
-              <FormHelperText>Maximum radius for map markers</FormHelperText>
             </FormControl>
-          </Grid>
-
-          <Grid item xs={6} >
-            <div className="customButton" >
-              <Button
-                variant="outlined"
-                color="primary"
-                size="large"
-                className={classes.button}
-                onClick={this.handleClick}
-              >
-                <Save className={classNames(classes.leftIcon, classes.iconSmall)} />
-                Save
-              </Button>
-            </div>
-          </Grid>
-        </Grid>
+          </div>
+        </OptionWrapper>
       </div>
       );
     }

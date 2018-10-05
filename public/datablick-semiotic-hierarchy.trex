@@ -7,7 +7,7 @@
     <author name="DataBlick" email="extensions@datablick.com" organization="DataBlick" website="https://www.datablick.com"/>
     <min-api-version>1.1</min-api-version>
     <source-location>
-      <url>http://localhost:3000/index.html</url>
+      <url>https://demartsc.github.io/tableau-semiotic-hierarchy/</url>
     </source-location>
     <icon></icon>
     <context-menu>

@@ -222,6 +222,7 @@ class SemioticHierarchy extends React.Component {
             nodeFillOpacity, 
             nodeStrokeColor, 
             nodeStrokeOpacity,
+            nodeSize,
             edgeRender,
             edgeType,
             edgeFillColor, 
@@ -243,7 +244,7 @@ class SemioticHierarchy extends React.Component {
             nodeColorScale,
         } = this.preprocessData();
 
-        console.log('hierarchy Data in sub component', hierarchyDataPreped, edgeData);
+        console.log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
         // create the custom tooltip for semiotic
         const popOver = (d) => {
@@ -298,63 +299,63 @@ class SemioticHierarchy extends React.Component {
             // })}
         }
 
-        return (
-            <div className="semiotic-hierarchy" style={{ padding: 10, height: height*.65, flex: 1, float: 'none', margin: '0 auto' }}>
-                <div style={{ height: height*.95, width: width*.95, float: 'none', margin: '0 auto' }}>
-                    <ResponsiveNetworkFrame
-                        size={[width*.925,height*.925]}
-                        // responsiveWidth
-                        // responsiveHeight
-                        edges={edgeData}
-                        nodeIDAccessor={d => d.child}
-                        nodeSizeAccessor={
-                                tableauSettings.nodeSize === "none" ? undefined
-                            :   tableauSettings.ConfigType === "Circlepack" ? undefined 
-                            :   tableauSettings.ConfigType === "Treemap" ? undefined
-                            :   tableauSettings.ConfigValueField === "None" ? undefined
-                            :   d => nodeSizeScale(d.valueMetric)
-                        } // this breaks the treemap and circlepack
-                        nodeRenderMode={nodeRender}
-                        edgeRenderMode={edgeRender}
-                        edgeType={edgeType}
-                        nodeStyle={(d,i) => ({ 
-                            fill: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeFillColor,',')[0]
-                                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
-                                : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
-                                : _.split(this.props.nodeFillColor,',')[0],
-                            fillOpacity: nodeFillOpacity,
-                            stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.strokeFillColor,',')[0]
-                                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
-                                : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
-                                : _.split(this.props.strokeFillColor,',')[0],
-                            strokeOpacity: nodeStrokeOpacity
-                        })}
-                        edgeStyle={(d,i) => ({ 
-                            fill: edgeFillColor,
-                            fillOpacity: edgeFillOpacity,
-                            stroke: d.target.colorHex || "#BDBDBD", 
-                            strokeOpacity: edgeStrokeOpacity
-                        })}
-                        edgeWidthAccessor={d => d.valueMetric || 1}
-                        networkType={{
-                            type: networkType,
-                            projection: networkProjection,
-                            nodePadding: 1,
-                            forceManyBody: networkType === "force" ? -250 : -50,
-                            edgeStrength: networkType === "force" ? 2 : 1,
-                            iterations: networkType === "force" ? 500 : 1,
-                            padding: networkType === "treemap" ? 3 : networkType === "circlepack" ? 2 : 0,
-                            distanceMax: networkType === "force" ? 500 : 1,
-                            hierarchySum: d => d.valueMetric || 0
-                        }}                
+       return (
+            <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
+                <ResponsiveNetworkFrame
+                    responsiveWidth
+                    responsiveHeight
+                    edges={edgeData}
+                    nodeIDAccessor={d => d.child}
+                    nodeSizeAccessor={ d => nodeSizeScale(d.valueMetric) }
+                    // {
+                    //     console.log('i', d.valueMetric, nodeSizeScale(d.valueMetric), tableauSettings.nodeSize);
+                    //     return 
+                    //         tableauSettings.nodeSize === "none" ? undefined
+                    //     :   tableauSettings.ConfigType === "Circlepack" ? undefined 
+                    //     :   tableauSettings.ConfigType === "Treemap" ? undefined
+                    //     :   tableauSettings.ConfigValueField === "None" ? undefined
+                    //     :   nodeSizeScale(d.valueMetric)
+                    // }} // this breaks the treemap and circlepack
+                    nodeRenderMode={nodeRender}
+                    edgeRenderMode={edgeRender}
+                    edgeType={edgeType}
+                    nodeStyle={(d,i) => ({ 
+                        fill: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeFillColor,',')[0]
+                            : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
+                            : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
+                            : _.split(this.props.nodeFillColor,',')[0],
+                        fillOpacity: nodeFillOpacity,
+                        stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.strokeFillColor,',')[0]
+                            : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
+                            : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
+                            : _.split(this.props.strokeFillColor,',')[0],
+                        strokeOpacity: nodeStrokeOpacity
+                    })}
+                    edgeStyle={(d,i) => ({ 
+                        fill: edgeFillColor,
+                        fillOpacity: edgeFillOpacity,
+                        stroke: d.target.colorHex || "#BDBDBD", 
+                        strokeOpacity: edgeStrokeOpacity
+                    })}
+                    edgeWidthAccessor={d => d.valueMetric || 1}
+                    networkType={{
+                        type: networkType,
+                        projection: networkProjection,
+                        nodePadding: 1,
+                        forceManyBody: networkType === "force" ? -250 : -50,
+                        edgeStrength: networkType === "force" ? 2 : 1,
+                        iterations: networkType === "force" ? 500 : 1,
+                        padding: networkType === "treemap" ? 3 : networkType === "circlepack" ? 2 : 0,
+                        distanceMax: networkType === "force" ? 500 : 1,
+                        hierarchySum: d => d.valueMetric || 0
+                    }}                
 
-                        // interactivity
-                        hoverAnnotation={this.props.hoverAnnotation}
-                        tooltipContent={d => popOver(d)}
-                        customClickBehavior={(d) => this.props.clickCallBack(d)}
-                        customHoverBehavior={(d) => this.props.hoverCallBack(d)}
-                    />
-                </div>
+                    // interactivity
+                    hoverAnnotation={hoverAnnotation}
+                    tooltipContent={d => popOver(d)}
+                    customClickBehavior={(d) => this.props.clickCallBack(d)}
+                    customHoverBehavior={(d) => this.props.hoverCallBack(d)}
+                />
             </div>
         );
     }

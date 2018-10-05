@@ -45,6 +45,9 @@ import { tableau } from './tableau-extensions-1.latest';
 // tableau settings handler
 import * as TableauSettings from './TableauSettings';
 
+// initial default settings
+import defaultSettings from './components/Configuration/defaultSettings';
+
 // utils and variables
 import { 
   defaultColor, 
@@ -497,6 +500,18 @@ class App extends Component {
     });
   };  
 
+  componentWillUnmount() {
+    let _this = this;
+    window.removeEventListener('resize', function() {
+      const thisWidth = window.innerWidth;
+      const thisHeight = window.innerHeight;
+      _this.setState({
+        width: thisWidth,
+        height: thisHeight
+      });
+    }, true);
+  }
+  
   componentDidMount () {
     const thisHeight = window.innerHeight;
     const thisWidth = window.innerWidth;
@@ -514,9 +529,19 @@ class App extends Component {
 
     tableauExt.initializeAsync({'configure': this.configure}).then(() => {
       let unregisterHandlerFunctions = [];
-  
-  
-      // this is where the majority of the code is going to go for this extension I think
+
+    // default tableau settings on initial entry into the extension
+    // we know if we haven't done anything yet when tableauSettings state = []
+    console.log("did mount", tableauExt.settings.get("ConfigType"));
+    if ( tableauExt.settings.get("ConfigType") === undefined ) {
+      console.log('defaultSettings triggered', defaultSettings.length, defaultSettings);
+      defaultSettings.defaultKeys.map((defaultSetting, index) => {
+        console.log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
+        this.configCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
+      })
+    }
+
+    // this is where the majority of the code is going to go for this extension I think
       console.log("will mount", tableauExt.settings.getAll());
   
       //get sheetNames and dashboard name from workbook
@@ -812,58 +837,43 @@ render() {
 
     // left off here config should be good, now we need to get component working from new config
     return (
-      <div className="App" >
-        <SemioticHierarchy
-          className={'semiotic-hierarchy-chart'}
-          width={this.state.width * .925}
-          height={this.state.height * .925}
-          hierarchyData={this.state.ConfigSheetData}
-          tableauSettings={tableauSettingsState}
+      <SemioticHierarchy
+        className={'semiotic-hierarchy-chart'}
+        width={this.state.width * .925}
+        height={this.state.height * .925}
+        hierarchyData={this.state.ConfigSheetData}
+        tableauSettings={tableauSettingsState}
 
-          //networkTypeProps
-          networkType={semioticTypes[tableauSettingsState.ConfigType]}
-          networkProjection={tableauSettingsState.networkProjection}
+        //networkTypeProps
+        networkType={semioticTypes[tableauSettingsState.ConfigType]}
+        networkProjection={tableauSettingsState.networkProjection}
 
-          //render mode props
-          nodeSize={tableauSettingsState.nodeSize}
-          nodeRender={tableauSettingsState.nodeRender}
-          edgeRender={tableauSettingsState.edgeRender}
-          edgeType={tableauSettingsState.edgeType}
+        //render mode props
+        nodeSize={tableauSettingsState.nodeSize}
+        nodeRender={tableauSettingsState.nodeRender}
+        edgeRender={tableauSettingsState.edgeRender}
+        edgeType={tableauSettingsState.edgeType}
 
-          //edge styling props
-          edgeFillColor={DataBlick[2]}
-          edgeFillOpacity={0}
-          edgeStrokeColor={DataBlick[2]}
-          edgeStrokeOpacity={.25}
-          //edgeWidthField || edgeWidthStroke
+        //edge styling props
+        edgeFillColor={DataBlick[2]}
+        edgeFillOpacity={0}
+        edgeStrokeColor={DataBlick[2]}
+        edgeStrokeOpacity={.25}
+        //edgeWidthField || edgeWidthStroke
 
-          //node styling props
-          nodeFillColor={tableauSettingsState.nodeColor}
-          nodeFillOpacity={tableauSettingsState.nodeFillOpacity || .35}
-          nodeStrokeColor={tableauSettingsState.nodeColor}
-          nodeStrokeOpacity={.5}
-          //nodeWidthField || nodeWidthStroke
-        
-          //interactivity props
-          hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
-          clickCallBack={this.clickCallBack}
-          hoverCallBack={this.hoverCallBack}
-        />
-      </div>
+        //node styling props
+        nodeFillColor={tableauSettingsState.nodeColor}
+        nodeFillOpacity={tableauSettingsState.nodeFillOpacity || .35}
+        nodeStrokeColor={tableauSettingsState.nodeColor}
+        nodeStrokeOpacity={tableauSettingsState.nodeStrokeOpacity || .5}
+        //nodeWidthField || nodeWidthStroke
+      
+        //interactivity props
+        hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
+        clickCallBack={this.clickCallBack}
+        hoverCallBack={this.hoverCallBack}
+      />
     );
-
-  return (
-    <Button
-      variant="outlined"
-      color="primary"
-      size="large"
-      className={classes.button}
-      onClick={this.clearSheet}
-    >
-      <Delete className={classNames(classes.leftIcon, classes.iconSmall)} />
-      Erase
-    </Button>
-  );
   }
 }
 

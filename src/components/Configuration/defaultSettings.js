@@ -5,9 +5,14 @@ const defaultSettings = {
     edgeType: "curve",
     markerMinRadius: 1, 
     markerMaxRadius: 25,
-    colorConfig: "single",
+    colorConfig: "field",
     hoverAnnotation: true,
-    nodeSize: 1
+    nodeSize: 'none', 
+    nodeFillOpacity: .35,
+    nodeStrokeOpacity: .5, 
+    nodeColor: "#CCCCCC", 
+    nodeRender: "normal", 
+    edgeRender: "normal",
   },
   defaultKeys: [ 
     'ConfigType',
@@ -17,7 +22,11 @@ const defaultSettings = {
     'markerMaxRadius',
     'colorConfig',
     'hoverAnnotation',
-    'nodeSize'
+    'nodeSize', 
+    'nodeFillOpacity', 
+    'nodeColor',
+    'nodeRender',
+    'edgeRender'
   ]
 }
 

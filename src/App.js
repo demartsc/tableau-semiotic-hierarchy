@@ -178,15 +178,14 @@ class App extends Component {
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
       console.log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
-      
       // select marks
-      // worksheet.selectMarksByValueAsync(
-      //   [{
-      //     'fieldName': tableauExt.settings.get("ConfigChildField"),
-      //     'value': [d.id],
-      //   }],
-      //   window.tableau.SelectionUpdateType.Replace
-      // ).then(e => console.log('select marks response: ' + worksheet.name, e)); // response is void per tableau-extensions.js
+      worksheet.selectMarksByValueAsync(
+        [{
+          'fieldName': tableauExt.settings.get("ConfigChildField"),
+          'value': [d.child],
+        }],
+        window.tableau.SelectionUpdateType.Replace
+      ).then(e => console.log('select marks response: ' + worksheet.name, e)); // response is void per tableau-extensions.js
       });
     }
   }

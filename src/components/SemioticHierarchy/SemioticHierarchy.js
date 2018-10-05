@@ -134,8 +134,8 @@ function buildNodeSizeScale(nodeData, markerMinRadius, markerMaxRadius) {
     return d3Scale.scaleLinear()
       .domain(d3Array.extent(nodeData, remapper))
       .range([
-        markerMinRadius || MIN_MARKER_RADIUS,
-        markerMaxRadius || MAX_MARKER_RADIUS,
+        markerMinRadius*1 || MIN_MARKER_RADIUS*1,
+        markerMaxRadius*1 || MAX_MARKER_RADIUS*1,
       ]);
 }
 
@@ -280,25 +280,6 @@ class SemioticHierarchy extends React.Component {
             }
         }
 
-        // check color props and then submit the correct props to Semiotic
-        if (this.props.tableauSettings.ConfigColorField === "None") {
-
-        } else {
-            // let colorNodeProps = 
-            // { 
-            //     fill:  d.colorHex,
-            //     fillOpacity: nodeFillOpacity,
-            //     stroke: d.colorHex, 
-            //     strokeOpacity: nodeStrokeOpacity
-            // }
-            // edgeStyle={(d,i) => ({ 
-            //     fill: edgeFillColor,
-            //     fillOpacity: edgeFillOpacity,
-            //     stroke: d.target.colorHex || "#BDBDBD", 
-            //     strokeOpacity: edgeStrokeOpacity
-            // })}
-        }
-
        return (
             <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
                 <ResponsiveNetworkFrame
@@ -306,16 +287,13 @@ class SemioticHierarchy extends React.Component {
                     responsiveHeight
                     edges={edgeData}
                     nodeIDAccessor={d => d.child}
-                    nodeSizeAccessor={ d => nodeSizeScale(d.valueMetric) }
-                    // {
-                    //     console.log('i', d.valueMetric, nodeSizeScale(d.valueMetric), tableauSettings.nodeSize);
-                    //     return 
-                    //         tableauSettings.nodeSize === "none" ? undefined
-                    //     :   tableauSettings.ConfigType === "Circlepack" ? undefined 
-                    //     :   tableauSettings.ConfigType === "Treemap" ? undefined
-                    //     :   tableauSettings.ConfigValueField === "None" ? undefined
-                    //     :   nodeSizeScale(d.valueMetric)
-                    // }} // this breaks the treemap and circlepack
+                    nodeSizeAccessor={
+                            tableauSettings.nodeSize === "none" ? undefined
+                        :   tableauSettings.ConfigType === "Circlepack" ? undefined 
+                        :   tableauSettings.ConfigType === "Treemap" ? undefined
+                        :   tableauSettings.ConfigValueField === "None" ? undefined
+                        :   d => nodeSizeScale(d.valueMetric)
+                    } // this breaks the treemap and circlepack
                     nodeRenderMode={nodeRender}
                     edgeRenderMode={edgeRender}
                     edgeType={edgeType}

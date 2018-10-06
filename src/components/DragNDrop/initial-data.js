@@ -25,14 +25,14 @@ const initialData = {
       id: 'ConfigParentField',
       title: 'Parent',
       type: 'single_drop',
-      icon: 'LongitudeIcon',
+      icon: 'ParentIcon',
       measureId: null
     },
     ConfigChildField: {
       id: 'ConfigChildField',
       title: 'Child',
       type: 'single_drop',
-      icon: 'LatitudeIcon',
+      icon: 'ChildIcon',
       measureId: null
     },
     ConfigColorField: {

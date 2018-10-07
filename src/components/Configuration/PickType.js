@@ -14,7 +14,7 @@ const styles = {
 const PickType = (props) => (
     <React.Fragment>
     <div class="content-container">
-      <h1 className="title">{props.title}</h1>
+      <h4 style={{color: "#BDBDBD"}}>{props.title}</h4>
       <div className="clearfix">
         <OptionColumn className="grid--4">
             <div className="SheetPicker" >

@@ -26,28 +26,32 @@ const initialData = {
       title: 'Parent',
       type: 'single_drop',
       icon: 'ParentIcon',
-      measureId: null
+      measureId: null, 
+      required: true
     },
     ConfigChildField: {
       id: 'ConfigChildField',
       title: 'Child',
       type: 'single_drop',
       icon: 'ChildIcon',
-      measureId: null
+      measureId: null, 
+      required: true
     },
     ConfigColorField: {
       id: 'ConfigColorField',
       title: 'Color By',
       type: 'single_drop',
       icon: 'FillByIcon',
-      measureId: null
+      measureId: null, 
+      required: false
     },
     ConfigValueField: {
       id: 'ConfigValueField',
       title: 'Size by',
       type: 'single_drop',
       icon: 'SizeByIcon',
-      measureId: null
+      measureId: null, 
+      required: false
     },
   },
   columnOrder: ['measures', 'config_options']

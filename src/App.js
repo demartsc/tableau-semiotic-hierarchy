@@ -811,6 +811,29 @@ render() {
           }
         });
 
+        const requiredFieldTextStyle = {
+          border: "2px solid rgba(70, 130, 180, 0.6)", 
+          borderRadius: "2px",
+          color: "rgba(70, 130, 180, 1)",
+          paddingLeft: "6px",
+          paddingRight: "6px",
+          fontSize: "13px",
+          float: "right",
+          marginTop: "8px"
+        }
+         const optionalFieldTextStyle = {
+          border: "2px dashed lightgrey", 
+          borderRadius: "2px",
+          color: "grey",
+          paddingLeft: "6px",
+          paddingRight: "6px",
+          fontSize: "13px",
+          float: "right",
+          marginRight: "6%",
+          marginLeft: "8px",
+          marginTop: "8px"
+        }
+
         return (
           <React.Fragment>
             <Stepper 
@@ -823,8 +846,9 @@ render() {
               configCallBack={this.configCallBack}
               eraseCallBack={this.eraseCallBack}
             />
-            <p style={{paddingRight: "6%", textAlign: "right", color: "steelblue"}}> blue is required </p>
-            <StepButtons
+            <span style={optionalFieldTextStyle} className="text--benton-light">*optional</span>
+            <span style={requiredFieldTextStyle} className="text--benton-light">*required</span>
+          <StepButtons
               onNextClick={this.onNextStep}
               onPrevClick={this.onPrevStep}
               stepIndex={this.state.stepIndex}

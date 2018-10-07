@@ -62,8 +62,8 @@ class ConfigScreen extends React.Component {
     return (
       <div className="sheetScreen">
         <OptionWrapper>
-          <OptionTitle>{this.props.configTitle}</OptionTitle>
           <div class="content-container">
+            <OptionTitle>{this.props.configTitle}</OptionTitle>
             <FormControl className={classes.formControl}>
               <InputLabelWithTooltip 
                   title="Edge Type"

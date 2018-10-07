@@ -25,29 +25,33 @@ const initialData = {
       id: 'ConfigParentField',
       title: 'Parent',
       type: 'single_drop',
-      icon: 'LongitudeIcon',
-      measureId: null
+      icon: 'ParentIcon',
+      measureId: null, 
+      required: true
     },
     ConfigChildField: {
       id: 'ConfigChildField',
       title: 'Child',
       type: 'single_drop',
-      icon: 'LatitudeIcon',
-      measureId: null
+      icon: 'ChildIcon',
+      measureId: null, 
+      required: true
     },
     ConfigColorField: {
       id: 'ConfigColorField',
       title: 'Color By',
       type: 'single_drop',
       icon: 'FillByIcon',
-      measureId: null
+      measureId: null, 
+      required: false
     },
     ConfigValueField: {
       id: 'ConfigValueField',
       title: 'Size by',
       type: 'single_drop',
       icon: 'SizeByIcon',
-      measureId: null
+      measureId: null, 
+      required: false
     },
   },
   columnOrder: ['measures', 'config_options']

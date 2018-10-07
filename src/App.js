@@ -524,7 +524,7 @@ class App extends Component {
     this.clearSheet();
     const popUpUrl = window.location.href + '#true';
     const popUpOptions = {
-      height: 570,
+      height: 625,
       width: 720,
       };
   
@@ -736,6 +736,7 @@ render() {
               steps={stepNames}
             />
             <PickType
+                title = {"Select a hierarchy data visualization"}
                 sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap", "Partition"]}
                 selectSheet = {this.configCallBack}
                 customChange = {this.demoChange}
@@ -817,11 +818,12 @@ render() {
               steps={stepNames}
             />
             <DragNDrop
-              title="Drag & Drop measures"
+              title={"Drag fields onto the marks shelves to map data to your visualization"}
               initialData={tmpMeasures}
               configCallBack={this.configCallBack}
               eraseCallBack={this.eraseCallBack}
             />
+            <p style={{paddingRight: "6%", textAlign: "right", color: "steelblue"}}> blue is required </p>
             <StepButtons
               onNextClick={this.onNextStep}
               onPrevClick={this.onPrevStep}
@@ -842,7 +844,7 @@ render() {
               steps={stepNames}
             />
             <CustomizeHierarchy
-              title="Customize Hierarchy"
+              // title="Customize Hierarchy"
               configTitle = "Customize your hierarchy chart"
               handleChange={this.handleChange}
               customCallBack={this.customCallBack}
@@ -869,7 +871,7 @@ render() {
           <SplashScreen 
             configure={this.configure} 
             title="Semiotic Hierarchy Charts in Tableau"
-            desc="Leverage the brillance of Semiotic's hierarchy network chart library, directly within Tableau!"
+            desc="Leverage the brilliance of Semiotic's hierarchy network chart library, directly within Tableau!"
             ctaText="Configure"
             poweredBy={
               <React.Fragment>

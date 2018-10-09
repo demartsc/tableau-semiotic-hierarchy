@@ -5,7 +5,7 @@ import { Droppable } from 'react-beautiful-dnd';
 import ExtensionIcons from './images';
 
 const Container = styled.div`
-  border: ${props => (props.isDraggingOver ? '2px solid rgba(208, 2, 27, 0.4)' : '1px solid lightgrey')};
+  border: ${props => (props.isDraggingOver ? '2px solid rgba(208, 2, 27, 0.4)' : props.areaRequired ? '2px solid rgba(70, 130, 180, 0.6)' : '2px dashed lightgrey')};
   border-radius: 2px;
   padding: 4px;
   display: inline-block;
@@ -39,6 +39,7 @@ export default class DropArea extends React.Component {
             innerRef={provided.innerRef}
             {...provided.droppableProps}
             isDraggingOver={snapshot.isDraggingOver}
+            areaRequired={this.props.area.required}
           >
             <MeasureIcon src={ExtensionIcons[this.props.area.icon]} alt="" />
             <MeasureTitle>{this.props.area.title}</MeasureTitle>

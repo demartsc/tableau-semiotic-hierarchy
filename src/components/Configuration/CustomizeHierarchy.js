@@ -6,7 +6,7 @@ import { OptionColumn } from './CustomizeUIElements';
 const CustomizeHierarchy = (props) => (
   <React.Fragment>
     <div class="content-container">
-      <h1 className="title">{props.title}</h1>
+      <h4 style={{color: "#BDBDBD"}}>{props.title}</h4>
       <div className="clearfix">
         <OptionColumn className="grid--5">
           <CustomScreen 
@@ -20,7 +20,7 @@ const CustomizeHierarchy = (props) => (
             tableauSettings={props.tableauSettings}
           />
         </OptionColumn>
-        <OptionColumn className="grid--7">
+        <OptionColumn className="grid--7" style={{border: 0}}>
         </OptionColumn>
       </div>
     </div>

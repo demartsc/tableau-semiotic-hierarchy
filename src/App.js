@@ -524,7 +524,7 @@ class App extends Component {
     this.clearSheet();
     const popUpUrl = window.location.href + '#true';
     const popUpOptions = {
-      height: 570,
+      height: 625,
       width: 720,
       };
   
@@ -736,6 +736,7 @@ render() {
               steps={stepNames}
             />
             <PickType
+                title = {"Select a hierarchy data visualization"}
                 sheetNames = {["Tidy Tree", "Dendogram", "Network", "Circlepack", "Treemap", "Partition"]}
                 selectSheet = {this.configCallBack}
                 customChange = {this.demoChange}
@@ -810,6 +811,29 @@ render() {
           }
         });
 
+        const requiredFieldTextStyle = {
+          border: "2px solid rgba(70, 130, 180, 0.6)", 
+          borderRadius: "2px",
+          color: "rgba(70, 130, 180, 1)",
+          paddingLeft: "6px",
+          paddingRight: "6px",
+          fontSize: "13px",
+          float: "right",
+          marginTop: "8px"
+        }
+         const optionalFieldTextStyle = {
+          border: "2px dashed lightgrey", 
+          borderRadius: "2px",
+          color: "grey",
+          paddingLeft: "6px",
+          paddingRight: "6px",
+          fontSize: "13px",
+          float: "right",
+          marginRight: "6%",
+          marginLeft: "8px",
+          marginTop: "8px"
+        }
+
         return (
           <React.Fragment>
             <Stepper 
@@ -817,12 +841,14 @@ render() {
               steps={stepNames}
             />
             <DragNDrop
-              title="Drag & Drop measures"
+              title={"Drag fields onto the marks shelves to map data to your visualization"}
               initialData={tmpMeasures}
               configCallBack={this.configCallBack}
               eraseCallBack={this.eraseCallBack}
             />
-            <StepButtons
+            <span style={optionalFieldTextStyle} className="text--benton-light">*optional</span>
+            <span style={requiredFieldTextStyle} className="text--benton-light">*required</span>
+          <StepButtons
               onNextClick={this.onNextStep}
               onPrevClick={this.onPrevStep}
               stepIndex={this.state.stepIndex}
@@ -842,7 +868,7 @@ render() {
               steps={stepNames}
             />
             <CustomizeHierarchy
-              title="Customize Hierarchy"
+              // title="Customize Hierarchy"
               configTitle = "Customize your hierarchy chart"
               handleChange={this.handleChange}
               customCallBack={this.customCallBack}
@@ -869,7 +895,7 @@ render() {
           <SplashScreen 
             configure={this.configure} 
             title="Semiotic Hierarchy Charts in Tableau"
-            desc="Leverage the brillance of Semiotic's hierarchy network chart library, directly within Tableau!"
+            desc="Leverage the brilliance of Semiotic's hierarchy network chart library, directly within Tableau!"
             ctaText="Configure"
             poweredBy={
               <React.Fragment>

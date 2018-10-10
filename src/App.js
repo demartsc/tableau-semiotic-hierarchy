@@ -157,18 +157,26 @@ class App extends Component {
 
   clickCallBack = d => {
     console.log('in on click callback', d);
-      // go through each worksheet and select marks
+    // go through each worksheet and select marks
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        console.log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
+        console.log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
         // filter
-        // if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
-        //   worksheet.applyFilterAsync(
-        //     tableauExt.settings.get("ConfigChildField"), 
-        //     [d.id],
-        //     window.tableau.FilterUpdateType.Replace
-        //   ).then(e => console.log('filter applied response', e)); // response is void per tableau-extensions.js
-        // }
+        if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
+          // worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then(
+            worksheet.applyFilterAsync(
+              tableauExt.settings.get("ConfigChildField"), 
+              [d.id],
+              window.tableau.FilterUpdateType.Replace
+            ).then(e => console.log('filter applied response', e)) // response is void per tableau-extensions.js
+          // );
+        }
+      });
+    }
+    else {
+      // no data clear filter // never gets called because you only call this on node click
+      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
+        worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then();
       });
     }
   }
@@ -183,10 +191,10 @@ class App extends Component {
       worksheet.selectMarksByValueAsync(
         [{
           'fieldName': tableauExt.settings.get("ConfigChildField"),
-          'value': [d.child],
+          'value': [d.id],
         }],
         window.tableau.SelectionUpdateType.Replace
-      ).then(e => console.log('select marks response: ' + worksheet.name, e)); // response is void per tableau-extensions.js
+      ).then(e => console.log('select marks response: ' + worksheet.name, e), err => console.log('select marks err: ' + worksheet.name, err)); // response is void per tableau-extensions.js
       });
     }
   }

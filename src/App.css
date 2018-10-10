@@ -2,6 +2,10 @@ html {
   overflow: scroll;
   overflow-x: hidden;
 }
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
 ::-webkit-scrollbar {
   width: 0px;  /* remove scrollbar space */
   background: transparent;  /* optional: just make scrollbar invisible */
@@ -11,6 +15,7 @@ html {
   /*text-align: center;*/
   position: fixed;
 }
+
 
 .tooltip-content {
   background: white;

@@ -140,6 +140,20 @@ class ConfigScreen extends React.Component {
             </FormControl>
             <FormControl className={classes.formControl}>
               <InputLabelWithTooltip 
+                  title="Show Highlight"
+                  tooltipText="Toggle whether to highlight based on Tableau selections"
+              />
+              <Select
+                value={tableauSettings.highlightAnnotation === "true"}
+                onChange={handleChange}
+                input={<Input name="highlightAnnotation" id="highlightAnnotation-helper" />}
+              >
+                 <MenuItem value={false}>False</MenuItem>
+                 <MenuItem value={true}>True</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
                     title="Color Config"
                     tooltipText="The way color will be applied"
               />

@@ -15,14 +15,14 @@
     "react-dom": "^16.3.2",
     "react-scripts": "1.1.4",
     "react-spinkit": "^3.0.0",
-    "semiotic": "^1.15.1",
+    "semiotic": "^1.15.3",
     "styled-components": "^3.4.9",
     "typeface-roboto": "^0.0.54",
     "url-parse": "^1.4.3"
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",  
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",

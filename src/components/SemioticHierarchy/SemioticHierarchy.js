@@ -328,6 +328,9 @@ class SemioticHierarchy extends React.Component {
                         hierarchySum: d => d.valueMetric || 0
                     }}                
 
+                    //annotations layer which allowers for pseudo highlight
+                    annotations={this.props.highlightOn}
+
                     // interactivity
                     hoverAnnotation={hoverAnnotation}
                     tooltipContent={d => popOver(d)}

@@ -1681,9 +1681,13 @@ commander@^2.11.0:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.17.1.tgz#bd77ab7de6de94205ceacc72f1716d29f20a77bf"
 
-commander@^2.18.0, commander@^2.8.1:
+commander@^2.18.0:
   version "2.18.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.18.0.tgz#2bf063ddee7c7891176981a2cc798e5754bc6970"
+
+commander@^2.8.1:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -6802,9 +6806,9 @@ semiotic-mark@0.3.0:
     prop-types "^15.6.0"
     roughjs-es5 "0.1.0"
 
-semiotic@^1.15.1:
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/semiotic/-/semiotic-1.15.1.tgz#ca3c4466ebd25864279334f1cfce4de7c5c79802"
+semiotic@^1.15.3:
+  version "1.15.3"
+  resolved "https://registry.yarnpkg.com/semiotic/-/semiotic-1.15.3.tgz#ec2fcde375f377b2c68c8f0fbb4e2d73e56d5b12"
   dependencies:
     "@mapbox/polylabel" "1"
     d3-array "^1.2.0"

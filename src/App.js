@@ -116,6 +116,7 @@ class App extends Component {
       demoType: "tree",
       stepIndex: 1,
       isMissingData: true,
+      highlightOn: undefined
     };
 
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
@@ -342,24 +343,42 @@ class App extends Component {
       }
   
       // selected marks is being triggered, but this approach will not work with semiotic
-      // console.log('refs test', this.refs);
       // now we reconcile marks to hierarchy data and adjust opacity accordingly
-      // for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
-        // if ( this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`] ) {
-        //   //if we find the data in the marks array then set to 1
-        //   if ( data.length === 0 ) {
-        //     this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`].style.opacity=parseFloat(this.state.tableauSettings.fillOpacity || .5);
-        //   }
-        //   else if (_.find(data, (o) => { return o[this.state.tableauSettings.ChoroJoinField] === this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]})) {
-        //     this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`].style.opacity=1;
-        //   }
-        //   else { // else set to .1
-        //     this.refs.SemioticHierarchy.refs[`country-${this.state['ChoroSheetData'][l][this.state.tableauSettings.ChoroJoinField]}`].style.opacity=.1;
-        //   }
-        // }
-      // }
+      let annotationsArray = []; 
+      if ( data.length > 0 && this.state.tableauSettings.highlightAnnotation === "true") {
+        for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
+        // console.log('marks data', data, this.state['ConfigSheetData'][l]);
+          if (_.find(data, (o) => { return o[this.state.tableauSettings.ConfigChildField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField]})) {
+            annotationsArray.push({
+              type: "highlight",
+              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField] ,
+              style: {
+                strokeWidth: 5,
+                strokeOpacity: 1,
+                fillOpacity: 1
+              }
+            })
+          }
+          else { // else set to .1
+            // annotationsArray.push({
+            //   type: "highlight",
+            //   id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
+            //   style: {
+            //     fill: "#FFF", 
+            //     storke: "#FFF",
+            //     strokeWidth: 5,
+            //     strokeOpacity: 1,
+            //     fillOpacity: .9
+            //   }
+            // })
+          }
+        }
+      }
   
-      console.log('marks data', data, this.state['ConfigSheetData']);
+      this.setState({
+        highlightOn: annotationsArray
+      })
+      console.log('marks data', annotationsArray, data, this.state['ConfigSheetData']);
     }, err => {console.log('marks error', err);}
     );
   }
@@ -922,7 +941,6 @@ render() {
     // left off here config should be good, now we need to get component working from new config
     return (
       <SemioticHierarchy
-        ref={"SemioticHierarchy"}
         className={'semiotic-hierarchy-chart'}
         width={this.state.width * .925}
         height={this.state.height * .925}
@@ -954,6 +972,7 @@ render() {
         //nodeWidthField || nodeWidthStroke
       
         //interactivity props
+        highlightOn={this.state.highlightOn}
         hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
         clickCallBack={this.clickCallBack}
         hoverCallBack={this.hoverCallBack}

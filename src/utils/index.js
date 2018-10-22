@@ -23,3 +23,6 @@ export const getColumnIndexes = (table, required_keys) => {
     return o;
   };
   
+  export const log = (...msgs) => {
+    if (process.env.NODE_ENV === 'development') console.log(...msgs)
+  }

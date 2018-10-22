@@ -55,7 +55,8 @@ import {
   semioticTypes
 } from './variables';
 import { 
-  convertRowToObject
+  convertRowToObject,
+  log
 } from './utils';
 
 // icons
@@ -157,11 +158,11 @@ class App extends Component {
   }
 
   clickCallBack = d => {
-    console.log('in on click callback', d);
+    log('in on click callback', d);
     // go through each worksheet and select marks
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        console.log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
+        log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
         // filter
         if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
           // worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then(
@@ -169,7 +170,7 @@ class App extends Component {
               tableauExt.settings.get("ConfigChildField"), 
               [d.id],
               window.tableau.FilterUpdateType.Replace
-            ).then(e => console.log('filter applied response', e)) // response is void per tableau-extensions.js
+            ).then(e => log('filter applied response', e)) // response is void per tableau-extensions.js
           // );
         }
       });
@@ -183,11 +184,11 @@ class App extends Component {
   }
   
   hoverCallBack = d => {
-    console.log('in on hover callback', d);
+    log('in on hover callback', d);
       // go through each worksheet and select marks
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-      console.log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
+      log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
       // select marks
       worksheet.selectMarksByValueAsync(
         [{
@@ -195,18 +196,18 @@ class App extends Component {
           'value': [d.id],
         }],
         window.tableau.SelectionUpdateType.Replace
-      ).then(e => console.log('select marks response: ' + worksheet.name, e), err => console.log('select marks err: ' + worksheet.name, err)); // response is void per tableau-extensions.js
+      ).then(e => log('select marks response: ' + worksheet.name, e), err => log('select marks err: ' + worksheet.name, err)); // response is void per tableau-extensions.js
       });
     }
   }
 
   demoChange = event => {
     this.setState({ demoType: event.target.value });
-    console.log('in demo change', event.target.value, this.state.demoType);
+    log('in demo change', event.target.value, this.state.demoType);
   };
 
   handleChange (event) {
-    console.log('event', event);
+    log('event', event);
     if (TableauSettings.ShouldUse) {
   
       // create a single k/v pair
@@ -231,7 +232,7 @@ class App extends Component {
 
   configCallBack (field, columnName) {
     // field = ChoroSheet, sheet = Data
-    console.log('configCallBack', field, columnName);
+    log('configCallBack', field, columnName);
   
     // if we are in config call back from a sheet selection, go get the data
     // this only works in the #true instance, must use update lifecycle method to catch both
@@ -263,7 +264,7 @@ class App extends Component {
   }
     
   eraseCallBack (field) {
-    console.log("triggered erase", field);
+    log("triggered erase", field);
     if (TableauSettings.ShouldUse) {
   
       TableauSettings.eraseAndSave([
@@ -289,7 +290,7 @@ class App extends Component {
   };
 
   customCallBack (confSetting) {
-    console.log('in custom call back', confSetting);
+    log('in custom call back', confSetting);
     if (TableauSettings.ShouldUse) {
       TableauSettings.updateAndSave({
         [confSetting]: true
@@ -321,7 +322,7 @@ class App extends Component {
 
   // on mark selection highlight the nodes in the hierarchy as well
   marksSelected (e) {
-    console.log('mark selected event', e);
+    log('mark selected event', e);
     e.getMarksAsync().then(marks => {
       
       // loop through marks table and adjust the class for opacity
@@ -330,7 +331,7 @@ class App extends Component {
       let data = [];
   
       //console the select marks table
-      console.log('marks', marksDataTable);
+      log('marks', marksDataTable);
   
       //write column names to array
       for (let k = 0; k < marksDataTable.columns.length; k++) {
@@ -338,7 +339,7 @@ class App extends Component {
       }
   
       for (let j = 0, len = marksDataTable.data.length; j < len; j++) {
-        //console.log(this.convertRowToObject(tableauData[j], col_indexes));
+        //log(this.convertRowToObject(tableauData[j], col_indexes));
         data.push(convertRowToObject(marksDataTable.data[j], col_indexes));
       }
   
@@ -347,7 +348,7 @@ class App extends Component {
       let annotationsArray = []; 
       if ( data.length > 0 && this.state.tableauSettings.highlightAnnotation === "true") {
         for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
-        // console.log('marks data', data, this.state['ConfigSheetData'][l]);
+        // log('marks data', data, this.state['ConfigSheetData'][l]);
           if (_.find(data, (o) => { return o[this.state.tableauSettings.ConfigChildField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField]})) {
             annotationsArray.push({
               type: "highlight",
@@ -378,17 +379,17 @@ class App extends Component {
       this.setState({
         highlightOn: annotationsArray
       })
-      console.log('marks data', annotationsArray, data, this.state['ConfigSheetData']);
-    }, err => {console.log('marks error', err);}
+      log('marks data', annotationsArray, data, this.state['ConfigSheetData']);
+    }, err => {log('marks error', err);}
     );
   }
 
   // find all sheets in array and then call get summary, for now hardcoding
   filterChanged (e) {
-    console.log('filter changed', e);
+    log('filter changed', e);
     let selectedSheet = tableauExt.settings.get('ConfigSheet');
     if ( selectedSheet ) {
-      console.log('calling summary data sheet');
+      log('calling summary data sheet');
       this.getSummaryData(selectedSheet, "ConfigSheet");
     } //get field3 from Settings
   }
@@ -399,7 +400,7 @@ class App extends Component {
       this.unregisterEventFn();
     }
   
-    console.log(selectedSheet, fieldName, "in getData");
+    log(selectedSheet, fieldName, "in getData");
   
     // get sheet information this.state.selectedSheet should be syncronized with settings
     // can possibly remove the || in the sheetName part
@@ -429,7 +430,7 @@ class App extends Component {
     //working here on pulling out summmary data
     //may want to limit to a single row when getting column names
     sheetObject.getSummaryDataAsync(options).then((t) => {
-      console.log('in getData()', t, this.state);
+      log('in getData()', t, this.state);
   
       let col_names = [];
       let col_names_S = [];
@@ -455,15 +456,15 @@ class App extends Component {
             col_names_N.push(t.columns[k].fieldName);
           }
       }
-      // console.log('columns', col_names, col_indexes);
+      // log('columns', col_names, col_indexes);
   
       for (let j = 0, len = t.data.length; j < len; j++) {
-        //console.log(this.convertRowToObject(tableauData[j], col_indexes));
+        //log(this.convertRowToObject(tableauData[j], col_indexes));
         data.push(convertRowToObject(t.data[j], col_indexes));
       }
   
       // log flat data for testing
-      console.log('flat data', data);
+      log('flat data', data);
   
     if (TableauSettings.ShouldUse) {
       TableauSettings.updateAndSave({
@@ -494,7 +495,7 @@ class App extends Component {
         });
       });
     }
-    console.log('getData() state', this.state);
+    log('getData() state', this.state);
   });
 
     this.unregisterEventFn = sheetObject.addEventListener(
@@ -510,7 +511,7 @@ class App extends Component {
     }
   
   clearSheet () {
-    console.log("triggered erase");
+    log("triggered erase");
     if (TableauSettings.ShouldUse) {
   
       TableauSettings.eraseAndSave([
@@ -557,7 +558,7 @@ class App extends Component {
       };
   
     tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {
-      console.log('configuring', closePayload, tableauExt.settings.getAll());
+      log('configuring', closePayload, tableauExt.settings.getAll());
       if (closePayload === 'false') {
         this.setState({
           isSplash: false,
@@ -570,7 +571,7 @@ class App extends Component {
       // clicks the 'X' in the top right of the dialog).  This can be checked for like so:
       switch(error.errorCode) {
         case window.tableau.ErrorCodes.DialogClosedByUser:
-          console.log("closed by user")
+          log("closed by user")
           break;
         default:
           console.error(error.message);
@@ -593,7 +594,7 @@ class App extends Component {
   componentDidMount () {
     const thisHeight = window.innerHeight;
     const thisWidth = window.innerWidth;
-    //console.log("size", thisHeight, thisWidth);
+    //log("size", thisHeight, thisWidth);
   
     let _this = this;
     window.addEventListener('resize', function() {
@@ -610,17 +611,17 @@ class App extends Component {
 
     // default tableau settings on initial entry into the extension
     // we know if we haven't done anything yet when tableauSettings state = []
-    console.log("did mount", tableauExt.settings.get("ConfigType"));
+    log("did mount", tableauExt.settings.get("ConfigType"));
     if ( tableauExt.settings.get("ConfigType") === undefined ) {
-      console.log('defaultSettings triggered', defaultSettings.length, defaultSettings);
+      log('defaultSettings triggered', defaultSettings.length, defaultSettings);
       defaultSettings.defaultKeys.map((defaultSetting, index) => {
-        console.log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
+        log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
         this.configCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
       })
     }
 
     // this is where the majority of the code is going to go for this extension I think
-      console.log("will mount", tableauExt.settings.getAll());
+      log("will mount", tableauExt.settings.getAll());
   
       //get sheetNames and dashboard name from workbook
       const dashboardName = tableauExt.dashboardContent.dashboard.name;
@@ -637,7 +638,7 @@ class App extends Component {
       // go through each worksheet and then add a filter change event listner
       // need to check whether this is being applied more than once
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        console.log("in sheet loop", worksheet.name, worksheet);
+        log("in sheet loop", worksheet.name, worksheet);
         // add event listner
         let unregisterHandlerFunction = worksheet.addEventListener(
             window.tableau.TableauEventType.FilterChanged,
@@ -645,10 +646,10 @@ class App extends Component {
         );
         // provided by tableau extension samples, may need to push this to state for react
         unregisterHandlerFunctions.push(unregisterHandlerFunction);
-        console.log(unregisterHandlerFunctions);
+        log(unregisterHandlerFunctions);
       });
   
-      console.log('checking field in getAll()', tableauExt.settings.getAll());
+      log('checking field in getAll()', tableauExt.settings.getAll());
   
       // Initialize the current saved settings global
       TableauSettings.init();
@@ -676,20 +677,20 @@ class App extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     // console log settings to check current status
-    console.log("will update", this.state, nextState, tableauExt.settings.getAll());
+    log("will update", this.state, nextState, tableauExt.settings.getAll());
   
     //get selectedSheet from Settings
     //hardcoding this for now because I know i have two possibilities
     let selectedSheet = tableauExt.settings.get('ConfigSheet');
     if (selectedSheet && this.state.tableauSettings.ConfigSheet !== nextState.tableauSettings.ConfigSheet) {
-      console.log('calling summary data sheet');
+      log('calling summary data sheet');
       this.getSummaryData(selectedSheet, "ConfigSheet");
     } //get field3 from Settings
   }
 
 // just logging this for now, may be able to remove later
 componentDidUpdate() {
-  console.log('did update', this.state, tableauExt.settings.getAll());
+  log('did update', this.state, tableauExt.settings.getAll());
 }
 
 render() {
@@ -701,8 +702,8 @@ render() {
   //short cut this cause we use it ALOT
   const tableauSettingsState = this.state.tableauSettings; 
 
-  // console.log some stuff to see what is going on
-  console.log('in render', this.state.width, this.state.height, this.state.configuration, tableauSettingsState,  this.state);
+  // log some stuff to see what is going on
+  log('in render', this.state.width, this.state.height, this.state.configuration, tableauSettingsState,  this.state);
 
   //loading screen jsx
   if (this.state.isLoading || tableauSettingsState.isLoading === "true") {
@@ -713,12 +714,12 @@ render() {
     if (this.state.isConfig) {
       let stepNames = ["Select Graph Type", "Select Sheet", "Drag & Drop Measures", "Customize the Graph"]
       
-      console.log(this.state.stepIndex)
+      log(this.state.stepIndex)
 
       if (this.state.stepIndex === 1) {
         const flareDataParsed = JSON.parse(flareData);
         const type = semioticTypes[this.state.demoType];
-        console.log('configType', semioticTypes[this.state.demoType], tableauSettingsState.ConfigType, flareDataParsed );
+        log('configType', semioticTypes[this.state.demoType], tableauSettingsState.ConfigType, flareDataParsed );
 
         const semioticHelp = 
         <div style={{ paddingTop: 20, height: 350*.95, width: 350*.95, float: 'none', margin: '0 auto' }}>

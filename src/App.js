@@ -502,10 +502,11 @@ class App extends Component {
       this.filterChanged
     );
 
-    this.unregisterEventFn = sheetObject.addEventListener(
-      window.tableau.TableauEventType.MarkSelectionChanged,
-      this.marksSelected
-    );
+    // Bug - Adding this event listener causes the viz to continuously re-render. 
+    // this.unregisterEventFn = sheetObject.addEventListener(
+    //   window.tableau.TableauEventType.MarkSelectionChanged,
+    //   this.marksSelected
+    // );
     }
   
   clearSheet () {

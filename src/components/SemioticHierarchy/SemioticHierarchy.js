@@ -19,7 +19,7 @@ import Paper from '@material-ui/core/Paper';
 //utils 
 import { 
     log
-  } from './utils';
+  } from '../../utils';
   
 const styles = {
   root: {

@@ -16,6 +16,11 @@ import _ from 'lodash';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 
+//utils 
+import { 
+    log
+  } from './utils';
+  
 const styles = {
   root: {
     flexGrow: 1,
@@ -81,7 +86,7 @@ function buildhierarchyDataPreped(hierarchyData, ConfigParentField, ConfigChildF
         }
     });
 
-    console.log('in semiotic component mount', hierarchyDataPreped, hierarchyData);
+    log('in semiotic component mount', hierarchyDataPreped, hierarchyData);
 
     return hierarchyDataPreped;
 }
@@ -94,9 +99,9 @@ function getRoot(hierarchyDataPreped) {
         return () => {};
     }
 
-    console.log('in get root', hierarchyDataPreped);
+    log('in get root', hierarchyDataPreped);
     let root = _.filter(hierarchyDataPreped, (o) => { return o.name == null; });
-    console.log('root array', root[0].child, root);
+    log('root array', root[0].child, root);
 
     return root;
 }
@@ -106,9 +111,9 @@ function buildEdgeData (hierarchyDataPreped, root) {
         return () => {};
     }
   
-    console.log('edgeData', hierarchyDataPreped);
+    log('edgeData', hierarchyDataPreped);
     let edgeData = unflatten(hierarchyDataPreped, { ...root[0] }, root[0].child);
-    console.log('edgeData', edgeData);
+    log('edgeData', edgeData);
 
     return edgeData;
 }
@@ -119,7 +124,7 @@ function buildNodeData (hierarchyDataPreped) {
     }
 
     let nodeData = _.uniqBy(hierarchyDataPreped, 'child'); 
-    console.log('nodeData', nodeData);
+    log('nodeData', nodeData);
 
     return nodeData;
 }
@@ -209,11 +214,11 @@ class SemioticHierarchy extends React.Component {
     }
 
     componentDidMount() {
-        console.log('component mounted');
+        log('component mounted');
     }
   
     render() {
-        //console.log('semitoic component', this.props);
+        //log('semitoic component', this.props);
         const {
             height,
             width,
@@ -244,11 +249,11 @@ class SemioticHierarchy extends React.Component {
             nodeColorScale,
         } = this.preprocessData();
 
-        console.log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
+        log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
         // create the custom tooltip for semiotic
         const popOver = (d) => {
-            // console.log('in tooltip', d);
+            // log('in tooltip', d);
             if ( d.parent && tableauSettings.ConfigValueField !== "None") {
                 return (
                     <Paper style={{'padding': '5px'}}>

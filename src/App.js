@@ -386,9 +386,9 @@ class App extends Component {
 
   // find all sheets in array and then call get summary, for now hardcoding
   filterChanged (e) {
-    log('filter changed', e);
+    log('filter changed', e.worksheet.name, e);
     let selectedSheet = tableauExt.settings.get('ConfigSheet');
-    if ( selectedSheet ) {
+    if ( selectedSheet && selectedSheet === e.worksheet.name ) {
       log('calling summary data sheet');
       this.getSummaryData(selectedSheet, "ConfigSheet");
     } //get field3 from Settings

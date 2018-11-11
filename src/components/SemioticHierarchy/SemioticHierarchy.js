@@ -136,7 +136,7 @@ function buildNodeSizeScale(nodeData, markerMinRadius, markerMaxRadius) {
     function remapper(d) {
       return parseFloat(d["valueMetric"] || 0) || 0;
     }
-    return d3Scale.scaleLinear()
+    return d3Scale.scaleSqrt()
       .domain(d3Array.extent(nodeData, remapper))
       .range([
         markerMinRadius*1 || MIN_MARKER_RADIUS*1,

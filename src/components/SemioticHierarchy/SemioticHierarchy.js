@@ -15,6 +15,12 @@ import _ from 'lodash';
 //material ui
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+
+//icons
+import Comment from '@material-ui/icons/Comment';
 
 //utils 
 import { 
@@ -177,12 +183,34 @@ class SemioticHierarchy extends React.Component {
         edgeData: [],
         nodeData: [],
         nodeSizeScale: undefined,
-        nodeColorScale: undefined
+        nodeColorScale: undefined, 
+        icons: false
       }  
+
+      // icon stuff
+      this.showIcons = this.showIcons.bind(this);
+      this.hideIcons = this.hideIcons.bind(this);
+      this.configAnnotations = this.configAnnotations.bind(this);
     }
 
-  // Previously in componentDidMount, this prepares our data if possible,
-  // and returns a dict that corresponds to the old componentDidMount() state changes
+    showIcons() {
+        this.setState({
+          icons: true
+        });
+      }
+  
+      hideIcons() {
+        this.setState({
+          icons: false
+        });
+      }
+
+      configAnnotations() {
+          console.log('configuartion of annotations');
+      }
+
+    // Previously in componentDidMount, this prepares our data if possible,
+    // and returns a dict that corresponds to the old componentDidMount() state changes
     preprocessData() {
         const {
             hierarchyData,
@@ -249,8 +277,30 @@ class SemioticHierarchy extends React.Component {
             nodeColorScale,
         } = this.preprocessData();
 
+        let iconJSX;
+
         log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
+        // check icons
+        if ( this.state.icons ) {
+            iconJSX =
+              <div style={{position: "absolute", zIndex: 9999}} >
+                <Grid container justify="center">
+                  <Grid item xs={6}>
+                    <Tooltip title={`Edit Annotations`} placement="right">
+                      <IconButton onClick={this.configAnnotations} >
+                          <Comment
+                            color="action"
+                            // color={this.state.enableDrag ? "secondary" : "action"}
+                            //style={{ fontSize: 15 }}
+                          />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                </Grid>
+              </div>
+            }
+    
         // create the custom tooltip for semiotic
         const popOver = (d) => {
             // log('in tooltip', d);
@@ -286,7 +336,13 @@ class SemioticHierarchy extends React.Component {
         }
 
        return (
-            <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
+            <div 
+                className="semiotic-hierarchy" 
+                style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}
+                onMouseEnter={this.showIcons}
+                onMouseLeave={this.hideIcons}
+                >
+                {iconJSX}
                 <ResponsiveNetworkFrame
                     responsiveWidth
                     responsiveHeight
@@ -334,7 +390,16 @@ class SemioticHierarchy extends React.Component {
                     }}                
 
                     //annotations layer which allowers for pseudo highlight
-                    annotations={this.props.highlightOn}
+                    // annotations={this.props.highlightOn}
+                    annotations={[
+                        {
+                            type: "enclose-hull",
+                            ids: ["controls","events"],
+                            color: "blue",
+                            label: "annotations are easy!",
+                            buffer: 20
+                        }
+                    ]}
 
                     // interactivity
                     hoverAnnotation={hoverAnnotation}

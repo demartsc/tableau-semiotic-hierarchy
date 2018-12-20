@@ -395,8 +395,9 @@ class SemioticHierarchy extends React.Component {
                         {
                             type: "enclose-hull",
                             ids: ["controls","events"],
-                            color: "blue",
+                            color: "#000",
                             label: "annotations are easy!",
+                            strokeWidth: 1,
                             buffer: 20
                         }
                     ]}

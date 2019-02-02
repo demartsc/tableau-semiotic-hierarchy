@@ -336,6 +336,7 @@ class SemioticHierarchy extends React.Component {
         }
 
        return (
+           console.log('render-return', height, width),
             <div 
                 className="semiotic-hierarchy" 
                 style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}
@@ -353,7 +354,7 @@ class SemioticHierarchy extends React.Component {
                         :   tableauSettings.ConfigType === "Circlepack" ? undefined 
                         :   tableauSettings.ConfigType === "Treemap" ? undefined
                         :   tableauSettings.ConfigValueField === "None" ? undefined
-                        :   d => nodeSizeScale(d.valueMetric)
+                        :   d => nodeSizeScale(d.valueMetric || 0)
                     } // this breaks the treemap and circlepack
                     nodeRenderMode={nodeRender}
                     edgeRenderMode={edgeRender}
@@ -391,17 +392,49 @@ class SemioticHierarchy extends React.Component {
 
                     //annotations layer which allowers for pseudo highlight
                     // annotations={this.props.highlightOn}
-                    annotations={[
-                        {
-                            type: "enclose-hull",
-                            ids: ["controls","events"],
-                            color: "#000",
-                            label: "annotations are easy!",
-                            strokeWidth: 1,
-                            buffer: 20
-                        }
-                    ]}
-
+                    // annotations={[
+                    //     {
+                    //         type: "enclose",
+                    //         ids: ["_",
+                    //               "add",
+                    //               "and",
+                    //               "average",
+                    //               "count",
+                    //               "distinct",
+                    //               "div",
+                    //               "eq",
+                    //               "fn",
+                    //               "gt",
+                    //               "gte",
+                    //               "iff",
+                    //               "isa",
+                    //               "lt",
+                    //               "lte",
+                    //               "max",
+                    //               "min",
+                    //               "mod",
+                    //               "mul",
+                    //               "neq",
+                    //               "not",
+                    //               "or",
+                    //               "orderby",
+                    //               "range",
+                    //               "select",
+                    //               "stddev",
+                    //               "sub",
+                    //               "sum",
+                    //               "update",
+                    //               "variance",
+                    //               "where",
+                    //               "xor"
+                    //             ],
+                    //         color: "#000",
+                    //         label: "these are methods!",
+                    //         strokeWidth: 1,
+                    //         padding: 20
+                    //     }
+                    // ]}
+                    
                     // interactivity
                     hoverAnnotation={hoverAnnotation}
                     tooltipContent={d => popOver(d)}

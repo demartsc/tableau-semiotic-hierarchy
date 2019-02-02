@@ -392,48 +392,64 @@ class SemioticHierarchy extends React.Component {
 
                     //annotations layer which allowers for pseudo highlight
                     // annotations={this.props.highlightOn}
-                    // annotations={[
-                    //     {
-                    //         type: "enclose",
-                    //         ids: ["_",
-                    //               "add",
-                    //               "and",
-                    //               "average",
-                    //               "count",
-                    //               "distinct",
-                    //               "div",
-                    //               "eq",
-                    //               "fn",
-                    //               "gt",
-                    //               "gte",
-                    //               "iff",
-                    //               "isa",
-                    //               "lt",
-                    //               "lte",
-                    //               "max",
-                    //               "min",
-                    //               "mod",
-                    //               "mul",
-                    //               "neq",
-                    //               "not",
-                    //               "or",
-                    //               "orderby",
-                    //               "range",
-                    //               "select",
-                    //               "stddev",
-                    //               "sub",
-                    //               "sum",
-                    //               "update",
-                    //               "variance",
-                    //               "where",
-                    //               "xor"
-                    //             ],
-                    //         color: "#000",
-                    //         label: "these are methods!",
-                    //         strokeWidth: 1,
-                    //         padding: 20
-                    //     }
-                    // ]}
+                    annotations={[
+                        {
+                            dx: (this.state.overridePosition || {})[0] ? this.state.overridePosition[0].dx : 0,
+                            dy: (this.state.overridePosition || {})[0] ? this.state.overridePosition[0].dy : 0,
+                            editMode: true,
+                            onDragEnd: annotationInfo => { 
+                                this.setState({
+                                    overridePosition: {
+                                        ...this.state.overridePosition,
+                                        [0]: {
+                                            dx: annotationInfo.updatedSettings.dx,
+                                            dy: annotationInfo.updatedSettings.dy
+                                        }
+                                    }
+                                });
+                                console.log('annotation info', annotationInfo, this.state);
+
+                            },
+                            type: "enclose",
+                            ids: ["_",
+                                  "add",
+                                  "and",
+                                  "average",
+                                  "count",
+                                  "distinct",
+                                  "div",
+                                  "eq",
+                                  "fn",
+                                  "gt",
+                                  "gte",
+                                  "iff",
+                                  "isa",
+                                  "lt",
+                                  "lte",
+                                  "max",
+                                  "min",
+                                  "mod",
+                                  "mul",
+                                  "neq",
+                                  "not",
+                                  "or",
+                                  "orderby",
+                                  "range",
+                                  "select",
+                                  "stddev",
+                                  "sub",
+                                  "sum",
+                                  "update",
+                                  "variance",
+                                  "where",
+                                  "xor"
+                                ],
+                            color: "#000",
+                            label: "these are methods!",
+                            strokeWidth: 1,
+                            padding: 20
+                        }
+                    ]}
                     
                     // interactivity
                     hoverAnnotation={hoverAnnotation}

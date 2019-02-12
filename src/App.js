@@ -15,6 +15,7 @@ import SplashScreen from './components/SplashScreen';
 import { 
   PickType, 
   PickSheets, 
+  CustomizeAnnotation,
   CustomizeHierarchy, 
   Stepper, 
   StepButtons,
@@ -106,6 +107,7 @@ class App extends Component {
     super(props);
     this.state = {
       isConfig: this.props.isConfig || false,
+      isAnnotation: this.props.isAnnotation || false,
       isLoading: true,
       isSplash: true,
       configuration: false,
@@ -120,7 +122,7 @@ class App extends Component {
       highlightOn: undefined
     };
 
-    TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
+    TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : this.props.isAnnotation ? "ANNOTATION" : "EXTENSION");
     this.unregisterEventFn = undefined;
 
     this.clickCallBack = this.clickCallBack.bind(this);
@@ -136,15 +138,19 @@ class App extends Component {
     this.clearSheet = this.clearSheet.bind(this);
     this.clearSplash = this.clearSplash.bind(this);
     this.configure = this.configure.bind(this);
+    this.configureAnnotation = this.configureAnnotation.bind(this);
     this.onNextStep = this.onNextStep.bind(this);
     this.onPrevStep = this.onPrevStep.bind(this);
   }
 
 
   onNextStep() {
-    if ( this.state.stepIndex === 4 ) {
+    if ( this.state.stepIndex === 4 && this.state.isConfig === true) {
       this.customCallBack('configuration');
-    } else {
+    } else if ( this.state.stepIndex === 1 && this.state.isAnnotation === true) {
+      this.customCallBack('annotation');
+    }
+    else {
       this.setState((previousState, currentProps) => {
         return { stepIndex: previousState.stepIndex + 1 }
       });
@@ -158,14 +164,15 @@ class App extends Component {
   }
 
   clickCallBack = d => {
-    log('in on click callback', d);
+    console.log('in on click callback', d);
     // go through each worksheet and select marks
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
+        console.log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
         // filter
         if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
           // worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then(
+            // first we are going to filter the companion sheets based on click
             worksheet.applyFilterAsync(
               tableauExt.settings.get("ConfigChildField"), 
               [d.id],
@@ -174,6 +181,44 @@ class App extends Component {
           // );
         }
       });
+
+      // asynchronously we are also going to create an annotation
+      // first thing we do is build our annotation array (need to include anything already annotated)
+      let annotationsArray = this.state.tableauSettings.clickAnnotations ? JSON.parse(this.state.tableauSettings.clickAnnotations) : []; 
+      console.log('we are now ready to add an annotation!', d, annotationsArray);
+
+      // no we can pass the annotations to a new config element for the annotations
+      // more to come, but we can use this function to pop a new box for annotation config
+      // this.configureAnnotation();
+
+      // once the UI is completed we can now push a new annotation
+      // hardcoded for now to see if we can get dynamic add done. 
+      annotationsArray.push({
+        type: "enclose",
+        ids: [d.id],
+        color: "#000",
+        label: "these are methods!",
+        padding: 5
+      })
+
+      // update the settings
+      if (TableauSettings.ShouldUse) {
+        TableauSettings.updateAndSave({
+          clickAnnotations: JSON.stringify(annotationsArray),
+        }, settings => {
+          this.setState({
+            tableauSettings: settings,
+          });
+        });
+    
+      } else {
+        tableauExt.settings.set("clickAnnotations", JSON.stringify(annotationsArray));
+        tableauExt.settings.saveAsync().then(() => {
+          this.setState({
+            tableauSettings: tableauExt.settings.getAll()
+          });
+        });
+      }
     }
     else {
       // no data clear filter // never gets called because you only call this on node click
@@ -262,7 +307,7 @@ class App extends Component {
       });
     }
   }
-    
+  
   eraseCallBack (field) {
     log("triggered erase", field);
     if (TableauSettings.ShouldUse) {
@@ -301,7 +346,7 @@ class App extends Component {
           tableauSettings: settings,
         });
   
-        if (confSetting === "configuration" ) {
+        if (confSetting === "configuration" || confSetting === "annotation" ) {
           tableauExt.ui.closeDialog("false");
         }
       })
@@ -314,6 +359,9 @@ class App extends Component {
           tableauSettings: tableauExt.settings.getAll()
         });
         if (confSetting === "configuration" ) {
+          tableauExt.ui.closeDialog("false");
+        }
+        if (confSetting === "annotation" ) {
           tableauExt.ui.closeDialog("false");
         }
       });
@@ -563,6 +611,37 @@ class App extends Component {
         this.setState({
           isSplash: false,
           isConfig: false,
+          isAnnotation: false,
+          tableauSettings: tableauExt.settings.getAll()
+        });
+      }
+    }).catch((error) => {
+      // One expected error condition is when the popup is closed by the user (meaning the user
+      // clicks the 'X' in the top right of the dialog).  This can be checked for like so:
+      switch(error.errorCode) {
+        case window.tableau.ErrorCodes.DialogClosedByUser:
+          log("closed by user")
+          break;
+        default:
+          console.error(error.message);
+      }
+    });
+  };  
+
+  configureAnnotation () {
+    this.clearSheet();
+    const popUpUrl = window.location.href + '#annotation';
+    const popUpOptions = {
+      height: 500,
+      width: 650,
+      };
+  
+    tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {
+      log('configuring annotation', closePayload, tableauExt.settings.getAll());
+      if (closePayload === 'false') {
+        this.setState({
+          isSplash: false,
+          isAnnotation: false,
           tableauSettings: tableauExt.settings.getAll()
         });
       }
@@ -917,6 +996,29 @@ render() {
       }
     }
 
+    // annotation config screen - broken right now
+    if (this.state.isAnnotation === "turning off") {
+      return (
+        <div className="annotationScreen" style={{padding : 5 }}>
+          <CustomizeAnnotation
+            configTitle = "Customize your annotation"
+            handleChange={this.handleChange}
+            customCallBack={this.customCallBack}
+            field={'annotation'}
+            tableauSettings={tableauSettingsState}
+          />
+          <StepButtons
+            onNextClick={this.onNextStep}
+            onPrevClick={this.onPrevStep}
+            stepIndex={1}
+            maxStepCount={1}
+            nextText={'Save'}
+            backText=""
+          />
+        </div>
+      );
+    }
+
     // splash screen jsx
     if (this.state.isSplash) {
       return (
@@ -978,6 +1080,10 @@ render() {
         hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
         clickCallBack={this.clickCallBack}
         hoverCallBack={this.hoverCallBack}
+
+        //annotation props
+        clickAnnotations={tableauSettingsState.clickAnnotations ? JSON.parse(tableauSettingsState.clickAnnotations) : []}
+        eraseAnnotationCallback={this.eraseCallBack}
       />
     );
   }

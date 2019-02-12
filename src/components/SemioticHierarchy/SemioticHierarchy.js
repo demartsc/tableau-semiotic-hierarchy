@@ -190,7 +190,7 @@ class SemioticHierarchy extends React.Component {
       // icon stuff
       this.showIcons = this.showIcons.bind(this);
       this.hideIcons = this.hideIcons.bind(this);
-      this.configAnnotations = this.configAnnotations.bind(this);
+      this.eraseAnnotations = this.eraseAnnotations.bind(this);
     }
 
     showIcons() {
@@ -205,8 +205,9 @@ class SemioticHierarchy extends React.Component {
         });
       }
 
-      configAnnotations() {
-          console.log('configuartion of annotations');
+      eraseAnnotations() {
+          console.log('erase of annotations');
+          this.props.eraseAnnotationCallback("clickAnnotations");
       }
 
     // Previously in componentDidMount, this prepares our data if possible,
@@ -265,6 +266,7 @@ class SemioticHierarchy extends React.Component {
             hoverAnnotation,
             networkType,
             networkProjection, 
+            clickAnnotations,
             tableauSettings,
         } = this.props;
         
@@ -287,8 +289,8 @@ class SemioticHierarchy extends React.Component {
               <div style={{position: "absolute", zIndex: 9999}} >
                 <Grid container justify="center">
                   <Grid item xs={6}>
-                    <Tooltip title={`Edit Annotations`} placement="right">
-                      <IconButton onClick={this.configAnnotations} >
+                    <Tooltip title={`Erase Annotations`} placement="right">
+                      <IconButton onClick={this.eraseAnnotations} >
                           <Comment
                             color="action"
                             // color={this.state.enableDrag ? "secondary" : "action"}
@@ -392,64 +394,7 @@ class SemioticHierarchy extends React.Component {
 
                     //annotations layer which allowers for pseudo highlight
                     // annotations={this.props.highlightOn}
-                    annotations={[
-                        {
-                            dx: (this.state.overridePosition || {})[0] ? this.state.overridePosition[0].dx : 0,
-                            dy: (this.state.overridePosition || {})[0] ? this.state.overridePosition[0].dy : 0,
-                            editMode: true,
-                            onDragEnd: annotationInfo => { 
-                                this.setState({
-                                    overridePosition: {
-                                        ...this.state.overridePosition,
-                                        [0]: {
-                                            dx: annotationInfo.updatedSettings.dx,
-                                            dy: annotationInfo.updatedSettings.dy
-                                        }
-                                    }
-                                });
-                                console.log('annotation info', annotationInfo, this.state);
-
-                            },
-                            type: "enclose",
-                            ids: ["_",
-                                  "add",
-                                  "and",
-                                  "average",
-                                  "count",
-                                  "distinct",
-                                  "div",
-                                  "eq",
-                                  "fn",
-                                  "gt",
-                                  "gte",
-                                  "iff",
-                                  "isa",
-                                  "lt",
-                                  "lte",
-                                  "max",
-                                  "min",
-                                  "mod",
-                                  "mul",
-                                  "neq",
-                                  "not",
-                                  "or",
-                                  "orderby",
-                                  "range",
-                                  "select",
-                                  "stddev",
-                                  "sub",
-                                  "sum",
-                                  "update",
-                                  "variance",
-                                  "where",
-                                  "xor"
-                                ],
-                            color: "#000",
-                            label: "these are methods!",
-                            strokeWidth: 1,
-                            padding: 20
-                        }
-                    ]}
+                    annotations={clickAnnotations || []}
                     
                     // interactivity
                     hoverAnnotation={hoverAnnotation}

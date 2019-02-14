@@ -111,6 +111,7 @@ class App extends Component {
       isLoading: true,
       isSplash: true,
       configuration: false,
+      annotation: false,
       height: 300,
       width: 300,
       dashboardName: '',
@@ -189,7 +190,7 @@ class App extends Component {
 
       // no we can pass the annotations to a new config element for the annotations
       // more to come, but we can use this function to pop a new box for annotation config
-      // this.configureAnnotation();
+      this.configureAnnotation();
 
       // once the UI is completed we can now push a new annotation
       // hardcoded for now to see if we can get dynamic add done. 
@@ -358,10 +359,7 @@ class App extends Component {
           [confSetting]: true,
           tableauSettings: tableauExt.settings.getAll()
         });
-        if (confSetting === "configuration" ) {
-          tableauExt.ui.closeDialog("false");
-        }
-        if (confSetting === "annotation" ) {
+        if (confSetting === "configuration" || confSetting === "annotation") {
           tableauExt.ui.closeDialog("false");
         }
       });
@@ -558,18 +556,20 @@ class App extends Component {
     // );
     }
   
-  clearSheet () {
+  clearSheet (showSplash) {
     log("triggered erase");
     if (TableauSettings.ShouldUse) {
   
       TableauSettings.eraseAndSave([
         'isLoading',
         'configuration',
+        'annotation',
       ], settings => {
         this.setState({
           tableauSettings: settings,
           configuration: false,
-          isSplash: true,
+          isSplash: showSplash,
+          annotation: false,
         });
       });
   
@@ -577,6 +577,7 @@ class App extends Component {
       // erase all the settings, there has got be a better way.
       tableauExt.settings.erase('isLoading');
       tableauExt.settings.erase('configuration');
+      tableauExt.settings.erase('annotation');
   
       // save async the erased settings
       // wip - should be able to get rid of state as this is all captured in tableu settings (written to state)
@@ -584,7 +585,8 @@ class App extends Component {
         this.setState({
           tableauSettings: tableauExt.settings.getAll(),
           configuration: false,
-          isSplash: true,
+          isSplash: showSplash,
+          annotation: false,
         });
       });
     }
@@ -598,8 +600,8 @@ class App extends Component {
   };
   
   configure () {
-    this.clearSheet();
-    const popUpUrl = window.location.href + '#true';
+    this.clearSheet(true);
+    const popUpUrl = window.location.href + 'true';
     const popUpOptions = {
       height: 625,
       width: 720,
@@ -629,8 +631,8 @@ class App extends Component {
   };  
 
   configureAnnotation () {
-    this.clearSheet();
-    const popUpUrl = window.location.href + '#annotation';
+    this.clearSheet(false);
+    const popUpUrl = window.location.href + 'annotation';
     const popUpOptions = {
       height: 500,
       width: 650,
@@ -750,6 +752,13 @@ class App extends Component {
         });
       }
   
+      if (this.state.tableauSettings.annotation && this.state.tableauSettings.annotation === "true") {
+        this.setState({
+          isSplash: false,
+          isAnnotation: false,
+        });
+      }
+
     });
   }
   
@@ -996,8 +1005,9 @@ render() {
       }
     }
 
-    // annotation config screen - broken right now
-    if (this.state.isAnnotation === "turning off") {
+    // annotation config screen - testing
+    console.log('testing annotation state', this.state.annotation, this.state.isAnnotation);
+    if (this.state.isAnnotation) {
       return (
         <div className="annotationScreen" style={{padding : 5 }}>
           <CustomizeAnnotation

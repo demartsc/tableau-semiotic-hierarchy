@@ -53,7 +53,7 @@ export const InputLabelWithTooltip = (props) => (
     <InputTitle htmlFor="markerShow-helper">{props.title}</InputTitle>
     <Tooltip className="tooltip">
       ?
-      <div class="tooltip__text">{props.tooltipText}</div>
+      <div className="tooltip__text">{props.tooltipText}</div>
     </Tooltip>
   </div>
 )

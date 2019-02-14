@@ -6,7 +6,7 @@ class AppWrapper extends Component {
 
   render() {
     const configState = parse(window.location.href).hash === '#true';
-    const annotationState = parse(window.location.href.hash === '#annotation');
+    const annotationState = parse(window.location.href).hash === '#annotation';
 
     return(
       <App

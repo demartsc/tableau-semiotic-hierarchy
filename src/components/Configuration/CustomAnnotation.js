@@ -45,13 +45,13 @@ class ConfigScreen extends React.Component {
     console.log('we are in custom annotations', this.props);
     return (
       <React.Fragment>
-        <div class="content-container">
+        <div className="content-container">
           <h4 style={{color: "#BDBDBD"}}>{title}</h4>
           <div className="clearfix">
-            <OptionColumn className="grid--5">
+            <OptionColumn className="grid--8  ">
               <div className="sheetScreen">
               <OptionWrapper>
-                <div class="content-container">
+                <div className="content-container">
                   <OptionTitle>{configTitle}</OptionTitle>
                   <FormControl className={classes.formControl}>
                     <InputLabelWithTooltip 
@@ -112,6 +112,22 @@ class ConfigScreen extends React.Component {
                       placeholder="1"
                       className={classes.textField}
                       value={tableauSettings.annotationPadding}
+                      onChange={handleChange}
+                      margin="normal"
+                    />
+                  </FormControl>
+                  <FormControl className={classes.formControl}>
+                    <InputLabelWithTooltip 
+                      title="Annotation Stroke Width"
+                      tooltipText="Width of enclose and connector"
+                    />
+                    <TextField  
+                      id="annotationStrokeWidth-helper"
+                      name="annotationStrokeWidth"
+                      label="Annotation Stroke Width"
+                      placeholder="1"
+                      className={classes.textField}
+                      value={tableauSettings.annotationStrokeWidth}
                       onChange={handleChange}
                       margin="normal"
                     />

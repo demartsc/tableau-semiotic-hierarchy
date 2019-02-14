@@ -183,43 +183,8 @@ class App extends Component {
         }
       });
 
-      // asynchronously we are also going to create an annotation
-      // first thing we do is build our annotation array (need to include anything already annotated)
-      let annotationsArray = this.state.tableauSettings.clickAnnotations ? JSON.parse(this.state.tableauSettings.clickAnnotations) : []; 
-      console.log('we are now ready to add an annotation!', d, annotationsArray);
-
-      // no we can pass the annotations to a new config element for the annotations
-      // more to come, but we can use this function to pop a new box for annotation config
-      this.configureAnnotation();
-
-      // once the UI is completed we can now push a new annotation
-      // hardcoded for now to see if we can get dynamic add done. 
-      annotationsArray.push({
-        type: "enclose",
-        ids: [d.id],
-        color: "#000",
-        label: "these are methods!",
-        padding: 5
-      })
-
-      // update the settings
-      if (TableauSettings.ShouldUse) {
-        TableauSettings.updateAndSave({
-          clickAnnotations: JSON.stringify(annotationsArray),
-        }, settings => {
-          this.setState({
-            tableauSettings: settings,
-          });
-        });
-    
-      } else {
-        tableauExt.settings.set("clickAnnotations", JSON.stringify(annotationsArray));
-        tableauExt.settings.saveAsync().then(() => {
-          this.setState({
-            tableauSettings: tableauExt.settings.getAll()
-          });
-        });
-      }
+      // call the config window for annotation build
+      this.configureAnnotation(d);
     }
     else {
       // no data clear filter // never gets called because you only call this on node click
@@ -601,7 +566,7 @@ class App extends Component {
   
   configure () {
     this.clearSheet(true);
-    const popUpUrl = window.location.href + 'true';
+    const popUpUrl = window.location.href + '#true';
     const popUpOptions = {
       height: 625,
       width: 720,
@@ -630,22 +595,54 @@ class App extends Component {
     });
   };  
 
-  configureAnnotation () {
+  configureAnnotation (d) {
     this.clearSheet(false);
-    const popUpUrl = window.location.href + 'annotation';
+    const popUpUrl = window.location.href + '#annotation';
     const popUpOptions = {
-      height: 500,
-      width: 650,
+      height: 550,
+      width: 600,
       };
   
     tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {
-      log('configuring annotation', closePayload, tableauExt.settings.getAll());
+      console.log('configuring annotation', closePayload, tableauExt.settings.getAll());
       if (closePayload === 'false') {
-        this.setState({
-          isSplash: false,
-          isAnnotation: false,
-          tableauSettings: tableauExt.settings.getAll()
+
+        let annotationsArray = this.state.tableauSettings.clickAnnotations ? JSON.parse(this.state.tableauSettings.clickAnnotations) : []; 
+        annotationsArray.push({
+          annotationID: d.id,
+          type: tableauExt.settings.get('annotationType'),
+          ids: [d.id],
+          color: tableauExt.settings.get('annotationColor'),
+          label: tableauExt.settings.get('annotationComment'),
+          padding: parseInt(tableauExt.settings.get('annotationPadding')), 
+          editMode: true,
+          strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
         });
+
+        console.log('we are now ready to add an annotation!', d, annotationsArray, this.state.tableauSettings);
+    
+        // update the settings
+        if (TableauSettings.ShouldUse) {
+          TableauSettings.updateAndSave({
+            clickAnnotations: JSON.stringify(annotationsArray),
+          }, settings => {
+            this.setState({
+                isSplash: false,
+                isAnnotation: false,
+                tableauSettings: settings,
+            });
+          });
+      
+        } else {
+          tableauExt.settings.set("clickAnnotations", JSON.stringify(annotationsArray));
+          tableauExt.settings.saveAsync().then(() => {
+            this.setState({
+                isSplash: false,
+                isAnnotation: false,
+                tableauSettings: tableauExt.settings.getAll()
+            });
+          });
+        }
       }
     }).catch((error) => {
       // One expected error condition is when the popup is closed by the user (meaning the user

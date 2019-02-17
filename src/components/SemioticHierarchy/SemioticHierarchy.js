@@ -20,7 +20,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 
 //icons
-import Comment from '@material-ui/icons/Comment';
+import QuestionAnswer from '@material-ui/icons/QuestionAnswer';
+import DeleteForever from '@material-ui/icons/DeleteForever';
 
 //utils 
 import { 
@@ -184,13 +185,15 @@ class SemioticHierarchy extends React.Component {
         nodeData: [],
         nodeSizeScale: undefined,
         nodeColorScale: undefined, 
-        icons: false
+        icons: false, 
+        editAnnotationMode: false || (this.props.clickAnnotations[0] || {}).editMode
       }  
 
       // icon stuff
       this.showIcons = this.showIcons.bind(this);
       this.hideIcons = this.hideIcons.bind(this);
       this.eraseAnnotations = this.eraseAnnotations.bind(this);
+      this.editAnnotations = this.editAnnotations.bind(this);
     }
 
     showIcons() {
@@ -205,7 +208,12 @@ class SemioticHierarchy extends React.Component {
         });
       }
 
-      eraseAnnotations() {
+      editAnnotations = () => {
+        this.setState({ editAnnotationMode: !this.state.editAnnotationMode});
+        this.props.editAnnotationCallBack();
+      }
+
+      eraseAnnotations = () => {
           console.log('erase of annotations');
           this.props.eraseAnnotationCallback("clickAnnotations");
       }
@@ -267,6 +275,7 @@ class SemioticHierarchy extends React.Component {
             networkType,
             networkProjection,
             annotationDragCallBack,
+            editAnnotationCallBack,
             clickAnnotations,
             tableauSettings,
         } = this.props;
@@ -290,12 +299,19 @@ class SemioticHierarchy extends React.Component {
               <div style={{position: "absolute", zIndex: 9999}} >
                 <Grid container justify="center">
                   <Grid item xs={6}>
+                    <Tooltip title={`Edit Annotations`} placement="right">
+                      <IconButton onClick={this.editAnnotations} >
+                          <QuestionAnswer
+                            color={this.state.editAnnotationMode ? "secondary" : "action"}
+                            style={{ fontSize: 20 }}
+                          />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title={`Erase Annotations`} placement="right">
                       <IconButton onClick={this.eraseAnnotations} >
-                          <Comment
+                          <DeleteForever
                             color="action"
-                            // color={this.state.enableDrag ? "secondary" : "action"}
-                            //style={{ fontSize: 15 }}
+                            style={{ fontSize: 20 }}
                           />
                       </IconButton>
                     </Tooltip>
@@ -404,7 +420,7 @@ class SemioticHierarchy extends React.Component {
                     annotations={clickAnnotations || []}
                     
                     // interactivity
-                    hoverAnnotation={hoverAnnotation}
+                    hoverAnnotation={hoverAnnotation && !this.state.editAnnotationMode}
                     tooltipContent={d => popOver(d)}
                     customClickBehavior={(d) => this.props.clickCallBack(d)}
                     customHoverBehavior={(d) => this.props.hoverCallBack(d)}

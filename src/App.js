@@ -115,6 +115,7 @@ class App extends Component {
     this.unregisterEventFn = undefined;
 
     this.annotationDragCallBack = this.annotationDragCallBack.bind(this);
+    this.editAnnotationCallBack = this.editAnnotationCallBack.bind(this);
     this.clickCallBack = this.clickCallBack.bind(this);
     this.hoverCallBack = this.hoverCallBack.bind(this);
     this.filterChanged = this.filterChanged.bind(this);
@@ -151,6 +152,37 @@ class App extends Component {
     this.setState((previousState, currentProps) => {
       return {stepIndex: previousState.stepIndex - 1}
     });
+  }
+
+  editAnnotationCallBack = () => {
+    console.log('edit annotations enabled');
+    if ((this.state.tableauSettings || {}).clickAnnotations) {
+      const newAnnotations = JSON.parse(this.state.tableauSettings.clickAnnotations);
+      newAnnotations.map(d => {
+        d.editMode = !d.editMode
+      })
+
+      console.log('editable annotations', newAnnotations);
+
+      if (TableauSettings.ShouldUse) {
+        TableauSettings.updateAndSave({
+          // ['is' + field]: true,
+          clickAnnotations: JSON.stringify(newAnnotations),
+        }, settings => {
+          this.setState({
+            tableauSettings: settings,
+          });
+        });
+    
+      } else {
+        tableauExt.settings.set('clickAnnotations', JSON.stringify(newAnnotations));
+        tableauExt.settings.saveAsync().then(() => {
+          this.setState({
+            tableauSettings: tableauExt.settings.getAll()
+          });
+        });
+      }
+    }
   }
 
   annotationDragCallBack = annotationInfo => {
@@ -638,7 +670,7 @@ class App extends Component {
           color: tableauExt.settings.get('annotationColor'),
           label: tableauExt.settings.get('annotationComment'),
           padding: parseInt(tableauExt.settings.get('annotationPadding')), 
-          editMode: true,
+          editMode: false,
           strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
           dx: 0,
           dy: 0,
@@ -1117,6 +1149,7 @@ render() {
         annotationDragCallBack={this.annotationDragCallBack}
         clickAnnotations={tableauSettingsState.clickAnnotations ? JSON.parse(tableauSettingsState.clickAnnotations) : []}
         eraseAnnotationCallback={this.eraseCallBack}
+        editAnnotationCallBack={this.editAnnotationCallBack}
       />
     );
   }

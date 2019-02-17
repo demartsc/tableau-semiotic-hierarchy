@@ -46,13 +46,13 @@ class ConfigScreen extends React.Component {
     console.log('we are in custom annotations', this.props);
     return (
       <React.Fragment>
-        <div class="content-container">
+        <div className="content-container">
           <h4 style={{color: "#BDBDBD"}}>{title}</h4>
           <div className="clearfix">
             <OptionColumn className="grid--8  ">
               <div className="sheetScreen">
               <OptionWrapper>
-                <div class="content-container">
+                <div className="content-container">
                   <OptionTitle>{configTitle}</OptionTitle>
                   <FormControl className={classes.formControl}>
                     <InputLabelWithTooltip 

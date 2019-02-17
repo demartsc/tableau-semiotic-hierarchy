@@ -657,26 +657,73 @@ class App extends Component {
       width: 650,
       };
   
+    // next need to figure out drag functions (if we enable edit mode)
+    let annotationsArray = this.state.tableauSettings.clickAnnotations ? JSON.parse(this.state.tableauSettings.clickAnnotations) : []; 
+
+    // now we check whether the annotation is new or exists
+    let existingAnnotation = _.find(annotationsArray, (o) => { return o.annotationID === d.id });
+    console.log('checking existing annotations', existingAnnotation);
+
+    // if this has something we have an existing annotation that we have to set to temp tableau settings
+    if ( existingAnnotation ) {
+      // update the settings
+      if (TableauSettings.ShouldUse) {
+        TableauSettings.updateAndSave({
+          annotationType: d.type,
+          annotationColor: d.color, 
+          annotationComment: d.label,
+          annotationPadding: d.padding,
+          annotationStrokeWidth: d.strokeWidth
+        }, settings => {
+          this.setState({
+              tableauSettings: settings,
+          });
+        });    
+      } else {
+        tableauExt.settings.set("annotationType", d.type);
+        tableauExt.settings.set("annotationColor", d.color);
+        tableauExt.settings.set("annotationComment", d.label);
+        tableauExt.settings.set("annotationPadding", d.padding);
+        tableauExt.settings.set("annotationStrokeWidth", d.strokeWidth);
+        tableauExt.settings.saveAsync().then(() => {
+          this.setState({
+              tableauSettings: tableauExt.settings.getAll()
+          });
+        });
+      }      
+    }
+
     tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {
-      console.log('configuring annotation', closePayload, tableauExt.settings.getAll());
+      console.log('configuring annotation', closePayload, tableauExt.settings.getAll(), d, annotationsArray, existingAnnotation);
       if (closePayload === 'false') {
 
-        // next need to figure out drag functions (if we enable edit mode)
-        let annotationsArray = this.state.tableauSettings.clickAnnotations ? JSON.parse(this.state.tableauSettings.clickAnnotations) : []; 
-        annotationsArray.push({
-          annotationID: d.id,
-          type: tableauExt.settings.get('annotationType'),
-          ids: [d.id],
-          color: tableauExt.settings.get('annotationColor'),
-          label: tableauExt.settings.get('annotationComment'),
-          padding: parseInt(tableauExt.settings.get('annotationPadding')), 
-          editMode: false,
-          strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
-          dx: 0,
-          dy: 0,
-        });
-
-        console.log('we are now ready to add an annotation!', d, annotationsArray, this.state.tableauSettings);
+        // if it does exist, we find it and edit the object in the existing array
+        if ( existingAnnotation ) {
+          annotationsArray.map(o => {
+            if (o.annotationID === d.id) {
+              o.type = tableauExt.settings.get('annotationType'),
+              o.color = tableauExt.settings.get('annotationColor'),
+              o.label = tableauExt.settings.get('annotationComment'),
+              o.padding = parseInt(tableauExt.settings.get('annotationPadding')), 
+              o.strokeWidth = tableauExt.settings.get('annotationStrokeWidth')
+            }
+          })
+        }
+        else {
+          // if it doesn't exist we push a new object onto the array
+          annotationsArray.push({
+            annotationID: d.id,
+            type: tableauExt.settings.get('annotationType'),
+            ids: [d.id],
+            color: tableauExt.settings.get('annotationColor'),
+            label: tableauExt.settings.get('annotationComment'),
+            padding: parseInt(tableauExt.settings.get('annotationPadding')), 
+            editMode: false,
+            strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
+            dx: 0,
+            dy: 0,
+          });
+        }
     
         // update the settings
         if (TableauSettings.ShouldUse) {

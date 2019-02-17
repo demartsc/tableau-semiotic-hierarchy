@@ -13,6 +13,10 @@ const defaultSettings = {
     nodeColor: "#CCCCCC", 
     nodeRender: "normal", 
     edgeRender: "normal",
+    annotationType: "enclose-hull",
+    annotationColor: "#000000",
+    annotationPadding: 5, 
+    annotationStrokeWidth: 1,
   },
   defaultKeys: [ 
     'ConfigType',
@@ -26,7 +30,11 @@ const defaultSettings = {
     'nodeFillOpacity', 
     'nodeColor',
     'nodeRender',
-    'edgeRender'
+    'edgeRender',
+    'annotationType',
+    'annotationColor',
+    'annotationPadding', 
+    'annotationStrokeWidth',
   ]
 }
 

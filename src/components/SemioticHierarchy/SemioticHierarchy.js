@@ -265,7 +265,8 @@ class SemioticHierarchy extends React.Component {
             edgeStrokeOpacity,
             hoverAnnotation,
             networkType,
-            networkProjection, 
+            networkProjection,
+            annotationDragCallBack,
             clickAnnotations,
             tableauSettings,
         } = this.props;
@@ -337,8 +338,14 @@ class SemioticHierarchy extends React.Component {
             }
         }
 
+        clickAnnotations.map(note => {
+            console.log('annotation note', note);
+            note.onDragEnd = annotationInfo => annotationDragCallBack(annotationInfo);
+        })
+        console.log('click annotations updated?', clickAnnotations);
+
        return (
-           console.log('render-return', height, width),
+           console.log('render-return', height, width, clickAnnotations, annotationDragCallBack),
             <div 
                 className="semiotic-hierarchy" 
                 style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}

@@ -126,6 +126,7 @@ class App extends Component {
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : this.props.isAnnotation ? "ANNOTATION" : "EXTENSION");
     this.unregisterEventFn = undefined;
 
+    this.annotationDragCallBack = this.annotationDragCallBack.bind(this);
     this.clickCallBack = this.clickCallBack.bind(this);
     this.hoverCallBack = this.hoverCallBack.bind(this);
     this.filterChanged = this.filterChanged.bind(this);
@@ -162,6 +163,39 @@ class App extends Component {
     this.setState((previousState, currentProps) => {
       return {stepIndex: previousState.stepIndex - 1}
     });
+  }
+
+  annotationDragCallBack = annotationInfo => {
+    if ((this.state.tableauSettings || {}).clickAnnotations) {
+      const newAnnotations = JSON.parse(this.state.tableauSettings.clickAnnotations);
+      newAnnotations.map(d => {
+        if (annotationInfo.originalSettings.annotationID === d.annotationID) {
+          d.dx = annotationInfo.updatedSettings.dx;
+          d.dy = annotationInfo.updatedSettings.dy;
+        }
+      })
+      
+      console.log('annotation drag ended', annotationInfo, newAnnotations);
+      if (TableauSettings.ShouldUse) {
+        TableauSettings.updateAndSave({
+          // ['is' + field]: true,
+          clickAnnotations: JSON.stringify(newAnnotations),
+        }, settings => {
+          this.setState({
+            tableauSettings: settings,
+          });
+        });
+    
+      } else {
+        tableauExt.settings.set('clickAnnotations', JSON.stringify(newAnnotations));
+        tableauExt.settings.saveAsync().then(() => {
+          this.setState({
+            tableauSettings: tableauExt.settings.getAll()
+          });
+        });
+      }
+  
+    }
   }
 
   clickCallBack = d => {
@@ -607,6 +641,7 @@ class App extends Component {
       console.log('configuring annotation', closePayload, tableauExt.settings.getAll());
       if (closePayload === 'false') {
 
+        // next need to figure out drag functions (if we enable edit mode)
         let annotationsArray = this.state.tableauSettings.clickAnnotations ? JSON.parse(this.state.tableauSettings.clickAnnotations) : []; 
         annotationsArray.push({
           annotationID: d.id,
@@ -617,6 +652,8 @@ class App extends Component {
           padding: parseInt(tableauExt.settings.get('annotationPadding')), 
           editMode: true,
           strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
+          dx: 0,
+          dy: 0,
         });
 
         console.log('we are now ready to add an annotation!', d, annotationsArray, this.state.tableauSettings);
@@ -1089,6 +1126,7 @@ render() {
         hoverCallBack={this.hoverCallBack}
 
         //annotation props
+        annotationDragCallBack={this.annotationDragCallBack}
         clickAnnotations={tableauSettingsState.clickAnnotations ? JSON.parse(tableauSettingsState.clickAnnotations) : []}
         eraseAnnotationCallback={this.eraseCallBack}
       />

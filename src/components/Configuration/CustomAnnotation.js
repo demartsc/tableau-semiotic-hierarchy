@@ -16,6 +16,7 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     minWidth: 120,
     display: 'inherit',
+    textAlign: 'start',
   },
 });
 
@@ -45,13 +46,13 @@ class ConfigScreen extends React.Component {
     console.log('we are in custom annotations', this.props);
     return (
       <React.Fragment>
-        <div className="content-container">
+        <div class="content-container">
           <h4 style={{color: "#BDBDBD"}}>{title}</h4>
           <div className="clearfix">
             <OptionColumn className="grid--8  ">
               <div className="sheetScreen">
               <OptionWrapper>
-                <div className="content-container">
+                <div class="content-container">
                   <OptionTitle>{configTitle}</OptionTitle>
                   <FormControl className={classes.formControl}>
                     <InputLabelWithTooltip 

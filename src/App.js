@@ -25,18 +25,11 @@ import {
 import DragNDrop from './components/DragNDrop/DragNDrop';
 import initialData from './components/DragNDrop/initial-data';
 
-// import CustomizeOptions from './components/CustomizeOptions';
-import { ConfigScreen, CustomScreen } from './components/Configuration';
-
 // Viz components
 import LoadingIndicatorComponent from './components/LoadingIndicatorComponent';
 import SemioticHierarchy from './components/SemioticHierarchy';
 
 import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
 
 // Tableau Styles and Tableau
 import './assets/tableau/vendor/slick.js/slick/slick.css';
@@ -51,7 +44,6 @@ import defaultSettings from './components/Configuration/defaultSettings';
 
 // utils and variables
 import { 
-  defaultColor, 
   DataBlick,
   semioticTypes
 } from './variables';
@@ -59,10 +51,6 @@ import {
   convertRowToObject,
   log
 } from './utils';
-
-// icons
-import Save from '@material-ui/icons/Save';
-import Delete from '@material-ui/icons/Delete';
 
 //logos
 import dbLogo from './assets/dblogo.png';
@@ -634,7 +622,7 @@ class App extends Component {
     const popUpUrl = window.location.href + '#annotation';
     const popUpOptions = {
       height: 550,
-      width: 600,
+      width: 650,
       };
   
     tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {

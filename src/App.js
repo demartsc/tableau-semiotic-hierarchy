@@ -192,13 +192,15 @@ class App extends Component {
         if (annotationInfo.originalSettings.annotationID === d.annotationID) {
           d.dx = annotationInfo.updatedSettings.dx;
           d.dy = annotationInfo.updatedSettings.dy;
+          d.radius = annotationInfo.updatedSettings.radius;
+          d.height = annotationInfo.updatedSettings.height;
+          d.width = annotationInfo.updatedSettings.width;
         }
       })
       
       console.log('annotation drag ended', annotationInfo, newAnnotations);
       if (TableauSettings.ShouldUse) {
         TableauSettings.updateAndSave({
-          // ['is' + field]: true,
           clickAnnotations: JSON.stringify(newAnnotations),
         }, settings => {
           this.setState({
@@ -672,7 +674,7 @@ class App extends Component {
           annotationType: d.type,
           annotationColor: d.color, 
           annotationComment: d.label,
-          annotationPadding: d.padding,
+          annotationPadding: d.padding + (Math.random()/100),
           annotationStrokeWidth: d.strokeWidth
         }, settings => {
           this.setState({
@@ -718,6 +720,7 @@ class App extends Component {
             color: tableauExt.settings.get('annotationColor'),
             label: tableauExt.settings.get('annotationComment'),
             padding: parseInt(tableauExt.settings.get('annotationPadding')), 
+            radiusPadding: parseInt(tableauExt.settings.get('annotationPadding')), 
             editMode: false,
             strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
             dx: 0,
@@ -754,6 +757,10 @@ class App extends Component {
       switch(error.errorCode) {
         case window.tableau.ErrorCodes.DialogClosedByUser:
           log("closed by user")
+          this.setState({
+            isSplash: false,
+            isAnnotation: false,
+          });
           break;
         default:
           console.error(error.message);
@@ -1123,7 +1130,7 @@ render() {
             onPrevClick={this.onPrevStep}
             stepIndex={1}
             maxStepCount={1}
-            nextText={'Save'}
+            nextText={'Save Comment'}
             backText=""
           />
         </div>

@@ -664,35 +664,37 @@ class App extends Component {
 
     // now we check whether the annotation is new or exists
     let existingAnnotation = _.find(annotationsArray, (o) => { return o.annotationID === d.id });
-    console.log('checking existing annotations', existingAnnotation);
+    console.log('checking existing annotations', d, existingAnnotation, TableauSettings.ShouldUse);
 
     // if this has something we have an existing annotation that we have to set to temp tableau settings
     if ( existingAnnotation ) {
       // update the settings
       if (TableauSettings.ShouldUse) {
         TableauSettings.updateAndSave({
-          annotationType: d.type,
-          annotationColor: d.color, 
-          annotationComment: d.label,
-          annotationPadding: d.padding + (Math.random()/100),
-          annotationStrokeWidth: d.strokeWidth
+          annotationType: existingAnnotation.type,
+          annotationColor: existingAnnotation.color, 
+          annotationComment: existingAnnotation.label,
+          annotationPadding: existingAnnotation.padding,
+          annotationStrokeWidth: existingAnnotation.strokeWidth
         }, settings => {
+          console.log('update and save', settings);
           this.setState({
               tableauSettings: settings,
           });
         });    
       } else {
-        tableauExt.settings.set("annotationType", d.type);
-        tableauExt.settings.set("annotationColor", d.color);
-        tableauExt.settings.set("annotationComment", d.label);
-        tableauExt.settings.set("annotationPadding", d.padding);
-        tableauExt.settings.set("annotationStrokeWidth", d.strokeWidth);
+        tableauExt.settings.set("annotationType", existingAnnotation.type);
+        tableauExt.settings.set("annotationColor", existingAnnotation.color);
+        tableauExt.settings.set("annotationComment", existingAnnotation.label);
+        tableauExt.settings.set("annotationPadding", existingAnnotation.padding);
+        tableauExt.settings.set("annotationStrokeWidth", existingAnnotation.strokeWidth);
         tableauExt.settings.saveAsync().then(() => {
+          console.log('direct save', tableauExt.settings.getAll());
           this.setState({
               tableauSettings: tableauExt.settings.getAll()
-          });
+            })
         });
-      }      
+      }
     }
 
     tableauExt.ui.displayDialogAsync(popUpUrl, "", popUpOptions).then((closePayload) => {
@@ -706,8 +708,9 @@ class App extends Component {
               o.type = tableauExt.settings.get('annotationType'),
               o.color = tableauExt.settings.get('annotationColor'),
               o.label = tableauExt.settings.get('annotationComment'),
-              o.padding = parseInt(tableauExt.settings.get('annotationPadding')), 
-              o.strokeWidth = tableauExt.settings.get('annotationStrokeWidth')
+              o.padding = parseFloat(tableauExt.settings.get('annotationPadding')) + (Math.random()/1000), 
+              o.radiusPadding = parseFloat(tableauExt.settings.get('annotationPadding')) + (Math.random()/1000), 
+              o.strokeWidth = parseFloat(tableauExt.settings.get('annotationStrokeWidth'))
             }
           })
         }
@@ -719,10 +722,10 @@ class App extends Component {
             ids: [d.id],
             color: tableauExt.settings.get('annotationColor'),
             label: tableauExt.settings.get('annotationComment'),
-            padding: parseInt(tableauExt.settings.get('annotationPadding')), 
-            radiusPadding: parseInt(tableauExt.settings.get('annotationPadding')), 
+            padding: parseFloat(tableauExt.settings.get('annotationPadding')) + (Math.random()/1000), 
+            radiusPadding: parseFloat(tableauExt.settings.get('annotationPadding')) + (Math.random()/1000), 
             editMode: false,
-            strokeWidth: tableauExt.settings.get('annotationStrokeWidth'),
+            strokeWidth: parseFloat(tableauExt.settings.get('annotationStrokeWidth')),
             dx: 0,
             dy: 0,
           });

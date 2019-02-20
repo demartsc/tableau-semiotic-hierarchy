@@ -399,7 +399,7 @@ class SemioticHierarchy extends React.Component {
                     edgeStyle={(d,i) => ({ 
                         fill: edgeFillColor,
                         fillOpacity: edgeFillOpacity,
-                        stroke: d.target.colorHex || "#BDBDBD", 
+                        stroke: tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.target.colorHex || "#BDBDBD" : _.split(this.props.nodeFillColor,',')[0] || "#BDBDBD", 
                         strokeOpacity: edgeStrokeOpacity
                     })}
                     edgeWidthAccessor={d => d.valueMetric || 1}

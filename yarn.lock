@@ -2131,9 +2131,9 @@ d3-polygon@^1.0.5:
   integrity sha512-RHhh1ZUJZfhgoqzWWuRhzQJvO7LavchhitSTHGu9oj6uuLFzYZVeBzaWTQ2qSO6bz2w55RMoOCf0MsLCDB6e0w==
 
 d3-quadtree@1:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/d3-quadtree/-/d3-quadtree-1.0.5.tgz#305394840b01f51a341a0da5008585e837fe7e9b"
-  integrity sha512-U2tjwDFbZ75JRAg8A+cqMvqPg1G3BE7UTJn3h8DHjY/pnsAfWdbJKgyfcy7zKjqGtLAmI0q8aDSeG1TVIKRaHQ==
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/d3-quadtree/-/d3-quadtree-1.0.6.tgz#d1ab2a95a7f27bbde88582c94166f6ae35f32056"
+  integrity sha512-NUgeo9G+ENQCQ1LsRr2qJg3MQ4DJvxcDNCiohdJGHt5gRhBW6orIB5m5FJ9kK3HNL8g9F4ERVoBzcEwQBfXWVA==
 
 d3-quadtree@1.0.1:
   version "1.0.1"
@@ -2188,9 +2188,9 @@ d3-time-format@2:
     d3-time "1"
 
 d3-time@1:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-1.0.10.tgz#8259dd71288d72eeacfd8de281c4bf5c7393053c"
-  integrity sha512-hF+NTLCaJHF/JqHN5hE8HVGAXPStEq6/omumPE/SxyHVrR7/qQxusFDo0t0c/44+sCGHthC7yNGFZIEgju0P8g==
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-1.0.11.tgz#1d831a3e25cd189eb256c17770a666368762bbce"
+  integrity sha512-Z3wpvhPLW4vEScGeIMUckDW7+3hWKOQfAWg/U7PlWBnQmeKQ00gCUsTtWSYulrKNA7ta8hJ+xXc6MHrMuITwEw==
 
 d3-timer@1:
   version "1.0.9"
@@ -6854,10 +6854,10 @@ semiotic-mark@0.3.1:
     prop-types "^15.6.0"
     roughjs-es5 "0.1.0"
 
-semiotic@^1.16.4:
-  version "1.16.4"
-  resolved "https://registry.yarnpkg.com/semiotic/-/semiotic-1.16.4.tgz#b4a9728d72322e768705b376c1a04d07412d62af"
-  integrity sha512-ZWWH+ehpHGyc4KVrhC+Vuuthodt71nCgv0ChRjQLrqaKm5z3yi+2yTA/zwuUi05YD+XhLNkcKC6w1Q/vnXP8GQ==
+semiotic@^1.16.8:
+  version "1.16.8"
+  resolved "https://registry.yarnpkg.com/semiotic/-/semiotic-1.16.8.tgz#9764290eab8161a0b722688f85a6d64a2617f98c"
+  integrity sha512-ncbTPW1ZZ+1lVd//usW94+duNRYO/Llcld+ZXxMLtqTatFoyl+KgiOaNBWR93yo4vkXUl6eucOK9f9rKq2ta4g==
   dependencies:
     "@mapbox/polylabel" "1"
     d3-array "^1.2.0"

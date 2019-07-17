@@ -83,9 +83,9 @@ const tableauExt = window.tableau.extensions;
 
 //tableau get summary data options
 const options = {
-         ignoreAliases: false,
-         ignoreSelection: true,
-         maxRows: 0
+  ignoreAliases: false,
+  ignoreSelection: true,
+  maxRows: 0
 };
 
 // end constants to move to another file later
@@ -108,12 +108,15 @@ class App extends Component {
       demoType: "tree",
       stepIndex: 1,
       isMissingData: true,
-      highlightOn: undefined
+      highlightOn: undefined,
+      unregisterHandlerFunctions: []
     };
 
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : this.props.isAnnotation ? "ANNOTATION" : "EXTENSION");
-    this.unregisterEventFn = undefined;
+    // this.unregisterEventFn = undefined; // to remove
 
+    this.unregisterHandlerFunctions = [];
+    this.applyingMouseActions = false;
     this.clickCallBack = _.throttle(this.clickCallBack, 200);
     this.hoverCallBack = _.throttle(this.hoverCallBack, 200);
   }
@@ -184,6 +187,48 @@ class App extends Component {
     this.unregisterHandlerFunctions = [];
   }
 
+  // applyMouseActionsToSheets = (d, action, fieldName) => {
+  //   if (this.applyingMouseActions) {
+  //     return;
+  //   }
+  //   const {ConfigSheet} = this.state.tableauSettings;
+  //   const toHighlight = action === 'Highlight' && (fieldName || 'None') !== 'None';
+  //   const toFilter = action === 'Filter' && (fieldName || 'None') !== 'None';
+
+  //   // if no action should be taken
+  //   if (!toHighlight && !toFilter) {
+  //     return;
+  //   }
+
+  //   // remove EventListeners before apply any async actions
+  //   this.removeEventListeners();
+  //   this.applyingMouseActions = true;
+
+  //   let tasks = [];
+
+  //   if (d) {
+  //     // select marks or filter
+  //     const fieldIdx = findColumnIndexByFieldName(this.state, fieldName);
+  //     const fieldValues = typeof d[0] === 'object' ?
+  //       d.map(childD => childD[fieldIdx]) : [d[fieldIdx]];
+
+  //     const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
+  //     tasks = actionToApply(fieldName, fieldValues, ConfigSheet);
+
+  //   } else {
+  //     // clear marks or filer
+  //     const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
+  //     tasks = actionToApply(fieldName, ConfigSheet);
+  //   }
+
+  //   Promise.all(tasks).then(() => {
+  //     // all selection should be completed
+  //     // Add event listeners back
+  //     this.addEventListeners();
+  //     this.applyingMouseActions = false;
+  //   });
+  // }
+  
   editAnnotationCallBack = () => {
     console.log('edit annotations enabled');
     if ((this.state.tableauSettings || {}).clickAnnotations) {
@@ -251,7 +296,12 @@ class App extends Component {
   }
 
   clickCallBack = d => {
+    // const {clickField, clickAction} = this.state.tableauSettings;
+
     console.log('in on click callback', d);
+
+    // this.applyMouseActionsToSheets(d, clickAction, clickField);
+
     // go through each worksheet and select marks
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
@@ -281,8 +331,13 @@ class App extends Component {
   }
   
   hoverCallBack = d => {
+    // const {hoverField, hoverAction} = this.state.tableauSettings;
+
     log('in on hover callback', d);
-      // go through each worksheet and select marks
+
+    // this.applyMouseActionsToSheets(d, hoverAction, hoverField);
+
+    // go through each worksheet and select marks
     if ( d ) {
       tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
       log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
@@ -419,7 +474,18 @@ class App extends Component {
 
   // on mark selection highlight the nodes in the hierarchy as well
   marksSelected = (e) => {
-    log('mark selected event', e);
+    // if ( this.state.tableauSettings.keplerFilterField ) {
+    //   if (this.applyingMouseActions) {
+    //     return;
+    //   }
+      console.log(
+        '%c ==============App Marker selected',
+        'background: red; color: white'
+      );
+
+      // remove event listeners
+      this.removeEventListeners();
+
     e.getMarksAsync().then(marks => {
       
       // loop through marks table and adjust the class for opacity
@@ -475,7 +541,8 @@ class App extends Component {
   
       this.setState({
         highlightOn: annotationsArray
-      })
+      }, () => this.addEventListeners());
+
       log('marks data', annotationsArray, data, this.state['ConfigSheetData']);
     }, err => {log('marks error', err);}
     );
@@ -492,10 +559,8 @@ class App extends Component {
   }
   
   getSummaryData = (selectedSheet, fieldName) => {
-    //clean up event listeners (taken from tableau expample)
-    if (this.unregisterEventFn) {
-      this.unregisterEventFn();
-    }
+    // clean up event listeners (taken from tableau example)
+    this.removeEventListeners();
   
     log(selectedSheet, fieldName, "in getData");
   
@@ -592,20 +657,10 @@ class App extends Component {
         });
       });
     }
-    log('getData() state', this.state);
-  });
-
-    this.unregisterEventFn = sheetObject.addEventListener(
-      window.tableau.TableauEventType.FilterChanged,
-      this.filterChanged
-    );
-
-    // Bug - Adding this event listener causes the viz to continuously re-render. 
-    // this.unregisterEventFn = sheetObject.addEventListener(
-    //   window.tableau.TableauEventType.MarkSelectionChanged,
-    //   this.marksSelected
-    // );
-    }
+    this.addEventListeners();
+    // log('getData() state', this.state);
+    });
+  }
   
   clearSheet = (showSplash) => {
     log("triggered erase");
@@ -802,34 +857,21 @@ class App extends Component {
   };  
 
   componentWillUnmount() {
-    let _this = this;
-    window.removeEventListener('resize', function() {
-      const thisWidth = window.innerWidth;
-      const thisHeight = window.innerHeight;
-      _this.setState({
-        width: thisWidth,
-        height: thisHeight
-      });
-    }, true);
+    window.removeEventListener('resize', this.resize, true);
   }
-  
+
+  resize = () => {
+    this.setState({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  }
+
   componentDidMount() {
-    const thisHeight = window.innerHeight;
-    const thisWidth = window.innerWidth;
-    //log("size", thisHeight, thisWidth);
-  
-    let _this = this;
-    window.addEventListener('resize', function() {
-      const thisWidth = window.innerWidth;
-      const thisHeight = window.innerHeight;
-      _this.setState({
-        width: thisWidth,
-        height: thisHeight
-      });
-    }, true);
+    window.addEventListener('resize', this.resize, true);
+    this.resize();
 
     tableauExt.initializeAsync({'configure': this.configure}).then(() => {
-      let unregisterHandlerFunctions = [];
 
     // default tableau settings on initial entry into the extension
     // we know if we haven't done anything yet when tableauSettings state = []
@@ -848,38 +890,17 @@ class App extends Component {
       //get sheetNames and dashboard name from workbook
       const dashboardName = tableauExt.dashboardContent.dashboard.name;
       const sheetNames = tableauExt.dashboardContent.dashboard.worksheets.map(worksheet => worksheet.name);
-  
-      // Whenever we restore the filters table, remove all save handling functions,
-      // since we add them back later in this function.
-      // provided by tableau extension samples
-      unregisterHandlerFunctions.forEach(function (unregisterHandlerFunction) {
-        unregisterHandlerFunction();
-      });
-  
-      //add filter change event listener with callback to re-query data after change
-      // go through each worksheet and then add a filter change event listner
-      // need to check whether this is being applied more than once
-      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        log("in sheet loop", worksheet.name, worksheet);
-        // add event listner
-        let unregisterHandlerFunction = worksheet.addEventListener(
-            window.tableau.TableauEventType.FilterChanged,
-            this.filterChanged
-        );
-        // provided by tableau extension samples, may need to push this to state for react
-        unregisterHandlerFunctions.push(unregisterHandlerFunction);
-        log(unregisterHandlerFunctions);
-      });
-  
+    
       log('checking field in getAll()', tableauExt.settings.getAll());
   
+      // add event listeners (this includes an initial removal)
+      this.addEventListeners();
+
       // Initialize the current saved settings global
       TableauSettings.init();
 
       this.setState({
         isLoading: false,
-        height: thisHeight,
-        width: thisWidth,
         sheetNames: sheetNames,
         dashboardName: dashboardName,
         demoType: tableauExt.settings.get("ConfigType") || "tree",
@@ -905,21 +926,25 @@ class App extends Component {
   
 
   componentWillUpdate(nextProps, nextState) {
-    // console log settings to check current status
-    log("will update", this.state, nextState, tableauExt.settings.getAll());
-  
-    //get selectedSheet from Settings
-    //hardcoding this for now because I know i have two possibilities
-    let selectedSheet = tableauExt.settings.get('ConfigSheet');
-    if (selectedSheet && this.state.tableauSettings.ConfigSheet !== nextState.tableauSettings.ConfigSheet) {
-      log('calling summary data sheet');
-      this.getSummaryData(selectedSheet, "ConfigSheet");
-    } //get field3 from Settings
+    if (tableauExt.settings) {
+      // console log settings to check current status
+      log("will update", this.state, nextState, tableauExt.settings.getAll());
+    
+      //get selectedSheet from Settings
+      //hardcoding this for now because I know i have two possibilities
+      let selectedSheet = tableauExt.settings.get('ConfigSheet');
+      if (selectedSheet && this.state.tableauSettings.ConfigSheet !== nextState.tableauSettings.ConfigSheet) {
+        log('calling summary data sheet');
+        this.getSummaryData(selectedSheet, "ConfigSheet");
+      } //get field3 from Settings
+    }
   }
 
 // just logging this for now, may be able to remove later
 componentDidUpdate() {
-  log('did update', this.state, tableauExt.settings.getAll());
+  if (tableauExt.settings) {
+    log('did update', this.state, tableauExt.settings.getAll());
+  }
 }
 
 render() {

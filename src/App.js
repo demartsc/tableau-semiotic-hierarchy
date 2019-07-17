@@ -8,7 +8,7 @@ import { flareData } from './data/flare.js';
 
 //lodash
 import _ from 'lodash';
-
+// import throttle from 'lodash.throttle';
 
 // Custom config components
 import SplashScreen from './components/SplashScreen';
@@ -114,28 +114,12 @@ class App extends Component {
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : this.props.isAnnotation ? "ANNOTATION" : "EXTENSION");
     this.unregisterEventFn = undefined;
 
-    this.annotationDragCallBack = this.annotationDragCallBack.bind(this);
-    this.editAnnotationCallBack = this.editAnnotationCallBack.bind(this);
-    this.clickCallBack = this.clickCallBack.bind(this);
-    this.hoverCallBack = this.hoverCallBack.bind(this);
-    this.filterChanged = this.filterChanged.bind(this);
-    this.marksSelected = this.marksSelected.bind(this);
-    this.getSummaryData = this.getSummaryData.bind(this);
-    this.configCallBack = this.configCallBack.bind(this);
-    this.eraseCallBack = this.eraseCallBack.bind(this);
-    this.customCallBack = this.customCallBack.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.demoChange = this.demoChange.bind(this);
-    this.clearSheet = this.clearSheet.bind(this);
-    this.clearSplash = this.clearSplash.bind(this);
-    this.configure = this.configure.bind(this);
-    this.configureAnnotation = this.configureAnnotation.bind(this);
-    this.onNextStep = this.onNextStep.bind(this);
-    this.onPrevStep = this.onPrevStep.bind(this);
+    this.clickCallBack = _.throttle(this.clickCallBack, 200);
+    this.hoverCallBack = _.throttle(this.hoverCallBack, 200);
   }
 
 
-  onNextStep() {
+  onNextStep = () => {
     if ( this.state.stepIndex === 4 && this.state.isConfig === true) {
       this.customCallBack('configuration');
     } else if ( this.state.stepIndex === 1 && this.state.isAnnotation === true) {
@@ -148,10 +132,56 @@ class App extends Component {
     }
   }
   
-  onPrevStep() {
+  onPrevStep = () => {
     this.setState((previousState, currentProps) => {
       return {stepIndex: previousState.stepIndex - 1}
     });
+  }
+
+  addEventListeners = () => {
+    // Whenever we restore the filters table, remove all save handling functions,
+    // since we add them back later in this function.
+    // provided by tableau extension samples
+
+    console.log('%c addEventListeners', 'background: purple; color:yellow');
+    this.removeEventListeners();
+
+    const localUnregisterHandlerFunctions = [];
+
+    // add filter change event listener with callback to re-query data after change
+    // go through each worksheet and then add a filter change event listener
+    // need to check whether this is being applied more than once
+    tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
+
+      // add event listener
+      const unregisterFilterHandlerFunction = worksheet.addEventListener(
+          window.tableau.TableauEventType.FilterChanged,
+          this.filterChanged
+      );
+      // provided by tableau extension samples, may need to push this to state for react
+      localUnregisterHandlerFunctions.push(unregisterFilterHandlerFunction);
+
+      const unregisterMarkerHandlerFunction = worksheet.addEventListener(
+        window.tableau.TableauEventType.MarkSelectionChanged,
+        this.marksSelected
+      );
+
+      // provided by tableau extension samples, may need to push this to state for react
+      localUnregisterHandlerFunctions.push(unregisterMarkerHandlerFunction);
+    });
+
+    this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
+    // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
+  }
+
+  removeEventListeners = () => {
+    console.log(`%c remove ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: green; color:black');
+
+    this.unregisterHandlerFunctions.forEach(unregisterHandlerFunction => {
+      unregisterHandlerFunction();
+    });
+
+    this.unregisterHandlerFunctions = [];
   }
 
   editAnnotationCallBack = () => {
@@ -273,7 +303,7 @@ class App extends Component {
     log('in demo change', event.target.value, this.state.demoType);
   };
 
-  handleChange (event) {
+  handleChange = (event) => {
     log('event', event);
     if (TableauSettings.ShouldUse) {
   
@@ -297,7 +327,7 @@ class App extends Component {
     }
   };
 
-  configCallBack (field, columnName) {
+  configCallBack = (field, columnName) => {
     // field = ChoroSheet, sheet = Data
     log('configCallBack', field, columnName);
   
@@ -330,7 +360,7 @@ class App extends Component {
     }
   }
   
-  eraseCallBack (field) {
+  eraseCallBack = (field) => {
     log("triggered erase", field);
     if (TableauSettings.ShouldUse) {
   
@@ -356,7 +386,7 @@ class App extends Component {
     }
   };
 
-  customCallBack (confSetting) {
+  customCallBack = (confSetting) => {
     log('in custom call back', confSetting);
     if (TableauSettings.ShouldUse) {
       TableauSettings.updateAndSave({
@@ -388,7 +418,7 @@ class App extends Component {
   }
 
   // on mark selection highlight the nodes in the hierarchy as well
-  marksSelected (e) {
+  marksSelected = (e) => {
     log('mark selected event', e);
     e.getMarksAsync().then(marks => {
       
@@ -452,7 +482,7 @@ class App extends Component {
   }
 
   // find all sheets in array and then call get summary, for now hardcoding
-  filterChanged (e) {
+  filterChanged = (e) => {
     log('filter changed', e.worksheet.name, e);
     let selectedSheet = tableauExt.settings.get('ConfigSheet');
     if ( selectedSheet && selectedSheet === e.worksheet.name ) {
@@ -461,7 +491,7 @@ class App extends Component {
     } //get field3 from Settings
   }
   
-  getSummaryData (selectedSheet, fieldName) {
+  getSummaryData = (selectedSheet, fieldName) => {
     //clean up event listeners (taken from tableau expample)
     if (this.unregisterEventFn) {
       this.unregisterEventFn();
@@ -577,7 +607,7 @@ class App extends Component {
     // );
     }
   
-  clearSheet (showSplash) {
+  clearSheet = (showSplash) => {
     log("triggered erase");
     if (TableauSettings.ShouldUse) {
   
@@ -614,13 +644,13 @@ class App extends Component {
   };
   
   
-  clearSplash () {
+  clearSplash = () => {
     this.setState({
       isSplash: false
     });
   };
   
-  configure () {
+  configure = () => {
     this.clearSheet(true);
     const popUpUrl = window.location.href + '#true';
     const popUpOptions = {
@@ -651,7 +681,7 @@ class App extends Component {
     });
   };  
 
-  configureAnnotation (d) {
+  configureAnnotation = (d) => {
     this.clearSheet(false);
     const popUpUrl = window.location.href + '#annotation';
     const popUpOptions = {
@@ -783,7 +813,7 @@ class App extends Component {
     }, true);
   }
   
-  componentDidMount () {
+  componentDidMount() {
     const thisHeight = window.innerHeight;
     const thisWidth = window.innerWidth;
     //log("size", thisHeight, thisWidth);

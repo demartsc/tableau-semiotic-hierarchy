@@ -7,7 +7,6 @@ import { ResponsiveNetworkFrame } from 'semiotic';
 //d3
 import * as d3Scale from "d3-scale";
 import * as d3Array from "d3-array";
-import * as d3Interpolate from "d3-interpolate"
 
 //lodash
 import _ from 'lodash';
@@ -63,6 +62,10 @@ function unflatten ( array, parent, seed, tree ) {
 // (the original code contained a bug which would result
 // in worldDataMissing always being an empty array)
 function buildhierarchyDataPreped(hierarchyData, ConfigParentField, ConfigChildField, ConfigColorField, ConfigValueField) {
+    if (!hierarchyData) {
+        return [{parent: null}] //() => {};
+    }
+
     const hierarchyDataPreped = _.cloneDeep(hierarchyData);
 
     //now that we are in here we can rename fields as we need to in order avoid errors
@@ -113,14 +116,21 @@ function getRoot(hierarchyDataPreped) {
     return root;
 }
 
-function buildEdgeData (hierarchyDataPreped, root) {
+function buildEdgeData (hierarchyDataPreped, nodeData) {
     if (!hierarchyDataPreped) {
         return () => {};
     }
   
-    log('edgeData', hierarchyDataPreped);
-    let edgeData = unflatten(hierarchyDataPreped, { ...root[0] }, root[0].child);
-    log('edgeData', edgeData);
+    log('edgeData', hierarchyDataPreped, nodeData);
+    // this code builds a hierarchy object
+    // let edgeData = unflatten(hierarchyDataPreped, { ...root[0] }, root[0].child);
+
+    // this code builds a source target list
+    let edgeData = _.forEach(hierarchyDataPreped, link => {
+        link.source = _.find(nodeData, o => o.child = link.name);
+        link.target = _.find(nodeData, o => o.child = link.child);
+    });
+    // log('edgeData', edgeData);
 
     return edgeData;
 }
@@ -169,7 +179,7 @@ function buildNodeColorScale(nodeData, nodeFillColor) {
 // the memoize depends on passing an equal object to get the cached result.
 let memoized = {
     buildhierarchyDataPreped: _.memoize(buildhierarchyDataPreped),
-    getRoot: _.memoize(getRoot),
+    // getRoot: _.memoize(getRoot),
     buildNodeData: _.memoize(buildNodeData),
     buildEdgeData: _.memoize(buildEdgeData),
     buildNodeSizeScale: _.memoize(buildNodeSizeScale),
@@ -234,9 +244,9 @@ class SemioticHierarchy extends React.Component {
             tableauSettings.ConfigValueField
         );
 
-        let root = memoized.getRoot(hierarchyDataPreped);
+        // let root = memoized.getRoot(hierarchyDataPreped);
         let nodeData = memoized.buildNodeData(hierarchyDataPreped);
-        let edgeData = memoized.buildEdgeData(hierarchyDataPreped, root);
+        let edgeData = memoized.buildEdgeData(hierarchyDataPreped, nodeData);
 
         let nodeSizeScale = memoized.buildNodeSizeScale(nodeData, tableauSettings.markerMinRadius, tableauSettings.markerMaxRadius);
         let nodeColorScale = memoized.buildNodeColorScale(nodeData, tableauSettings.nodeFillColor);
@@ -291,7 +301,7 @@ class SemioticHierarchy extends React.Component {
 
         let iconJSX;
 
-        log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
+        log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData, nodeData);
 
         // check icons
         if ( this.state.icons ) {
@@ -373,6 +383,7 @@ class SemioticHierarchy extends React.Component {
                     responsiveWidth
                     responsiveHeight
                     edges={edgeData}
+                    nodes={nodeData}
                     nodeIDAccessor={d => d.child}
                     nodeSizeAccessor={
                             tableauSettings.nodeSize === "none" ? undefined

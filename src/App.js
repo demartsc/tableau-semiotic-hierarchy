@@ -121,17 +121,17 @@ class App extends Component {
     };
 
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
-    this.unregisterEventFn = undefined;
+    this.unregisterHandlerFunctions = [];
 
-    this.clickCallBack = this.clickCallBack.bind(this);
-    this.hoverCallBack = this.hoverCallBack.bind(this);
-    this.filterChanged = this.filterChanged.bind(this);
-    this.marksSelected = this.marksSelected.bind(this);
+    this.clickCallBack = _.debounce(this.clickCallBack.bind(this),500);
+    this.hoverCallBack = _.debounce(this.hoverCallBack.bind(this),500);
+    this.filterChanged = _.debounce(this.filterChanged.bind(this),500);
+    this.marksSelected = _.debounce(this.marksSelected,500).bind(this);
     this.getSummaryData = this.getSummaryData.bind(this);
-    this.configCallBack = this.configCallBack.bind(this);
-    this.eraseCallBack = this.eraseCallBack.bind(this);
-    this.customCallBack = this.customCallBack.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.configCallBack = _.debounce(this.configCallBack.bind(this),500);
+    this.eraseCallBack = _.debounce(this.eraseCallBack.bind(this),500);
+    this.customCallBack = _.debounce(this.customCallBack.bind(this),500);
+    this.handleChange = _.debounce(this.handleChange.bind(this),500);
     this.demoChange = this.demoChange.bind(this);
     this.clearSheet = this.clearSheet.bind(this);
     this.clearSplash = this.clearSplash.bind(this);
@@ -140,6 +140,51 @@ class App extends Component {
     this.onPrevStep = this.onPrevStep.bind(this);
   }
 
+  addEventListeners = () => {
+    // Whenever we restore the filters table, remove all save handling functions,
+    // since we add them back later in this function.
+    // provided by tableau extension samples
+
+    console.log('%c addEventListeners', 'background: purple; color:yellow');
+    this.removeEventListeners();
+
+    const localUnregisterHandlerFunctions = [];
+
+    // add filter change event listener with callback to re-query data after change
+    // go through each worksheet and then add a filter change event listener
+    // need to check whether this is being applied more than once
+    tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
+
+      // add event listener
+      const unregisterFilterHandlerFunction = worksheet.addEventListener(
+          window.tableau.TableauEventType.FilterChanged,
+          this.filterChanged
+      );
+      // provided by tableau extension samples, may need to push this to state for react
+      localUnregisterHandlerFunctions.push(unregisterFilterHandlerFunction);
+
+      const unregisterMarkerHandlerFunction = worksheet.addEventListener(
+        window.tableau.TableauEventType.MarkSelectionChanged,
+        this.marksSelected
+      );
+
+      // provided by tableau extension samples, may need to push this to state for react
+      localUnregisterHandlerFunctions.push(unregisterMarkerHandlerFunction);
+    });
+
+    this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
+    // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
+  }
+
+  removeEventListeners = () => {
+    console.log(`%c remove ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: green; color:black');
+
+    this.unregisterHandlerFunctions.forEach(unregisterHandlerFunction => {
+      unregisterHandlerFunction();
+    });
+
+    this.unregisterHandlerFunctions = [];
+  }
 
   onNextStep() {
     if ( this.state.stepIndex === 4 ) {
@@ -156,6 +201,78 @@ class App extends Component {
       return {stepIndex: previousState.stepIndex - 1}
     });
   }
+
+  clickCallBack = d => {
+    const {clickField, clickAction} = this.state.tableauSettings;
+
+    console.log(
+      '%c in on click callback',
+      'background: brown',
+      // d,
+      // findColumnIndexByFieldName(this.state, clickField),
+      // clickAction
+    );
+
+    this.applyMouseActionsToSheets(d, clickAction, clickField);
+  };
+
+  hoverCallBack = d => {
+    const {hoverField, hoverAction} = this.state.tableauSettings;
+
+    console.log(
+      '%c in on hover callback',
+      'background: OLIVE',
+      // d,
+      // findColumnIndexByFieldName(this.state, hoverField),
+      // hoverAction
+    );
+
+    this.applyMouseActionsToSheets(d, hoverAction, hoverField);
+    // go through each worksheet and select marks
+  };
+
+  applyMouseActionsToSheets = (d, action, fieldName) => {
+    if (this.applyingMouseActions) {
+      return;
+    }
+    const {ConfigSheet} = this.state.tableauSettings;
+    const toHighlight = action === 'Highlight' && (fieldName || 'None') !== 'None';
+    const toFilter = action === 'Filter' && (fieldName || 'None') !== 'None';
+
+    // if no action should be taken
+    if (!toHighlight && !toFilter) {
+      return;
+    }
+
+    // remove EventListeners before apply any async actions
+    this.removeEventListeners();
+    this.applyingMouseActions = true;
+
+    let tasks = [];
+
+    if (d) {
+      // select marks or filter
+      const fieldIdx = findColumnIndexByFieldName(this.state, fieldName);
+      const fieldValues = typeof d[0] === 'object' ?
+        d.map(childD => childD[fieldIdx]) : [d[fieldIdx]];
+
+      const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
+      tasks = actionToApply(fieldName, fieldValues, ConfigSheet);
+
+    } else {
+      // clear marks or filer
+      const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
+      tasks = actionToApply(fieldName, ConfigSheet);
+    }
+
+    Promise.all(tasks).then(() => {
+      // all selection should be completed
+      // Add event listeners back
+      this.addEventListeners();
+      this.applyingMouseActions = false;
+    });
+  }
+
 
   clickCallBack = d => {
     log('in on click callback', d);
@@ -504,10 +621,10 @@ class App extends Component {
     );
 
     // Bug - Adding this event listener causes the viz to continuously re-render. 
-    // this.unregisterEventFn = sheetObject.addEventListener(
-    //   window.tableau.TableauEventType.MarkSelectionChanged,
-    //   this.marksSelected
-    // );
+    this.unregisterEventFn = sheetObject.addEventListener(
+      window.tableau.TableauEventType.MarkSelectionChanged,
+      this.marksSelected
+    );
     }
   
   clearSheet () {

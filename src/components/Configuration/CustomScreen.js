@@ -20,9 +20,6 @@ const styles = theme => ({
 
 // the example on material ui has this function statement
 class CustomScreen extends React.Component {
-  constructor (props) {
-    super(props);
-  }
 
   // for call back to work with field included
   handleClick = event => {

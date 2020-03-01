@@ -24,18 +24,11 @@ import {
 import DragNDrop from './components/DragNDrop/DragNDrop';
 import initialData from './components/DragNDrop/initial-data';
 
-// import CustomizeOptions from './components/CustomizeOptions';
-import { ConfigScreen, CustomScreen } from './components/Configuration';
-
 // Viz components
 import LoadingIndicatorComponent from './components/LoadingIndicatorComponent';
 import SemioticHierarchy from './components/SemioticHierarchy';
 
 import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
 
 // Tableau Styles and Tableau
 import './assets/tableau/vendor/slick.js/slick/slick.css';
@@ -168,7 +161,7 @@ class App extends Component {
       localUnregisterHandlerFunctions.push(unregisterMarkerHandlerFunction);
     });
 
-    console.log('%c addEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions);
+    console.log('%c addEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
     this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
     // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
   }
@@ -205,12 +198,15 @@ class App extends Component {
     console.log(
       '%c in on click callback',
       'background: brown',
-      // d,
+      d,
       // findColumnIndexByFieldName(this.state, clickField),
       // clickAction
     );
 
-    this.applyMouseActionsToSheets(d, clickAction, clickField);
+    // if we are actually hovering on something then we should call this function
+    if ( d ) {
+      this.applyMouseActionsToSheets(d, clickAction, clickField);
+    }
   };
 
   hoverCallBack = d => {
@@ -219,13 +215,15 @@ class App extends Component {
     console.log(
       '%c in on hover callback',
       'background: OLIVE',
-      // d,
+      d,
       // findColumnIndexByFieldName(this.state, hoverField),
       // hoverAction
-    );
+    );  
 
-    this.applyMouseActionsToSheets(d, hoverAction, hoverField);
-    // go through each worksheet and select marks
+    // if we are actually hovering on something then we should call this function
+    if ( d ) {
+      this.applyMouseActionsToSheets(d, hoverAction, hoverField);
+    }
   };
 
   applyMouseActionsToSheets = (d, action, fieldName) => {
@@ -247,7 +245,7 @@ class App extends Component {
 
     let tasks = [];
 
-    if (d) {
+    if ( d ) {
       // select marks or filter
       const fieldIdx = findColumnIndexByFieldName(this.state, fieldName);
       const fieldValues = typeof d[0] === 'object' ?
@@ -508,10 +506,7 @@ class App extends Component {
       let marksDataTable = marks.data[0];
       let col_indexes = {};
       let data = [];
-  
-      //console the select marks table
-      log('marks', marksDataTable);
-  
+    
       //write column names to array
       for (let k = 0; k < marksDataTable.columns.length; k++) {
           col_indexes[marksDataTable.columns[k].fieldName] = k;
@@ -521,7 +516,7 @@ class App extends Component {
         //log(this.convertRowToObject(tableauData[j], col_indexes));
         data.push(convertRowToObject(marksDataTable.data[j], col_indexes));
       }
-  
+
       // selected marks is being triggered, but this approach will not work with semiotic
       // now we reconcile marks to hierarchy data and adjust opacity accordingly
       let annotationsArray = []; 
@@ -540,21 +535,24 @@ class App extends Component {
             })
           }
           else { // else set to .1
-            // annotationsArray.push({
-            //   type: "highlight",
-            //   id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
-            //   style: {
-            //     fill: "#FFF", 
-            //     storke: "#FFF",
-            //     strokeWidth: 5,
-            //     strokeOpacity: 1,
-            //     fillOpacity: .9
-            //   }
-            // })
+            annotationsArray.push({
+              type: "highlight",
+              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
+              style: {
+                fill: "#FFF", 
+                storke: "#FFF",
+                strokeWidth: 5,
+                strokeOpacity: 1,
+                fillOpacity: .9
+              }
+            })
           }
         }
       }
-  
+
+      //console the select marks table
+      console.log('marks selected', marksDataTable, col_indexes, data, annotationsArray);
+
       this.setState({
         highlightOn: annotationsArray
       }, () => this.addEventListeners())
@@ -754,8 +752,6 @@ class App extends Component {
     this.resize();
 
     tableauExt.initializeAsync({'configure': this.configure}).then(() => {
-      let unregisterHandlerFunctions = [];
-
     // default tableau settings on initial entry into the extension
     // we know if we haven't done anything yet when tableauSettings state = []
     log("did mount", tableauExt.settings.get("ConfigType"));

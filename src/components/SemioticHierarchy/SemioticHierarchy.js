@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 //semiotic
 import { ResponsiveNetworkFrame } from 'semiotic';
@@ -7,7 +7,6 @@ import { ResponsiveNetworkFrame } from 'semiotic';
 //d3
 import * as d3Scale from "d3-scale";
 import * as d3Array from "d3-array";
-import * as d3Interpolate from "d3-interpolate"
 
 //lodash
 import _ from 'lodash';

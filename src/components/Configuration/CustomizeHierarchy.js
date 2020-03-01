@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CustomScreen } from './';
+import { CustomScreen, InteractionScreen } from './';
 import { OptionColumn } from './CustomizeUIElements';
 
 const CustomizeHierarchy = (props) => (
@@ -9,17 +9,28 @@ const CustomizeHierarchy = (props) => (
       <h4 style={{color: "#BDBDBD"}}>{props.title}</h4>
       <div className="clearfix">
         <OptionColumn className="grid--5">
-          <CustomScreen 
-            configTitle={props.configTitle}
-            handleChange={props.handleChange}
-            customCallBack={props.customCallBack}
-            field={props.field}
-            d3Projections={props.d3Projections}
-            projectionName={props.projectionName}
-            color={props.color}
-            tableauSettings={props.tableauSettings}
-          />
-        </OptionColumn>
+          { props.configType === 'customize'
+            ? 
+              <CustomScreen 
+                configTitle={props.configTitle}
+                handleChange={props.handleChange}
+                customCallBack={props.customCallBack}
+                field={props.field}
+                color={props.color}
+                tableauSettings={props.tableauSettings}
+              />
+            : 
+              <InteractionScreen 
+                configTitle={props.configTitle}
+                handleChange={props.handleChange}
+                customCallBack={props.customCallBack}
+                field={props.field}
+                color={props.color}
+                tableauSettings={props.tableauSettings}
+                configSheetColumns={props.configSheetColumns}
+              />
+          }
+    </OptionColumn>
         <OptionColumn className="grid--7" style={{border: 0}}>
         </OptionColumn>
       </div>

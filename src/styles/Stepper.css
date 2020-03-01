@@ -2,11 +2,12 @@
   display: block;
   margin-bottom: 32px;
   padding-top: 16px;
+  padding-right: 4%;
 }
 
 #Stepper.step-grid .step-item {
   display: inline-block;
-  width: 25%;
+  width: 20%;
   text-align: center;
   color: rgb(120, 120, 120);
   vertical-align: top;
@@ -14,6 +15,8 @@
 
 #Stepper.step-grid .step-item .step-name {
   font-size: 12px;
+  max-width: 20%;
+  display: inline;
 }
 
 #Stepper.step-grid .step-item .step-count {
@@ -28,11 +31,11 @@
 
 #Stepper.step-grid .step-item .step-count:after {
   position: absolute;
-  width: 16%;
+  width: 12%;
   height: 1px;
   background: rgb(187, 187, 187);
   content: '';
-  margin-left: 2%;
+  margin-left: 5%;
   margin-top: 12px;
 }
 

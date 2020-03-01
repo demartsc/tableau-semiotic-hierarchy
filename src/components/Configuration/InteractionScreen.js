@@ -1,5 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+
+//semiotic
+import { ResponsiveNetworkFrame } from 'semiotic';
 
 //material ui
 import { withStyles } from '@material-ui/core/styles';
@@ -19,7 +23,7 @@ const styles = theme => ({
 });
 
 // the example on material ui has this function statement
-class CustomScreen extends React.Component {
+class InteractionScreen extends React.Component {
   constructor (props) {
     super(props);
   }
@@ -37,6 +41,7 @@ class CustomScreen extends React.Component {
     const {
       classes,
       handleChange,
+      configSheetColumns,
       tableauSettings } = this.props;
 
     console.log('we are in custom', this.props);
@@ -46,63 +51,97 @@ class CustomScreen extends React.Component {
           <div class="content-container">
             <OptionTitle>{this.props.configTitle}</OptionTitle>
             <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                  title="Edge Type"
-                  tooltipText="Select the style of edge for your viz"
-                />
-              <Select
-                value={tableauSettings.edgeType || "normal"}
-                onChange={handleChange}
-                input={<Input name="edgeType" id="edgeType-helper" />}
-              >
-                 <MenuItem value={"normal"}>Normal</MenuItem>
-                 <MenuItem value={"linearc"}>Line Arc</MenuItem>
-                 <MenuItem value={"curve"}>Curve</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                    title="Viz Layout"
-                    tooltipText="Select the layout for your viz (vertical, horizontal or radial"
+              <InputLabelWithTooltip
+                    title="Hover Action"
+                    tooltipText="Toggle and select which action to take on hover"
                   />
               <Select
-                value={tableauSettings.networkProjection || "vertical"}
+                value={tableauSettings.hoverAction || "No Action"}
                 onChange={handleChange}
-                input={<Input name="networkProjection" id="networkProjection-helper" />}
+                input={<Input name="hoverAction" id="hoverAction-helper" />}
               >
-                 <MenuItem value={"vertical"}>Vertical</MenuItem>
-                 <MenuItem value={"horizontal"}>Horizontal</MenuItem>
-                 <MenuItem value={"radial"}>Radial</MenuItem>
+                 <MenuItem value={"No Action"}>No Action</MenuItem>
+                 <MenuItem value={"Highlight"}>Highlight</MenuItem>
+                 <MenuItem value={"Filter"}>Filter</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                      title="Edge Render Type"
-                      tooltipText="Select from Semoitic's Render Modes"
-                    />
+              <InputLabelWithTooltip
+                    title="Hover Identifying Field"
+                    tooltipText="Select which STRING field to take action on (we require string for interaction)"
+                  />
               <Select
-                value={tableauSettings.edgeRender || "normal"}
+                value={tableauSettings.hoverField || "None"}
                 onChange={handleChange}
-                input={<Input name="edgeRender" id="edgeRender-helper" />}
+                input={<Input name="hoverField" id="hoverField-helper" />}
               >
-                 <MenuItem value={"normal"}>Normal</MenuItem>
-                 <MenuItem value={"sketchy"}>Sketchy</MenuItem>
-                 <MenuItem value={"painty"}>Painty</MenuItem>
+                 <MenuItem value={"None"}>None</MenuItem>
+                 {
+                  configSheetColumns.map(f => (
+                    <MenuItem value={f.fieldName} key={f.fieldName}>{f.fieldName}</MenuItem>
+                  ))
+                };
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip
+                    title="Click Action"
+                    tooltipText="Toggle and select which action to take on click"
+                  />
+              <Select
+                value={tableauSettings.clickAction || "No Action"}
+                onChange={handleChange}
+                input={<Input name="clickAction" id="clickAction-helper" />}
+              >
+                 <MenuItem value={"No Action"}>No Action</MenuItem>
+                 <MenuItem value={"Highlight"}>Highlight</MenuItem>
+                 <MenuItem value={"Filter"}>Filter</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip
+                    title="Click Identifying Field"
+                    tooltipText="Select which STRING field to take action on (we require string for interaction)"
+                  />
+              <Select
+                value={tableauSettings.clickField || "None"}
+                onChange={handleChange}
+                input={<Input name="clickField" id="clickField-helper" />}
+              >
+                 <MenuItem value={"None"}>None</MenuItem>
+                 {
+                  configSheetColumns.map(f => (
+                    <MenuItem value={f.fieldName} key={f.fieldName}>{f.fieldName}</MenuItem>
+                  ))
+                };
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
               <InputLabelWithTooltip 
-                title="Node Render Type"
-                tooltipText="Select from Semoitic's Render Modes"
+                  title="Show Tooltip"
+                  tooltipText="Toggle whether to show the tooltip"
               />
               <Select
-                value={tableauSettings.nodeRender || "normal"}
+                value={tableauSettings.hoverAnnotation === "true"}
                 onChange={handleChange}
-                input={<Input name="nodeRender" id="nodeRender-helper" />}
+                input={<Input name="hoverAnnotation" id="hoverAnnotation-helper" />}
               >
-                 <MenuItem value={"normal"}>Normal</MenuItem>
-                 <MenuItem value={"sketchy"}>Sketchy</MenuItem>
-                 <MenuItem value={"painty"}>Painty</MenuItem>
+                 <MenuItem value={false}>False</MenuItem>
+                 <MenuItem value={true}>True</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
+                  title="Show Highlight"
+                  tooltipText="Toggle whether to highlight based on Tableau selections"
+              />
+              <Select
+                value={tableauSettings.highlightAnnotation === "true"}
+                onChange={handleChange}
+                input={<Input name="highlightAnnotation" id="highlightAnnotation-helper" />}
+              >
+                 <MenuItem value={false}>False</MenuItem>
+                 <MenuItem value={true}>True</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
@@ -152,52 +191,6 @@ class CustomScreen extends React.Component {
                 margin="normal"
               />
             </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                  title="Node Size"
-                  tooltipText="Toggle node size from value field"
-              />
-              <Select
-                value={tableauSettings.nodeSize || "none"}
-                onChange={handleChange}
-                input={<Input name="nodeSize" id="nodeSize-helper" />}
-              >
-                 <MenuItem value={"none"}>None</MenuItem>
-                 <MenuItem value={"value"}>Value</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                title="Minimum Node Size"
-                tooltipText="Minimum radius for nodes (e.g., 1)"
-              />
-              <TextField  
-                id="markerMinRadius-helper"
-                name="markerMinRadius"
-                label="Minimum Radius for Markers"
-                placeholder="1"
-                className={classes.textField}
-                value={tableauSettings.markerMinRadius}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                title="Maximum Node Size"
-                tooltipText="Maximum radius for nodes (e.g., 10)"
-              />
-              <TextField  
-                id="markerMaxRadius-helper"
-                name="markerMaxRadius"
-                label="Maximum Radius for Markers"
-                placeholder="25"
-                className={classes.textField}
-                value={tableauSettings.markerMaxRadius}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </FormControl>
           </div>
         </OptionWrapper>
       </div>
@@ -205,8 +198,8 @@ class CustomScreen extends React.Component {
     }
 }
 
-CustomScreen.propTypes = {
+InteractionScreen.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(CustomScreen);
+export default withStyles(styles)(InteractionScreen);

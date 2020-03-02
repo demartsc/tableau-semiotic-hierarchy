@@ -1,3 +1,23 @@
+// Copyright (c) 2020 Chris DeMartini
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 import React from 'react';
 // import PropTypes from 'prop-types';
 
@@ -251,7 +271,7 @@ class SemioticHierarchy extends React.Component {
         log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
         // create the custom tooltip for semiotic
-        const popOver = (d) => {
+        const popOver = d => {
             // log('in tooltip', d);
             if ( d.parent && tableauSettings.ConfigValueField !== "None") {
                 return (
@@ -296,7 +316,7 @@ class SemioticHierarchy extends React.Component {
                         :   tableauSettings.ConfigType === "Circlepack" ? undefined 
                         :   tableauSettings.ConfigType === "Treemap" ? undefined
                         :   tableauSettings.ConfigValueField === "None" ? undefined
-                        :   d => nodeSizeScale(d.valueMetric)
+                        :   d => nodeSizeScale(d.valueMetric || 0)
                     } // this breaks the treemap and circlepack
                     nodeRenderMode={nodeRender}
                     edgeRenderMode={edgeRender}
@@ -307,22 +327,26 @@ class SemioticHierarchy extends React.Component {
                             : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
                             : _.split(this.props.nodeFillColor,',')[0],
                         fillOpacity: nodeFillOpacity,
-                        stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.strokeFillColor,',')[0]
+                        stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeStrokeColor,',')[0]
                             : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
                             : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
-                            : _.split(this.props.strokeFillColor,',')[0],
+                            : _.split(this.props.nodeStrokeColor,',')[0],
                         strokeOpacity: nodeStrokeOpacity
                     })}
                     edgeStyle={(d,i) => ({ 
                         fill: edgeFillColor,
                         fillOpacity: edgeFillOpacity,
-                        stroke: d.target.colorHex || "#BDBDBD", 
-                        strokeOpacity: edgeStrokeOpacity
+                        stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeStrokeColor,',')[0]
+                            : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.target.valueMetric || 0)
+                            : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.target.colorHex 
+                            : _.split(this.props.nodeStrokeColor,',')[0],
+                        strokeOpacity: nodeStrokeOpacity*.5
                     })}
                     edgeWidthAccessor={d => d.valueMetric || 1}
                     networkType={{
                         type: networkType,
                         projection: networkProjection,
+                        zoom: true,
                         nodePadding: 1,
                         forceManyBody: networkType === "force" ? -250 : -50,
                         edgeStrength: networkType === "force" ? 2 : 1,
@@ -337,9 +361,9 @@ class SemioticHierarchy extends React.Component {
 
                     // interactivity
                     hoverAnnotation={hoverAnnotation}
-                    tooltipContent={d => popOver(d)}
-                    customClickBehavior={(d) => this.props.clickCallBack(d)}
-                    customHoverBehavior={(d) => this.props.hoverCallBack(d)}
+                    tooltipContent={popOver}
+                    customClickBehavior={this.props.clickCallBack}
+                    customHoverBehavior={this.props.hoverCallBack}
                 />
             </div>
         );

@@ -38,13 +38,13 @@ class InteractionScreen extends React.Component {
   }
   
   render() {
+    // console.log('we are in custom', this.props);
     const {
       classes,
       handleChange,
       configSheetColumns,
       tableauSettings } = this.props;
 
-    console.log('we are in custom', this.props);
     return (
       <div className="sheetScreen">
         <OptionWrapper>
@@ -78,7 +78,7 @@ class InteractionScreen extends React.Component {
                  <MenuItem value={"None"}>None</MenuItem>
                  {
                   configSheetColumns.map(f => (
-                    <MenuItem value={f.fieldName} key={f.fieldName}>{f.fieldName}</MenuItem>
+                    <MenuItem value={f} key={f}>{f}</MenuItem>
                   ))
                 };
               </Select>
@@ -111,7 +111,7 @@ class InteractionScreen extends React.Component {
                  <MenuItem value={"None"}>None</MenuItem>
                  {
                   configSheetColumns.map(f => (
-                    <MenuItem value={f.fieldName} key={f.fieldName}>{f.fieldName}</MenuItem>
+                    <MenuItem value={f} key={f}>{f}</MenuItem>
                   ))
                 };
               </Select>

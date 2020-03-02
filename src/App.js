@@ -1,3 +1,23 @@
+// Copyright (c) 2020 Chris DeMartini
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './App.css';
@@ -94,9 +114,9 @@ const options = {
   maxRows: 0
 };
 
-function findColumnIndexByFieldName(state, fieldName) {
-  return (state.ConfigSheetColumns || [])
-    .findIndex(f => f.fieldName === fieldName);
+function findColumnIndexByFieldName(ConfigSheetColumns, fieldName) {
+  return (ConfigSheetColumns || [])
+    .findIndex(f => f === fieldName);
 }
 // end constants to move to another file later
 
@@ -194,6 +214,8 @@ class App extends Component {
 
   clickCallBack = d => {
     const {clickField, clickAction} = this.state.tableauSettings;
+    const hoverAnnotation = [];
+
 
     console.log(
       '%c in on click callback',
@@ -211,25 +233,44 @@ class App extends Component {
 
   hoverCallBack = d => {
     const {hoverField, hoverAction} = this.state.tableauSettings;
+    const hoverAnnotation = [];
 
     console.log(
       '%c in on hover callback',
       'background: OLIVE',
       d,
-      // findColumnIndexByFieldName(this.state, hoverField),
-      // hoverAction
+      this.state.ConfigSheetColumns, 
+      hoverField,
+      findColumnIndexByFieldName(this.state.ConfigSheetColumns, hoverField),
+      hoverAction
     );  
 
     // if we are actually hovering on something then we should call this function
     if ( d ) {
-      this.applyMouseActionsToSheets(d, hoverAction, hoverField);
+      hoverAnnotation.push({
+        type: 'highlight',
+        ...d,
+        style : {
+          stroke: "#222222",
+          strokeWidth: 2,
+          strokeOpacity: 1
+        }
+      });
+      this.setState({
+        highlightOn: hoverAnnotation
+      }); //, () => this.applyMouseActionsToSheets(d, hoverAction, hoverField)
+    } else {
+      this.setState({
+        highlightOn: []
+      });
     }
-  };
+  }
 
   applyMouseActionsToSheets = (d, action, fieldName) => {
     if (this.applyingMouseActions) {
       return;
     }
+
     const {ConfigSheet} = this.state.tableauSettings;
     const toHighlight = action === 'Highlight' && (fieldName || 'None') !== 'None';
     const toFilter = action === 'Filter' && (fieldName || 'None') !== 'None';
@@ -247,7 +288,7 @@ class App extends Component {
 
     if ( d ) {
       // select marks or filter
-      const fieldIdx = findColumnIndexByFieldName(this.state, fieldName);
+      const fieldIdx = findColumnIndexByFieldName(this.state.ConfigSheetColumns, fieldName);
       const fieldValues = typeof d[0] === 'object' ?
         d.map(childD => childD[fieldIdx]) : [d[fieldIdx]];
 
@@ -519,33 +560,38 @@ class App extends Component {
 
       // selected marks is being triggered, but this approach will not work with semiotic
       // now we reconcile marks to hierarchy data and adjust opacity accordingly
-      let annotationsArray = []; 
+      let annotationsArray = [];
+
       if ( data.length > 0 && this.state.tableauSettings.highlightAnnotation === "true") {
+        annotationsArray.push({
+          type: "desaturation-layer",
+          style: { fill: "white", opacity: 0.6 }
+        });
+
         for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
-        // log('marks data', data, this.state['ConfigSheetData'][l]);
-          if (_.find(data, (o) => { return o[this.state.tableauSettings.ConfigChildField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField]})) {
+          // log('marks data', data, this.state['ConfigSheetData'][l]);
+          if (_.find(data, o => { return o[this.state.tableauSettings.ConfigChildField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField]})) {
+          // if (_.find(data, o => { return o['Group Color'] === this.state['ConfigSheetData'][l]['Group Color']})) {
+            log('marks data found', data, this.state['ConfigSheetData'][l]);
             annotationsArray.push({
               type: "highlight",
               id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField] ,
               style: {
-                strokeWidth: 5,
-                strokeOpacity: 1,
-                fillOpacity: 1
+                stroke: "#222222",
+                strokeWidth: 2,
+                strokeOpacity: 1
               }
             })
           }
           else { // else set to .1
-            annotationsArray.push({
-              type: "highlight",
-              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
-              style: {
-                fill: "#FFF", 
-                storke: "#FFF",
-                strokeWidth: 5,
-                strokeOpacity: 1,
-                fillOpacity: .9
-              }
-            })
+            // annotationsArray.push({
+            //   type: "highlight",
+            //   id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
+            //   style: {
+            //     strokeOpacity: .1,
+            //     fillOpacity: .1
+            //   }
+            // })
           }
         }
       }
@@ -1043,6 +1089,7 @@ render() {
       }
 
       if (this.state.stepIndex === 5) {
+        console.log('checking state in stepIndex 5', this.state);
         return (
           <React.Fragment>
             <Stepper 

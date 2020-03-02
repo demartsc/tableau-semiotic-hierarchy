@@ -270,6 +270,18 @@ class SemioticHierarchy extends React.Component {
 
         log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
+        // create the hoverAnnotation prop for semiotic
+        const hoverAnnotationProp = hoverAnnotation ? 
+            [{
+                type: 'highlight',
+                style : {
+                stroke: "#222222",
+                strokeWidth: 2,
+                strokeOpacity: 1
+                }
+            }, { type: "frame-hover" }
+            ] : false;
+
         // create the custom tooltip for semiotic
         const popOver = d => {
             // log('in tooltip', d);
@@ -360,7 +372,7 @@ class SemioticHierarchy extends React.Component {
                     annotations={this.props.highlightOn}
 
                     // interactivity
-                    hoverAnnotation={hoverAnnotation}
+                    hoverAnnotation={hoverAnnotationProp}
                     tooltipContent={popOver}
                     customClickBehavior={this.props.clickCallBack}
                     customHoverBehavior={this.props.hoverCallBack}

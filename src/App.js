@@ -233,7 +233,6 @@ class App extends Component {
 
   hoverCallBack = d => {
     const {hoverField, hoverAction} = this.state.tableauSettings;
-    const hoverAnnotation = [];
 
     console.log(
       '%c in on hover callback',
@@ -247,23 +246,8 @@ class App extends Component {
 
     // if we are actually hovering on something then we should call this function
     if ( d ) {
-      hoverAnnotation.push({
-        type: 'highlight',
-        ...d,
-        style : {
-          stroke: "#222222",
-          strokeWidth: 2,
-          strokeOpacity: 1
-        }
-      });
-      this.setState({
-        highlightOn: hoverAnnotation
-      }); //, () => this.applyMouseActionsToSheets(d, hoverAction, hoverField)
-    } else {
-      this.setState({
-        highlightOn: []
-      });
-    }
+      this.applyMouseActionsToSheets(d, hoverAction, hoverField)
+    } 
   }
 
   applyMouseActionsToSheets = (d, action, fieldName) => {

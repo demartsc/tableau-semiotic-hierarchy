@@ -28,13 +28,28 @@ export function selectMarksByField(fieldName, fieldValues, ConfigSheet) {
 
   // Empty promise that resolves when the selection is complete.
   return tableauExt.dashboardContent.dashboard.worksheets
-    .filter(ws => ws.name !== ConfigSheet)
+    // .filter(ws => ws.name !== ConfigSheet)
     .map(worksheet => worksheet
       .selectMarksByValueAsync(
         marksValue,
         window.tableau.SelectionUpdateType.Replace
       )
     );
+}
+
+export function clearMarksByField(fieldName) {
+  const marksValue = [{
+    fieldName,
+    value: []
+  }];
+
+  return tableauExt.dashboardContent.dashboard.worksheets
+  .map(worksheet => worksheet
+    .selectMarksByValueAsync(
+      marksValue,
+      window.tableau.SelectionUpdateType.Replace
+    )
+  );
 }
 
 export function applyFilterByField(fieldName, fieldValues, ConfigSheet) {
@@ -58,8 +73,4 @@ export function clearFilterByField(fieldName, ConfigSheet) {
     .map(worksheet => {
       worksheet.clearFilterAsync(fieldName);
   });
-}
-
-export function clearMarksByField(fieldName, ConfigSheet) {
-  return selectMarksByField(fieldName, [], ConfigSheet);
 }

@@ -136,7 +136,7 @@ class App extends Component {
       demoType: "tree",
       stepIndex: 1,
       isMissingData: true,
-      highlightOn: undefined
+      highlightOn: []
     };
 
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
@@ -144,9 +144,9 @@ class App extends Component {
     // interactivity and listeners
     this.unregisterHandlerFunctions = [];
     this.applyingMouseActions = false;
-    this.clickCallBack = _.throttle(this.clickCallBack,200);
-    this.hoverCallBack = _.throttle(this.hoverCallBack,200);
-    this.configCallBack = _.debounce(this.configCallBack,500);
+    this.clickCallBack = _.debounce(this.clickCallBack,200);
+    this.hoverCallBack = _.debounce(this.hoverCallBack,200);
+    this.configCallBack = _.debounce(this.configCallBack,200);
   }
 
   addEventListeners = () => {
@@ -245,9 +245,7 @@ class App extends Component {
     );  
 
     // if we are actually hovering on something then we should call this function
-    if ( d ) {
-      this.applyMouseActionsToSheets(d, hoverAction, hoverField)
-    } 
+    this.applyMouseActionsToSheets(d, hoverAction, hoverField)
   }
 
   applyMouseActionsToSheets = (d, action, fieldName) => {
@@ -272,13 +270,9 @@ class App extends Component {
 
     if ( d ) {
       // select marks or filter
-      const fieldIdx = findColumnIndexByFieldName(this.state.ConfigSheetColumns, fieldName);
-      const fieldValues = typeof d[0] === 'object' ?
-        d.map(childD => childD[fieldIdx]) : [d[fieldIdx]];
-
       const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
-      tasks = actionToApply(fieldName, fieldValues, ConfigSheet);
-
+      tasks = actionToApply(fieldName, d[fieldName], ConfigSheet);
+      // console.log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, fieldIdx, fieldValues, d[fieldName], actionToApply);
     } else {
       // clear marks or filer
       const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
@@ -567,7 +561,8 @@ class App extends Component {
               }
             })
           }
-          else { // else set to .1
+          else { 
+            // else set to .1
             // annotationsArray.push({
             //   type: "highlight",
             //   id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],

@@ -316,6 +316,7 @@ class SemioticHierarchy extends React.Component {
             }
         }
 
+        // console.log('renderProps', 'annotations:', this.props.highlightOn, 'hover call back:', this.props.hoverCallBack, 'hoverAnnotation:', hoverAnnotationProp);
        return (
             <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
                 <ResponsiveNetworkFrame

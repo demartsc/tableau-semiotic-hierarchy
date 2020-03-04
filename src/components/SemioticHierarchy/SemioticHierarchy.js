@@ -257,6 +257,7 @@ class SemioticHierarchy extends React.Component {
             networkType,
             networkProjection, 
             tableauSettings,
+            filterRenderedNodes
         } = this.props;
         
         // pull in memoized stuff for use in render function
@@ -317,7 +318,7 @@ class SemioticHierarchy extends React.Component {
         }
 
         // console.log('renderProps', 'annotations:', this.props.highlightOn, 'hover call back:', this.props.hoverCallBack, 'hoverAnnotation:', hoverAnnotationProp);
-       return (
+        return (
             <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
                 <ResponsiveNetworkFrame
                     responsiveWidth
@@ -369,6 +370,8 @@ class SemioticHierarchy extends React.Component {
                         hierarchySum: d => d.valueMetric || 0
                     }}                
 
+                    filterRenderedNodes={d => d.depth > parseInt(filterRenderedNodes || -1)}
+                    
                     //annotations layer which allowers for pseudo highlight
                     annotations={this.props.highlightOn}
 

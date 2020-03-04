@@ -144,53 +144,6 @@ class InteractionScreen extends React.Component {
                  <MenuItem value={true}>True</MenuItem>
               </Select>
             </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                    title="Color Config"
-                    tooltipText="The way color will be applied"
-              />
-              <Select
-                value={tableauSettings.colorConfig || "solid"}
-                onChange={handleChange}
-                input={<Input name="colorConfig" id="colorConfig-helper" />}
-              >
-                 <MenuItem value={"solid"}>Single Color</MenuItem>
-                 <MenuItem value={"scale"}>Color Scale</MenuItem>
-                 <MenuItem value={"field"}>Color Field</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                title="Color"
-                tooltipText="For single, enter 1 hex code for scale enter two, e.g., #ccc,#ddd"
-              />
-              <TextField  
-                id="nodeColor-helper"
-                name="nodeColor"
-                label="Node Fill Color(s)"
-                placeholder="#CCCCCC or #CCCCCC,#DDDDDD"
-                className={classes.textField}
-                value={tableauSettings.nodeColor}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                title="Node Fill Opacity"
-                tooltipText="A decimal from 0 to 1 that will control node opacity"
-              />
-              <TextField  
-                id="nodeFillOpacity-helper"
-                name="nodeFillOpacity"
-                label="Node Fill Opacity"
-                placeholder=".35"
-                className={classes.textField}
-                value={tableauSettings.nodeFillOpacity}
-                onChange={handleChange}
-                margin="normal"
-              />
-            </FormControl>
           </div>
         </OptionWrapper>
       </div>

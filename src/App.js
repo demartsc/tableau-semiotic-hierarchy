@@ -147,6 +147,8 @@ class App extends Component {
     this.clickCallBack = _.debounce(this.clickCallBack,200);
     this.hoverCallBack = _.debounce(this.hoverCallBack,200);
     this.configCallBack = _.debounce(this.configCallBack,200);
+    // this.addEventListeners = _.debounce(this.addEventListeners,500);
+    // this.removeEventListeners = _.debounce(this.removeEventListeners,500);
   }
 
   addEventListeners = () => {
@@ -271,8 +273,9 @@ class App extends Component {
     if ( d ) {
       // select marks or filter
       const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
-      tasks = actionToApply(fieldName, d[fieldName], ConfigSheet);
-      // console.log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, fieldIdx, fieldValues, d[fieldName], actionToApply);
+      tasks = actionToApply(fieldName, [d[fieldName]], ConfigSheet);
+      // console.log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
+      
     } else {
       // clear marks or filer
       const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
@@ -463,48 +466,6 @@ class App extends Component {
     }
   }
   
-  // on mark selection highlight the nodes in the hierarchy as well
-  // marksSelected = e => {
-  //   if ( this.state.tableauSettings.keplerFilterField ) {
-  //     if (this.applyingMouseActions) {
-  //       return;
-  //     }
-  //     console.log(
-  //       '%c ==============App Marker selected',
-  //       'background: red; color: white'
-  //     );
-
-  //     // remove event listeners
-  //     this.removeEventListeners();
-
-  //     // get selected marks and pass to kepler via state object
-  //     e.getMarksAsync().then(marks => {
-  //       const {keplerFilterField} = this.state.tableauSettings;
-  //       // loop through marks table and adjust the class for opacity
-  //       const marksDataTable = marks.data[0];
-  //       const col_indexes = {};
-  //       const keplerFields = [];
-
-  //       // write column names to array
-  //       for (let k = 0; k < marksDataTable.columns.length; k++) {
-  //           col_indexes[marksDataTable.columns[k].fieldName] = k;
-  //           keplerFields.push(columnToKeplerField(marksDataTable.columns[k], k));
-  //         }
-
-  //       const keplerData = dataToKeplerRow(marksDataTable.data, keplerFields);
-
-  //       const filterKeplerObject = {
-  //         field: keplerFilterField,
-  //         values: keplerData.map(childD => childD[col_indexes[keplerFilterField]])
-  //       };
-
-  //       // @shan you can remove this console once you are good with the object
-  //       this.props.dispatch(markerSelect(filterKeplerObject));
-  //       this.setState({filterKeplerObject}, () => this.addEventListeners());
-  //     });
-  //   }
-  // }
-
   marksSelected = e => {
     console.log(
       '%c ==============App Marker selected',
@@ -598,25 +559,26 @@ class App extends Component {
     // clean up event listeners (taken from tableau example)
     this.removeEventListeners();
 
-    if (TableauSettings.ShouldUse) {
-      TableauSettings.updateAndSave({
-        isLoading: true
-      }, settings => {
-        this.setState({
-          isLoading: true,
-          tableauSettings: settings,
-        })
-      });
+    // this forces the component to completely re-render when data changes
+    // if (TableauSettings.ShouldUse) {
+    //   TableauSettings.updateAndSave({
+    //     isLoading: true
+    //   }, settings => {
+    //     this.setState({
+    //       isLoading: true,
+    //       tableauSettings: settings,
+    //     })
+    //   });
 
-    } else {
-      this.setState({ isLoading: true });
-      tableauExt.settings.set('isLoading', true);
-      tableauExt.settings.saveAsync().then(() => {
-        this.setState({
-          tableauSettings: tableauExt.settings.getAll()
-        });
-      });
-    }
+    // } else {
+    //   this.setState({ isLoading: true });
+    //   tableauExt.settings.set('isLoading', true);
+    //   tableauExt.settings.saveAsync().then(() => {
+    //     this.setState({
+    //       tableauSettings: tableauExt.settings.getAll()
+    //     });
+    //   });
+    // }
 
     //working here on pulling out summmary data
     //may want to limit to a single row when getting column names
@@ -1132,6 +1094,7 @@ render() {
         //networkTypeProps
         networkType={semioticTypes[tableauSettingsState.ConfigType]}
         networkProjection={tableauSettingsState.networkProjection}
+        filterRenderedNodes={tableauSettingsState.filterDepth === "none" ? undefined : tableauSettingsState.filterDepth}
 
         //render mode props
         nodeSize={tableauSettingsState.nodeSize}

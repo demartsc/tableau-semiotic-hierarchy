@@ -501,7 +501,7 @@ class App extends Component {
       // now we reconcile marks to hierarchy data and adjust opacity accordingly
       let annotationsArray = [];
 
-      if ( data.length > 0 && this.state.tableauSettings.highlightAnnotation === "true") {
+      if ( data.length > 0 ) {
         annotationsArray.push({
           type: "desaturation-layer",
           style: { fill: "white", opacity: 0.6 }
@@ -1119,6 +1119,7 @@ render() {
         //interactivity props
         highlightOn={this.state.highlightOn}
         hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
+        highlightAnnotation={tableauSettingsState.highlightAnnotation === "true"}
         clickCallBack={this.clickCallBack}
         hoverCallBack={this.hoverCallBack}
       />

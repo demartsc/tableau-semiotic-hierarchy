@@ -254,6 +254,7 @@ class SemioticHierarchy extends React.Component {
             edgeStrokeColor, 
             edgeStrokeOpacity,
             hoverAnnotation,
+            highlightAnnotation,
             networkType,
             networkProjection, 
             tableauSettings,
@@ -272,7 +273,7 @@ class SemioticHierarchy extends React.Component {
         log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
         // create the hoverAnnotation prop for semiotic
-        const hoverAnnotationProp = hoverAnnotation ? 
+        const hoverAnnotationProp = hoverAnnotation && highlightAnnotation ? 
             [{
                 type: 'highlight',
                 style : {
@@ -281,7 +282,18 @@ class SemioticHierarchy extends React.Component {
                 strokeOpacity: 1
                 }
             }, { type: "frame-hover" }
-            ] : false;
+            ] : hoverAnnotation ? 
+                [{ type: "frame-hover" }]
+                : highlightAnnotation ? 
+                    [{
+                        type: 'highlight',
+                        style : {
+                        stroke: "#222222",
+                        strokeWidth: 2,
+                        strokeOpacity: 1
+                        }
+                    }]
+                : false;
 
         // create the custom tooltip for semiotic
         const popOver = d => {
@@ -317,7 +329,7 @@ class SemioticHierarchy extends React.Component {
             }
         }
 
-        // console.log('renderProps', 'annotations:', this.props.highlightOn, 'hover call back:', this.props.hoverCallBack, 'hoverAnnotation:', hoverAnnotationProp);
+        // console.log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
         return (
             <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
                 <ResponsiveNetworkFrame
@@ -371,7 +383,8 @@ class SemioticHierarchy extends React.Component {
                     }}                
 
                     filterRenderedNodes={d => d.depth > parseInt(filterRenderedNodes || -1)}
-                    
+                    interactionSettings={{ voronoiClipping: (tableauSettings.markerMaxRadius*2 || MAX_MARKER_RADIUS*2) < 25 ? 25 : (tableauSettings.markerMaxRadius*2 || MAX_MARKER_RADIUS*2) }}
+
                     //annotations layer which allowers for pseudo highlight
                     annotations={this.props.highlightOn}
 

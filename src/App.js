@@ -503,16 +503,14 @@ class App extends Component {
       // now we reconcile marks to hierarchy data and adjust opacity accordingly
       let annotationsArray = [];
 
-      if ( data.length > 0 ) {
+      if ( data.length > 0 && this.state.tableauSettings.tableauField !== 'None' && this.state.tableauSettings.highlightAnnotation === 'true' ) {
         annotationsArray.push({
           type: "desaturation-layer",
           style: { fill: "white", opacity: 0.6 }
         });
 
         for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
-          // log('marks data', data, this.state['ConfigSheetData'][l]);
-          if (_.find(data, o => { return o[this.state.tableauSettings.ConfigChildField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField]})) {
-          // if (_.find(data, o => { return o['Group Color'] === this.state['ConfigSheetData'][l]['Group Color']})) {
+          if (_.find(data, o => { return o[this.state.tableauSettings.tableauField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.tableauField]})) {
             log('marks data found', data, this.state['ConfigSheetData'][l]);
             annotationsArray.push({
               type: "highlight",
@@ -525,6 +523,7 @@ class App extends Component {
             })
           }
           else { 
+            // do nothing for now
             // else set to .1
             // annotationsArray.push({
             //   type: "highlight",
@@ -535,6 +534,10 @@ class App extends Component {
             //   }
             // })
           }
+        }
+        // if after all that we only have the desaturation layer, remove it
+        if ( annotationsArray.length === 1 ) {
+          annotationsArray = [];
         }
       }
 

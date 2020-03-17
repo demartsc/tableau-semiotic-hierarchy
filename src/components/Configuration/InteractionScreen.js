@@ -117,6 +117,24 @@ class InteractionScreen extends React.Component {
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip
+                    title="Tableau to Semiotic Field"
+                    tooltipText="Select which STRING field to take action on (we require string for interaction)"
+                  />
+              <Select
+                value={tableauSettings.tableauField || "None"}
+                onChange={handleChange}
+                input={<Input name="tableauField" id="tableauField-helper" />}
+              >
+                 <MenuItem value={"None"}>None</MenuItem>
+                 {
+                  configSheetColumns.map(f => (
+                    <MenuItem value={f} key={f}>{f}</MenuItem>
+                  ))
+                };
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
               <InputLabelWithTooltip 
                   title="Show Tooltip"
                   tooltipText="Toggle whether to show the tooltip"

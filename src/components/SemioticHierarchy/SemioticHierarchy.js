@@ -206,6 +206,8 @@ class SemioticHierarchy extends React.Component {
         const {
             hierarchyData,
             tableauSettings,
+            hoverAnnotation, 
+            highlightAnnotation
         } = this.props;
 
         let hierarchyDataPreped = memoized.buildhierarchyDataPreped(
@@ -223,57 +225,8 @@ class SemioticHierarchy extends React.Component {
         let nodeSizeScale = memoized.buildNodeSizeScale(nodeData, tableauSettings.markerMinRadius, tableauSettings.markerMaxRadius);
         let nodeColorScale = memoized.buildNodeColorScale(nodeData, tableauSettings.nodeFillColor);
 
-        return ({
-            hierarchyDataPreped: hierarchyDataPreped, 
-            nodeData: nodeData,
-            edgeData: edgeData,
-            nodeSizeScale: nodeSizeScale, 
-            nodeColorScale: nodeColorScale,
-        });
-    }
-
-    componentDidMount() {
-        log('component mounted');
-    }
-  
-    render() {
-        //log('semitoic component', this.props);
-        const {
-            height,
-            width,
-            nodeRender,
-            nodeFillColor, 
-            nodeFillOpacity, 
-            nodeStrokeColor, 
-            nodeStrokeOpacity,
-            nodeSize,
-            edgeRender,
-            edgeType,
-            edgeFillColor, 
-            edgeFillOpacity, 
-            edgeStrokeColor, 
-            edgeStrokeOpacity,
-            hoverAnnotation,
-            highlightAnnotation,
-            networkType,
-            networkProjection, 
-            tableauSettings,
-            filterRenderedNodes
-        } = this.props;
-        
-        // pull in memoized stuff for use in render function
-        let {
-            hierarchyDataPreped, 
-            nodeData,
-            edgeData,
-            nodeSizeScale, 
-            nodeColorScale,
-        } = this.preprocessData();
-
-        log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
-
         // create the hoverAnnotation prop for semiotic
-        const hoverAnnotationProp = hoverAnnotation && highlightAnnotation ? 
+        let hoverAnnotationProp = hoverAnnotation && highlightAnnotation ? 
             [{
                 type: 'highlight',
                 style : {
@@ -295,39 +248,148 @@ class SemioticHierarchy extends React.Component {
                     }]
                 : false;
 
-        // create the custom tooltip for semiotic
-        const popOver = d => {
-            // log('in tooltip', d);
-            if ( d.parent && tableauSettings.ConfigValueField !== "None") {
-                return (
-                    <Paper style={{'padding': '5px'}}>
-                        <Typography> {tableauSettings.ConfigParentField}: {d.parent.child} </Typography>
-                        <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
-                        <Typography> {tableauSettings.ConfigValueField}: {d.valueMetric} </Typography>
-                    </Paper>
-                );
-            } else if ( d.parent ) {
-                return (
-                    <Paper style={{'padding': '5px'}}>
-                        <Typography> {tableauSettings.ConfigParentField}: {d.parent.child} </Typography>
-                        <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
-                    </Paper>
-                );
-            } else if (tableauSettings.ConfigValueField !== "None") {
-                return (
-                    <Paper style={{'padding': '5px'}}>
-                        <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
-                        <Typography> {tableauSettings.ConfigValueField}: {d.valueMetric} </Typography>
-                    </Paper>
-                );
-            } else {
-                return (
-                    <Paper style={{'padding': '5px'}}>
-                        <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
-                    </Paper>
-                );
+        return ({
+            hierarchyDataPreped: hierarchyDataPreped, 
+            nodeData: nodeData,
+            edgeData: edgeData,
+            nodeSizeScale: nodeSizeScale, 
+            nodeColorScale: nodeColorScale,
+            hoverAnnotationProp: hoverAnnotationProp
+        });
+    }
+
+    getColorHex = d => { 
+        console.log('checking on get color hex', d, d.colorHex);
+        return d.colorHex;
+    }
+    getValueMetric0 = d => d.valueMetric || 0;
+    getValueMetric1 = d => d.valueMetric || 1;
+
+    getNodeSize = d => {
+        let { nodeSizeScale } = this.preprocessData();
+        return nodeSizeScale(this.getValueMetric0(d));
+    }
+
+    getNodeColor = d => {
+        let { nodeColorScale } = this.preprocessData();
+        console.log('checking node color', d, this.getValueMetric0(d), nodeColorScale(d));
+        return nodeColorScale(this.getValueMetric0(d));
+    }
+
+
+    getTargetNodeColor = d => {
+        let { nodeColorScale } = this.preprocessData();
+        return nodeColorScale(d.target.valueMetric || 0);
+    }
+
+    getTargetColorHex = d => d.target.colorHex;
+
+    getNodeStyle = d => {
+        const { tableauSettings, nodeFillColor, nodeStrokeColor, nodeFillOpacity, nodeStrokeOpacity } = this.props;
+        return (
+            {
+                fill: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeFillColor,',')[0]
+                    : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getNodeColor(d)
+                    : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getColorHex(d)
+                    : _.split(nodeFillColor,',')[0],
+                fillOpacity: nodeFillOpacity,
+                stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeStrokeColor,',')[0]
+                    : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getNodeColor(d)
+                    : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getColorHex(d)
+                    : _.split(nodeStrokeColor,',')[0],
+                strokeOpacity: nodeStrokeOpacity        
             }
+        );
+    }
+
+    getEdgeStyle = d => {
+        const { tableauSettings, edgeFillColor, edgeFillOpacity, nodeStrokeColor, nodeStrokeOpacity } = this.props;
+        return (
+            { 
+                fill: edgeFillColor,
+                fillOpacity: edgeFillOpacity,
+                stroke: tableauSettings.colorConfig === "solid" ? _.split(nodeStrokeColor,',')[0]
+                    : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getTargetNodeColor(d)
+                    : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getTargetColorHex(d)
+                    : _.split(nodeStrokeColor,',')[0],
+                strokeOpacity: nodeStrokeOpacity*.5
+            }
+        );
+    }
+
+    evaluateNodesToRender = d => {
+        const {
+            filterRenderedNodes, 
+            filterHash
+        } = this.props;
+        
+        if ( Object.keys(filterHash).length > 0 ) {
+            return filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true
+        } else {
+            return d.depth > parseInt(filterRenderedNodes || -1);
         }
+    }
+
+    // create the custom tooltip for semiotic
+    popOver = d => {
+        const {tableauSettings} = this.props;
+        // log('in tooltip', d);
+        if ( d.parent && tableauSettings.ConfigValueField !== "None") {
+            return (
+                <Paper style={{'padding': '5px'}}>
+                    <Typography> {tableauSettings.ConfigParentField}: {d.parent.child} </Typography>
+                    <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
+                    <Typography> {tableauSettings.ConfigValueField}: {d.valueMetric} </Typography>
+                </Paper>
+            );
+        } else if ( d.parent ) {
+            return (
+                <Paper style={{'padding': '5px'}}>
+                    <Typography> {tableauSettings.ConfigParentField}: {d.parent.child} </Typography>
+                    <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
+                </Paper>
+            );
+        } else if (tableauSettings.ConfigValueField !== "None") {
+            return (
+                <Paper style={{'padding': '5px'}}>
+                    <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
+                    <Typography> {tableauSettings.ConfigValueField}: {d.valueMetric} </Typography>
+                </Paper>
+            );
+        } else {
+            return (
+                <Paper style={{'padding': '5px'}}>
+                    <Typography> {tableauSettings.ConfigChildField}: {d.child} </Typography>
+                </Paper>
+            );
+        }
+    }
+    
+    componentDidMount() {
+        log('component mounted');
+    }
+  
+    render() {
+        //log('semitoic component', this.props);
+        const {
+            height,
+            width,
+            nodeRender,
+            edgeRender,
+            edgeType,
+            networkType,
+            networkProjection, 
+            tableauSettings
+        } = this.props;
+        
+        // pull in memoized stuff for use in render function
+        let {
+            hierarchyDataPreped, 
+            edgeData,
+            hoverAnnotationProp
+        } = this.preprocessData();
+
+        log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
         // console.log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
         return (
@@ -336,39 +398,20 @@ class SemioticHierarchy extends React.Component {
                     responsiveWidth
                     responsiveHeight
                     edges={edgeData}
-                    nodeIDAccessor={d => d.child}
-                    nodeSizeAccessor={
+                    nodeIDAccessor={"child"}
+                    nodeSizeAccessor={                
                             tableauSettings.nodeSize === "none" ? undefined
                         :   tableauSettings.ConfigType === "Circlepack" ? undefined 
                         :   tableauSettings.ConfigType === "Treemap" ? undefined
                         :   tableauSettings.ConfigValueField === "None" ? undefined
-                        :   d => nodeSizeScale(d.valueMetric || 0)
-                    } // this breaks the treemap and circlepack
+                        :   this.getNodeSize
+                    }
                     nodeRenderMode={nodeRender}
                     edgeRenderMode={edgeRender}
                     edgeType={edgeType}
-                    nodeStyle={(d,i) => ({ 
-                        fill: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeFillColor,',')[0]
-                            : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
-                            : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
-                            : _.split(this.props.nodeFillColor,',')[0],
-                        fillOpacity: nodeFillOpacity,
-                        stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeStrokeColor,',')[0]
-                            : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.valueMetric || 0)
-                            : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.colorHex 
-                            : _.split(this.props.nodeStrokeColor,',')[0],
-                        strokeOpacity: nodeStrokeOpacity
-                    })}
-                    edgeStyle={(d,i) => ({ 
-                        fill: edgeFillColor,
-                        fillOpacity: edgeFillOpacity,
-                        stroke: tableauSettings.colorConfig === "solid" ? _.split(this.props.nodeStrokeColor,',')[0]
-                            : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? nodeColorScale(d.target.valueMetric || 0)
-                            : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? d.target.colorHex 
-                            : _.split(this.props.nodeStrokeColor,',')[0],
-                        strokeOpacity: nodeStrokeOpacity*.5
-                    })}
-                    edgeWidthAccessor={d => d.valueMetric || 1}
+                    nodeStyle={this.getNodeStyle}
+                    edgeStyle={this.getEdgeStyle}
+                    edgeWidthAccessor={this.getValueMetric1}
                     networkType={{
                         type: networkType,
                         projection: networkProjection,
@@ -379,10 +422,12 @@ class SemioticHierarchy extends React.Component {
                         iterations: networkType === "force" ? 500 : 1,
                         padding: networkType === "treemap" ? 3 : networkType === "circlepack" ? 2 : 0,
                         distanceMax: networkType === "force" ? 500 : 1,
-                        hierarchySum: d => d.valueMetric || 0
+                        hierarchySum: this.getValueMetric0
                     }}                
 
-                    filterRenderedNodes={d => d.depth > parseInt(filterRenderedNodes || -1)}
+                    // depending on if the source sheet is filtered we do different stuff here...
+                    filterRenderedNodes={this.evaluateNodesToRender}
+
                     interactionSettings={{ voronoiClipping: (tableauSettings.markerMaxRadius*2 || MAX_MARKER_RADIUS*2) < 25 ? 25 : (tableauSettings.markerMaxRadius*2 || MAX_MARKER_RADIUS*2) }}
 
                     //annotations layer which allowers for pseudo highlight
@@ -390,7 +435,7 @@ class SemioticHierarchy extends React.Component {
 
                     // interactivity
                     hoverAnnotation={hoverAnnotationProp}
-                    tooltipContent={popOver}
+                    tooltipContent={this.popOver}
                     customClickBehavior={this.props.clickCallBack}
                     customHoverBehavior={this.props.hoverCallBack}
                 />

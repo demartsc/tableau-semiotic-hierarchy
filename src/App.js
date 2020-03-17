@@ -136,7 +136,8 @@ class App extends Component {
       demoType: "tree",
       stepIndex: 1,
       isMissingData: true,
-      highlightOn: []
+      highlightOn: [], 
+      filterHash: {}
     };
 
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
@@ -460,9 +461,10 @@ class App extends Component {
     if (selectedSheet && selectedSheet === e.worksheet.name) {
       log(
         '%c ==============App filter has changed',
-        'background: red; color: white'
+        'background: red; color: white',
+        e
       );
-      this.getSummaryData(selectedSheet, "ConfigSheet");
+      this.getFilteredData(selectedSheet, "ConfigSheet");
     }
   }
   
@@ -514,7 +516,7 @@ class App extends Component {
             log('marks data found', data, this.state['ConfigSheetData'][l]);
             annotationsArray.push({
               type: "highlight",
-              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField] ,
+              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
               style: {
                 stroke: "#222222",
                 strokeWidth: 2,
@@ -546,6 +548,54 @@ class App extends Component {
     );
   }
   
+  getFilteredData = (selectedSheet, fieldName) => {
+    const sheetName = selectedSheet;
+    const sheetObject = tableauExt.dashboardContent.dashboard.worksheets.find(
+      worksheet => worksheet.name === sheetName
+    );
+
+    if (!sheetObject) { 
+      return;
+    }
+
+    // clean up event listeners (taken from tableau example)
+    this.removeEventListeners();
+
+    //working here on pulling out summmary data
+    //may want to limit to a single row when getting column names
+    sheetObject.getSummaryDataAsync(options).then((t) => {
+      log('in getData()', t, this.state);
+  
+      let col_indexes = {};
+      let data = [];
+      let filterHash = {};
+  
+      //write column names to array
+      for (let k = 0; k < t.columns.length; k++) {
+        col_indexes[t.columns[k].fieldName] = k;
+      }
+      // log('columns', col_names, col_indexes);
+    
+      for (let j = 0, len = t.data.length; j < len; j++) {
+        //log(this.convertRowToObject(tableauData[j], col_indexes));
+        data.push(convertRowToObject(t.data[j], col_indexes));
+        if ( data[j][this.state.tableauSettings.ConfigChildField] ) {
+          filterHash[data[j][this.state.tableauSettings.ConfigChildField]] = true;
+        }
+      }
+  
+      // log flat data for testing
+      log('filtered data', data, filterHash);
+  
+      this.setState({
+        filterHash: filterHash
+      });
+
+      // trying to add listeners back
+      this.addEventListeners();
+    });
+  }
+
   getSummaryData = (selectedSheet, fieldName) => {
     const sheetName = selectedSheet;
     const sheetObject = tableauExt.dashboardContent.dashboard.worksheets.find(
@@ -1117,6 +1167,7 @@ render() {
         //nodeWidthField || nodeWidthStroke
       
         //interactivity props
+        filterHash={this.state.filterHash}
         highlightOn={this.state.highlightOn}
         hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
         highlightAnnotation={tableauSettingsState.highlightAnnotation === "true"}

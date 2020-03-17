@@ -461,7 +461,7 @@ class App extends Component {
       if ( data.length > 0 && this.state.tableauSettings.tableauField !== 'None' && this.state.tableauSettings.highlightAnnotation === 'true' ) {
         annotationsArray.push({
           type: "desaturation-layer",
-          style: { fill: "white", opacity: 0.6 }
+          style: { fill: this.state.tableauSettings.washOutColor || "white", opacity: this.state.tableauSettings.washOutOpacity || 0.6 }
         });
 
         for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {

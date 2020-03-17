@@ -187,7 +187,40 @@ class InteractionScreen extends React.Component {
                  <MenuItem value={"4.5"}>4.5</MenuItem>
                  <MenuItem value={"5"}>5</MenuItem>
               </Select>
-            </FormControl>            <FormControl className={classes.formControl}>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
+                title="Washout Color"
+                tooltipText="Enter a hex code for the washout layer over marks, during highlight."
+              />
+              <TextField  
+                id="washOutColor-helper"
+                name="washOutColor"
+                label="Washout Color"
+                placeholder="#FFFFFF"
+                className={classes.textField}
+                value={tableauSettings.washOutColor}
+                onChange={handleChange}
+                margin="normal"
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
+                title="Washout Opacity"
+                tooltipText="A decimal from 0 to 1 that will control how much nodes not selected are washed out."
+              />
+              <TextField  
+                id="washOutOpacity-helper"
+                name="washOutOpacity"
+                label="Washout Opacity"
+                placeholder="0.6"
+                className={classes.textField}
+                value={tableauSettings.washOutOpacity}
+                onChange={handleChange}
+                margin="normal"
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
               <InputLabelWithTooltip 
                   title="Show Tooltip"
                   tooltipText="Toggle whether to show the tooltip"

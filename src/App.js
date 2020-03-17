@@ -291,51 +291,6 @@ class App extends Component {
     });
   }
 
-
-  // clickCallBack = d => {
-  //   log('in on click callback', d);
-  //   // go through each worksheet and select marks
-  //   if ( d ) {
-  //     tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-  //       log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
-  //       // filter
-  //       if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
-  //         // worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then(
-  //           worksheet.applyFilterAsync(
-  //             tableauExt.settings.get("ConfigChildField"), 
-  //             [d.id],
-  //             window.tableau.FilterUpdateType.Replace
-  //           ).then(e => log('filter applied response', e)) // response is void per tableau-extensions.js
-  //         // );
-  //       }
-  //     });
-  //   }
-  //   else {
-  //     // no data clear filter // never gets called because you only call this on node click
-  //     tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-  //       worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then();
-  //     });
-  //   }
-  // }
-  
-  // hoverCallBack = d => {
-  //   log('in on hover callback', d);
-  //     // go through each worksheet and select marks
-  //   if ( d ) {
-  //     tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-  //     log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
-  //     // select marks
-  //     worksheet.selectMarksByValueAsync(
-  //       [{
-  //         'fieldName': tableauExt.settings.get("ConfigChildField"),
-  //         'value': [d.id],
-  //       }],
-  //       window.tableau.SelectionUpdateType.Replace
-  //     ).then(e => log('select marks response: ' + worksheet.name, e), err => log('select marks err: ' + worksheet.name, err)); // response is void per tableau-extensions.js
-  //     });
-  //   }
-  // }
-
   demoChange = event => {
     this.setState({ demoType: event.target.value });
     log('in demo change', event.target.value, this.state.demoType);
@@ -516,9 +471,9 @@ class App extends Component {
               type: "highlight",
               id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
               style: {
-                stroke: "#222222",
-                strokeWidth: 2,
-                strokeOpacity: 1
+                stroke: this.state.tableauSettings.highlightStrokeColor || "#222222",
+                strokeWidth: this.state.tableauSettings.highlightStrokeWidth || 2,
+                strokeOpacity: this.state.tableauSettings.highlightStrokeOpacity || 1
               }
             })
           }

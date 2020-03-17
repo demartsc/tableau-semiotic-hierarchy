@@ -136,6 +136,59 @@ class InteractionScreen extends React.Component {
             </FormControl>
             <FormControl className={classes.formControl}>
               <InputLabelWithTooltip 
+                title="Highlight Stroke Color"
+                tooltipText="Enter a hex code for the highlight outline of a mark"
+              />
+              <TextField  
+                id="highlightStrokeColor-helper"
+                name="highlightStrokeColor"
+                label="Highlight Stroke Fill Color"
+                placeholder="#222222"
+                className={classes.textField}
+                value={tableauSettings.highlightStrokeColor}
+                onChange={handleChange}
+                margin="normal"
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
+                title="Highlight Stroke Opacity"
+                tooltipText="A decimal from 0 to 1 that will control highlight stroke opacity"
+              />
+              <TextField  
+                id="highlightStorkeOpacity-helper"
+                name="highlightStorkeOpacity"
+                label="Highlight Stroke Opacity"
+                placeholder="1"
+                className={classes.textField}
+                value={tableauSettings.highlightStorkeOpacity}
+                onChange={handleChange}
+                margin="normal"
+              />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
+                    title="Highlight Stroke Width"
+                    tooltipText="Set the width of the stroke when a node is highlighted"
+              />
+              <Select
+                value={tableauSettings.highlightStrokeWidth || 2}
+                onChange={handleChange}
+                input={<Input name="highlightStrokeWidth" id="highlightStrokeWidth-helper" />}
+              >
+                 <MenuItem value={"0.5"}>0.5</MenuItem>
+                 <MenuItem value={"1"}>1</MenuItem>
+                 <MenuItem value={"1.5"}>1.5</MenuItem>
+                 <MenuItem value={"2"}>2</MenuItem>
+                 <MenuItem value={"2.5"}>2.5</MenuItem>
+                 <MenuItem value={"3"}>3</MenuItem>
+                 <MenuItem value={"3.5"}>3.5</MenuItem>
+                 <MenuItem value={"4"}>4</MenuItem>
+                 <MenuItem value={"4.5"}>4.5</MenuItem>
+                 <MenuItem value={"5"}>5</MenuItem>
+              </Select>
+            </FormControl>            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
                   title="Show Tooltip"
                   tooltipText="Toggle whether to show the tooltip"
               />

@@ -230,10 +230,10 @@ class SemioticHierarchy extends React.Component {
             [{
                 type: 'highlight',
                 style : {
-                stroke: "#222222",
-                strokeWidth: 2,
-                strokeOpacity: 1
-                }
+                    stroke: tableauSettings.highlightStrokeColor || "#222222",
+                    strokeWidth: tableauSettings.highlightStrokeWidth || 2,
+                    strokeOpacity: tableauSettings.highlightStrokeOpacity || 1
+                }    
             }, { type: "frame-hover" }
             ] : hoverAnnotation ? 
                 [{ type: "frame-hover" }]
@@ -241,9 +241,9 @@ class SemioticHierarchy extends React.Component {
                     [{
                         type: 'highlight',
                         style : {
-                        stroke: "#222222",
-                        strokeWidth: 2,
-                        strokeOpacity: 1
+                            stroke: tableauSettings.highlightStrokeColor || "#222222",
+                            strokeWidth: tableauSettings.highlightStrokeWidth || 2,
+                            strokeOpacity: tableauSettings.highlightStrokeOpacity || 1
                         }
                     }]
                 : false;

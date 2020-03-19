@@ -3,15 +3,9 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
-
-// icons
-import Save from '@material-ui/icons/Save';
 
 const styles = theme => ({
   formControl: {
@@ -75,7 +69,7 @@ class RadioButtonsGroup extends React.Component {
   }
   
   render() {
-    const { classes, sheets, title, helperText, customChange } = this.props;
+    const { classes, sheets, title } = this.props;
 
     // const changeCallBack = customChange || this.handleChange;
 

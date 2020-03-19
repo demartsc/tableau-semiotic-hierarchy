@@ -56,7 +56,7 @@ export function applyFilterByField(fieldName, fieldValues, ConfigSheet) {
   // Empty promise that resolves when the selection is complete.
   return tableauExt.dashboardContent.dashboard.worksheets
     .filter(ws => ws.name !== ConfigSheet)
-    .map(worksheet => {
+    .forEach(worksheet => {
       worksheet
         .applyFilterAsync(
           fieldName,
@@ -70,7 +70,7 @@ export function clearFilterByField(fieldName, ConfigSheet) {
   // Empty promise that resolves when the selection is complete.
   return tableauExt.dashboardContent.dashboard.worksheets
     .filter(ws => ws.name !== ConfigSheet)
-    .map(worksheet => {
+    .forEach(worksheet => {
       worksheet.clearFilterAsync(fieldName);
   });
 }

@@ -53,7 +53,7 @@ import { withStyles } from '@material-ui/core/styles';
 // Tableau Styles and Tableau
 import './assets/tableau/vendor/slick.js/slick/slick.css';
 import './assets/tableau/css/style.min.css';
-import { tableau } from './tableau-extensions-1.latest';
+import { tableau } from './tableau-extensions-1.latest'; // eslint-disable-line  no-unused-vars
 
 // tableau settings handler
 import * as TableauSettings from './TableauSettings';
@@ -63,7 +63,6 @@ import defaultSettings from './components/Configuration/defaultSettings';
 
 // utils and variables
 import { 
-  defaultColor, 
   DataBlick,
   semioticTypes
 } from './variables';
@@ -164,7 +163,7 @@ class App extends Component {
     // add filter change event listener with callback to re-query data after change
     // go through each worksheet and then add a filter change event listener
     // need to check whether this is being applied more than once
-    tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
+    tableauExt.dashboardContent.dashboard.worksheets.forEach((worksheet) => {
       console.log('adding listners to', worksheet, ' sheet');
 
       // add event listener
@@ -217,10 +216,8 @@ class App extends Component {
 
   clickCallBack = d => {
     const {clickField, clickAction} = this.state.tableauSettings;
-    const hoverAnnotation = [];
 
-
-    console.log(
+    log(
       '%c in on click callback',
       'background: brown',
       d,
@@ -237,7 +234,7 @@ class App extends Component {
   hoverCallBack = d => {
     const {hoverField, hoverAction} = this.state.tableauSettings;
 
-    console.log(
+    log(
       '%c in on hover callback',
       'background: OLIVE',
       d,
@@ -337,7 +334,7 @@ class App extends Component {
       }, settings => {
         this.setState({
           // ['is' + field]: true,
-          tableauSettings: settings,
+          tableauSettings: settings
         });
       });
   
@@ -674,7 +671,7 @@ class App extends Component {
         this.setState({
           tableauSettings: settings,
           configuration: false,
-          isSplash: true,
+          // isSplash: true,
         });
       });
   
@@ -689,7 +686,7 @@ class App extends Component {
         this.setState({
           tableauSettings: tableauExt.settings.getAll(),
           configuration: false,
-          isSplash: true,
+          // isSplash: true,
         });
       });
     }
@@ -752,7 +749,7 @@ class App extends Component {
     log("did mount", tableauExt.settings.get("ConfigType"));
     if ( tableauExt.settings.get("ConfigType") === undefined ) {
       log('defaultSettings triggered', defaultSettings.length, defaultSettings);
-      defaultSettings.defaultKeys.map((defaultSetting, index) => {
+      defaultSettings.defaultKeys.forEach((defaultSetting, index) => {
         log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
         this.configCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
       })
@@ -814,8 +811,6 @@ class App extends Component {
   }
 
 render() {
-  const { classes } = this.props;
-
   // create these variables so they are blank if not populated by user
   let configMeasuresObject = {};
 
@@ -1079,9 +1074,9 @@ render() {
             poweredBy={
               <React.Fragment>
                 <p className="info">Brought to you by: </p>
-                <a href="http://www.datablick.com/" target="_blank"><img src={dbLogo} /></a> <a href="https://starschema.com/" target="_blank"><img src={ssLogo} /></a>
+                <a href="http://www.datablick.com/" target="_blank" rel="noopener noreferrer"><img src={dbLogo} alt="datablick logo"/></a> <a href="https://starschema.com/" target="_blank" rel="noopener noreferrer" ><img src={ssLogo} alt="star schema logo"/></a>
                 <p className="info">Powered by: </p>
-                <a href="https://emeeks.github.io/semiotic/#/" target="_blank"><img src={semLogo} /></a>
+                <a href="https://emeeks.github.io/semiotic/#/" target="_blank" rel="noopener noreferrer"><img src={semLogo} alt="semiotic logo" /></a>
             </React.Fragment>
           }
           />

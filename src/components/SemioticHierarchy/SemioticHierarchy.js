@@ -40,11 +40,6 @@ import {
     log
   } from '../../utils';
   
-const styles = {
-  root: {
-    flexGrow: 1,
-  },
-};
 
 // Minimum and maximum fallback sizes for markers
 const MIN_MARKER_RADIUS = 1;
@@ -56,10 +51,10 @@ function unflatten ( array, parent, seed, tree ) {
     tree = typeof tree !== 'undefined' ? tree : [];
     parent = typeof parent !== 'undefined' ? parent : { id: 0 };
 
-    var children = _.filter( array, function(child){ return child.name == parent.child; });
+    var children = _.filter( array, function(child){ return child.name === parent.child; });
 
     if( !_.isEmpty( children )  ){
-        if( parent.child == seed ) {
+        if( parent.child === seed ) {
             tree = Object.assign({}, parent, {"name": seed, "children": children});
         }
         else {
@@ -119,7 +114,7 @@ function getRoot(hierarchyDataPreped) {
     }
 
     log('in get root', hierarchyDataPreped);
-    let root = _.filter(hierarchyDataPreped, (o) => { return o.name == null; });
+    let root = _.filter(hierarchyDataPreped, (o) => { return o.name === null; });
     log('root array', root[0].child, root);
 
     return root;
@@ -258,10 +253,7 @@ class SemioticHierarchy extends React.Component {
         });
     }
 
-    getColorHex = d => { 
-        console.log('checking on get color hex', d, d.colorHex);
-        return d.colorHex;
-    }
+    getColorHex = d => d.colorHex;
     getValueMetric0 = d => d.valueMetric || 0;
     getValueMetric1 = d => d.valueMetric || 1;
 
@@ -272,7 +264,6 @@ class SemioticHierarchy extends React.Component {
 
     getNodeColor = d => {
         let { nodeColorScale } = this.preprocessData();
-        console.log('checking node color', d, this.getValueMetric0(d), nodeColorScale(d));
         return nodeColorScale(this.getValueMetric0(d));
     }
 
@@ -326,7 +317,7 @@ class SemioticHierarchy extends React.Component {
         if ( Object.keys(filterHash).length > 0 ) {
             return filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true
         } else {
-            return d.depth > parseInt(filterRenderedNodes || -1);
+            return d.depth > parseInt(filterRenderedNodes || -1, 10);
         }
     }
 

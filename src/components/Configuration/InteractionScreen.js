@@ -1,9 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-
-//semiotic
-import { ResponsiveNetworkFrame } from 'semiotic';
 
 //material ui
 import { withStyles } from '@material-ui/core/styles';
@@ -24,10 +20,6 @@ const styles = theme => ({
 
 // the example on material ui has this function statement
 class InteractionScreen extends React.Component {
-  constructor (props) {
-    super(props);
-  }
-
   // for call back to work with field included
   handleClick = event => {
     console.log('handleClick', this.props);

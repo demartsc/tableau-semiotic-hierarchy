@@ -185,7 +185,7 @@ class App extends Component {
     // go through each worksheet and then add a filter change event listener
     // need to check whether this is being applied more than once
     tableauExt.dashboardContent.dashboard.worksheets.forEach((worksheet) => {
-      console.log('adding listners to', worksheet, ' sheet');
+      log('adding listners to', worksheet, ' sheet');
 
       // add event listener
       const unregisterFilterHandlerFunction = worksheet.addEventListener(
@@ -204,13 +204,13 @@ class App extends Component {
       localUnregisterHandlerFunctions.push(unregisterMarkerHandlerFunction);
     });
 
-    console.log('%c addEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
+    log('%c addEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
     this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
     // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
   }
 
   removeEventListeners = () => {
-    console.log(`%c remove ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: green; color:black');
+    log(`%c remove ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: green; color:black');
 
     this.unregisterHandlerFunctions.forEach(unregisterHandlerFunction => {
       unregisterHandlerFunction();
@@ -293,7 +293,7 @@ class App extends Component {
       // select marks or filter
       const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
       tasks.push(actionToApply(fieldName, [d[fieldName]], ConfigSheet));
-      // console.log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
+      // log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
       
     } else {
       // clear marks or filer
@@ -485,7 +485,7 @@ class App extends Component {
   }
   
   marksSelected = e => {
-    console.log(
+    log(
       '%c ==============App Marker selected',
       'background: red; color: white',
       this.applyingMouseActions
@@ -558,7 +558,7 @@ class App extends Component {
       }
 
       //console the select marks table
-      console.log('marks selected', marksDataTable, col_indexes, data, annotationsArray);
+      log('marks selected', marksDataTable, col_indexes, data, annotationsArray);
 
       this.setState({
         highlightOn: annotationsArray
@@ -720,7 +720,7 @@ class App extends Component {
 
       // trying to add listeners back
       this.addEventListeners();
-      console.log('checking on adding listeners back', this.unregisterHandlerFunctions, this.state);
+      log('checking on adding listeners back', this.unregisterHandlerFunctions, this.state);
     });
   }
   
@@ -861,7 +861,7 @@ class App extends Component {
     if ( tableauExt.settings ) {
       //get selectedSheet from Settings
       //hardcoding this for now because I know i have two possibilities
-      console.log('checking settings in will update', tableauExt);
+      log('checking settings in will update', tableauExt);
       let selectedSheet = tableauExt.settings.get('ConfigSheet');
       if (selectedSheet && this.state.tableauSettings.ConfigSheet !== nextState.tableauSettings.ConfigSheet) {
         log('calling summary data sheet');
@@ -1099,7 +1099,7 @@ render() {
       }
 
       if (this.state.stepIndex === 5) {
-        console.log('checking state in stepIndex 5', this.state);
+        log('checking state in stepIndex 5', this.state);
         return (
           <React.Fragment>
             <Stepper 

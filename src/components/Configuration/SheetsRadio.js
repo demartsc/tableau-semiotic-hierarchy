@@ -7,6 +7,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 
+import { log } from '../../utils';
+
 const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit * 3,
@@ -37,7 +39,7 @@ const styles = theme => ({
 class RadioButtonsGroup extends React.Component {
   constructor (props) {
     super(props);
-    console.log('props', this.props);
+    log('props', this.props);
     this.state = {
       value: this.props.selectedValue || ""
     };
@@ -48,7 +50,7 @@ class RadioButtonsGroup extends React.Component {
   // };
 
   handleClick = event => {
-    console.log('handleClick', this.props.field, event.target.value);
+    log('handleClick', this.props.field, event.target.value);
     if ( event.target.value ) {
       this.props.sheetCallBack(this.props.field, event.target.value);
     }
@@ -61,7 +63,7 @@ class RadioButtonsGroup extends React.Component {
   componentWillUpdate(nextProps, nextState) {
     // if we get a new field, reset value to existing tableau setting
     if (this.props.field !== nextProps.field || this.state.value !== nextProps.selectedValue) {
-      console.log('sheetRadioUpdate', this.props, this.state);
+      log('sheetRadioUpdate', this.props, this.state);
       this.setState({
         value: nextProps.selectedValue || ""
       })
@@ -73,7 +75,7 @@ class RadioButtonsGroup extends React.Component {
 
     // const changeCallBack = customChange || this.handleChange;
 
-    console.log('sheetRadio', this.props, this.state);
+    log('sheetRadio', this.props, this.state);
     return (
       <div className={classes.root}>
         <div>

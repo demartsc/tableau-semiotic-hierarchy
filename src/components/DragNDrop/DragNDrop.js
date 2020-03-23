@@ -4,6 +4,7 @@ import { DragDropContext } from 'react-beautiful-dnd';
 
 import '@atlaskit/css-reset';
 import styled from 'styled-components';
+import { log } from '../../utils';
 
 const Container = styled.div`
   display: flex;
@@ -14,7 +15,7 @@ class DragNDrop extends React.Component {
   state = this.props.initialData;
 
   handleClick = (field, val) => {
-    console.log('handleClick', field, val);
+    log('handleClick', field, val);
     this.props.configCallBack(field,val);
   }
 
@@ -23,7 +24,7 @@ class DragNDrop extends React.Component {
   onDragUpdate = update => {}
 
   onDragEnd = result => {
-    console.log('drag end', result, this.props);
+    log('drag end', result, this.props);
     const { destination, source, draggableId } = result;
 
     if (!destination) {
@@ -53,7 +54,7 @@ class DragNDrop extends React.Component {
         }
       };
       
-      this.setState(newState, () => {console.log('Current state:', this.state)});
+      this.setState(newState, () => {log('Current state:', this.state)});
       this.handleClick(destination.droppableId,draggableId);
     }
 

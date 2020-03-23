@@ -1,3 +1,5 @@
+import { log } from './utils';
+
 const tableauExt = window.tableau.extensions;
 
 let EnvName = "DEFAULT";
@@ -27,7 +29,7 @@ export const StringifyValues = false;
  * Log errors for the Tableau log
  */
 function logError(...args) {
-  console.log(args.map(a => a.toString()).join('    '))
+  log(args.map(a => a.toString()).join('    '))
 }
 
 /**
@@ -35,7 +37,7 @@ function logError(...args) {
  */
 function logData(tag, data, formatData=false) {
   let dataStr = formatData ? JSON.stringify(data, null, "\t") : JSON.stringify(data);
-  console.log(EnvName + " [ DATA: " + tag + " ] " + dataStr);
+  log(EnvName + " [ DATA: " + tag + " ] " + dataStr);
 }
 
 /**

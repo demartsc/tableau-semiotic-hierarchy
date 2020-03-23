@@ -10,6 +10,8 @@ import Select from '@material-ui/core/Select';
 
 import { InputLabelWithTooltip, OptionWrapper, OptionTitle, TextField } from './CustomizeUIElements';
 
+import { log } from '../../utils';
+
 const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit,
@@ -23,7 +25,7 @@ class CustomScreen extends React.Component {
 
   // for call back to work with field included
   handleClick = event => {
-    console.log('handleClick', this.props);
+    log('handleClick', this.props);
     // update this if to include the minimum required fields
     // if (this.props.tableauSettings.ChoroFillScale && this.props.tableauSettings.ChoroFillScaleColors) {
       this.props.customCallBack(this.props.field)
@@ -36,7 +38,7 @@ class CustomScreen extends React.Component {
       handleChange,
       tableauSettings } = this.props;
 
-    console.log('we are in custom', this.props);
+    log('we are in custom', this.props);
     return (
       <div className="sheetScreen">
         <OptionWrapper>

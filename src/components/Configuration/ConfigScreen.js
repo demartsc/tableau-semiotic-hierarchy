@@ -9,6 +9,8 @@ import Typography from '@material-ui/core/Typography';
 //sheets radio
 import RadioButtonsGroup from './SheetsRadio';
 
+import { log } from '../../utils';
+
 const styles = {
   root: {
     flexGrow: 1
@@ -24,7 +26,7 @@ function ConfigScreen(props) {
     field,
     selectedValue } = props;
 
-  console.log('configScreen', props);
+  log('configScreen', props);
   return (
     <React.Fragment>
       <div className="sheetScreen" style={{padding : 10, paddingBottom: 100 }}>

@@ -382,7 +382,7 @@ class SemioticHierarchy extends React.Component {
 
         log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
 
-        // console.log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
+        // log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
         return (
             <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
                 <ResponsiveNetworkFrame

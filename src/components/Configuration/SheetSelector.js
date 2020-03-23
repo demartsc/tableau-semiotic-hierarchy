@@ -31,7 +31,6 @@ function ConfigScreen(props) {
     configTitle,
     listTitle } = props;
 
-  //console.log('configStyles', configStyles);
   return (
     <div className="sheetScreen" style={{padding : 10 }}>
       <Grid

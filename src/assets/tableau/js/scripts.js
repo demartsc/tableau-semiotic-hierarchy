@@ -13,7 +13,7 @@
  * $video.data('bcPlayer').catalog.getVideo($video.data('videoId'),
  * function(error, data) {
  *   // Do things with the return.
- *   console.log(data);
+ *   log(data);
  * });
  *
  * This presumes that the Brightcove API script has been loaded on page.

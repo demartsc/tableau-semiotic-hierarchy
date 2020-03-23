@@ -1,9 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-
-//semiotic
-import { ResponsiveNetworkFrame } from 'semiotic';
 
 //material ui
 import { withStyles } from '@material-ui/core/styles';
@@ -23,10 +19,7 @@ const styles = theme => ({
 });
 
 // the example on material ui has this function statement
-class ConfigScreen extends React.Component {
-  constructor (props) {
-    super(props);
-  }
+class CustomScreen extends React.Component {
 
   // for call back to work with field included
   handleClick = event => {
@@ -40,22 +33,7 @@ class ConfigScreen extends React.Component {
   render() {
     const {
       classes,
-      theme,
-      sheetNames,
-      height,
-      configTitle,
-      listTitle,
-      customCallBack,
       handleChange,
-      colors,
-      colorHex,
-      color,
-      edgeType,
-      edgeRender,
-      nodeRender,
-      edgeColor,
-      padAngle,
-      hoverAnnotation, 
       tableauSettings } = this.props;
 
     console.log('we are in custom', this.props);
@@ -122,34 +100,6 @@ class ConfigScreen extends React.Component {
                  <MenuItem value={"normal"}>Normal</MenuItem>
                  <MenuItem value={"sketchy"}>Sketchy</MenuItem>
                  <MenuItem value={"painty"}>Painty</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                  title="Show Tooltip"
-                  tooltipText="Toggle whether to show the tooltip"
-              />
-              <Select
-                value={tableauSettings.hoverAnnotation === "true"}
-                onChange={handleChange}
-                input={<Input name="hoverAnnotation" id="hoverAnnotation-helper" />}
-              >
-                 <MenuItem value={false}>False</MenuItem>
-                 <MenuItem value={true}>True</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <InputLabelWithTooltip 
-                  title="Show Highlight"
-                  tooltipText="Toggle whether to highlight based on Tableau selections"
-              />
-              <Select
-                value={tableauSettings.highlightAnnotation === "true"}
-                onChange={handleChange}
-                input={<Input name="highlightAnnotation" id="highlightAnnotation-helper" />}
-              >
-                 <MenuItem value={false}>False</MenuItem>
-                 <MenuItem value={true}>True</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
@@ -245,6 +195,34 @@ class ConfigScreen extends React.Component {
                 margin="normal"
               />
             </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabelWithTooltip 
+                    title="Filter Depth"
+                    tooltipText="Filters everything below and equal to this level/depth out"
+              />
+              <Select
+                value={tableauSettings.filterDepth || "none"}
+                onChange={handleChange}
+                input={<Input name="filterDepth" id="filterDepth-helper" />}
+              >
+                 <MenuItem value={"none"}>No Filter</MenuItem>
+                 <MenuItem value={"0"}>1</MenuItem>
+                 <MenuItem value={"1"}>2</MenuItem>
+                 <MenuItem value={"2"}>3</MenuItem>
+                 <MenuItem value={"3"}>4</MenuItem>
+                 <MenuItem value={"4"}>5</MenuItem>
+                 <MenuItem value={"5"}>6</MenuItem>
+                 <MenuItem value={"6"}>7</MenuItem>
+                 <MenuItem value={"7"}>8</MenuItem>
+                 <MenuItem value={"8"}>9</MenuItem>
+                 <MenuItem value={"9"}>10</MenuItem>
+                 <MenuItem value={"10"}>11</MenuItem>
+                 <MenuItem value={"11"}>12</MenuItem>
+                 <MenuItem value={"12"}>13</MenuItem>
+                 <MenuItem value={"13"}>14</MenuItem>
+                 <MenuItem value={"14"}>15</MenuItem>
+              </Select>
+            </FormControl>
           </div>
         </OptionWrapper>
       </div>
@@ -252,8 +230,8 @@ class ConfigScreen extends React.Component {
     }
 }
 
-ConfigScreen.propTypes = {
+CustomScreen.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ConfigScreen);
+export default withStyles(styles)(CustomScreen);

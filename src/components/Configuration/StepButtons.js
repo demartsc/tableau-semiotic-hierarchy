@@ -12,7 +12,7 @@ const StepButtons = (props) => {
           { props.backText }
         </a>
       }
-      <a class="cta cta--secondary cta--arrow next" href="#" onClick={props.onNextClick}>
+      <a class="cta cta--secondary cta--arrow next" onClick={props.onNextClick}>
         { props.nextText }
       </a>
     </div>

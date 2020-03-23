@@ -60,19 +60,19 @@ const iconStyle = {
   cursor: 'pointer' 
 };
 
-const MeasureSwitchButton = styled.button`
-  margin-bottom: 8px;
-  margin-left: 4px;
-  border-radius: 2px;
-  border: 1px solid ${props => (props.active ? 'rgb(83, 189, 146)' : 'lightgray')};
-  background: ${props => (props.active ? 'rgb(83, 189, 146)' : 'none')};
-  color: ${props => (props.active ? 'white' : 'initial')};
-  font-weight: ${props => (props.active ? 700 : 'normal')};
-  padding-top: 5px;
-  padding-bottom: 5px;
-  cursor: pointer;
-  outline: none;
-`;
+// const MeasureSwitchButton = styled.button`
+//   margin-bottom: 8px;
+//   margin-left: 4px;
+//   border-radius: 2px;
+//   border: 1px solid ${props => (props.active ? 'rgb(83, 189, 146)' : 'lightgray')};
+//   background: ${props => (props.active ? 'rgb(83, 189, 146)' : 'none')};
+//   color: ${props => (props.active ? 'white' : 'initial')};
+//   font-weight: ${props => (props.active ? 700 : 'normal')};
+//   padding-top: 5px;
+//   padding-bottom: 5px;
+//   cursor: pointer;
+//   outline: none;
+// `;
 
 export default class Column extends React.Component {
   constructor(props) {

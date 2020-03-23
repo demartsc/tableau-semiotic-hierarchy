@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
 
 //sheets radio
 import RadioButtonsGroup from './SheetsRadio';
@@ -18,7 +17,6 @@ const styles = {
 
 function ConfigScreen(props) {
   const {
-    classes,
     selectSheet,
     sheetNames,
     configTitle,

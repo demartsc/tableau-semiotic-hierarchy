@@ -40,10 +40,10 @@ export const dematrixifiedEdges2 = [
 ]
 
 export const semioticTypes = {
-  ["Tidy Tree"]: "tree",
-  ["Dendogram"]: "cluster",
-  ["Network"]: "force",
-  ["Circlepack"]: "circlepack",
-  ["Treemap"]: "treemap",
-  ["Partition"]: "partition",
+  "Tidy Tree": "tree",
+  "Dendogram": "cluster",
+  "Network": "force",
+  "Circlepack": "circlepack",
+  "Treemap": "treemap",
+  "Partition": "partition",
 }

@@ -1,3 +1,23 @@
+// Copyright (c) 2020 Chris DeMartini
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './App.css';
@@ -24,23 +44,16 @@ import {
 import DragNDrop from './components/DragNDrop/DragNDrop';
 import initialData from './components/DragNDrop/initial-data';
 
-// import CustomizeOptions from './components/CustomizeOptions';
-import { ConfigScreen, CustomScreen } from './components/Configuration';
-
 // Viz components
 import LoadingIndicatorComponent from './components/LoadingIndicatorComponent';
 import SemioticHierarchy from './components/SemioticHierarchy';
 
 import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import classNames from 'classnames';
 
 // Tableau Styles and Tableau
 import './assets/tableau/vendor/slick.js/slick/slick.css';
 import './assets/tableau/css/style.min.css';
-import { tableau } from './tableau-extensions-1.latest';
+import { tableau } from './tableau-extensions-1.latest'; // eslint-disable-line  no-unused-vars
 
 // tableau settings handler
 import * as TableauSettings from './TableauSettings';
@@ -50,7 +63,6 @@ import defaultSettings from './components/Configuration/defaultSettings';
 
 // utils and variables
 import { 
-  defaultColor, 
   DataBlick,
   semioticTypes
 } from './variables';
@@ -58,10 +70,12 @@ import {
   convertRowToObject,
   log
 } from './utils';
-
-// icons
-import Save from '@material-ui/icons/Save';
-import Delete from '@material-ui/icons/Delete';
+import {
+  selectMarksByField,
+  applyFilterByField,
+  clearMarksByField,
+  clearFilterByField
+} from './utils/interaction-utils';
 
 //logos
 import dbLogo from './assets/dblogo.png';
@@ -94,11 +108,15 @@ const tableauExt = window.tableau.extensions;
 
 //tableau get summary data options
 const options = {
-         ignoreAliases: false,
-         ignoreSelection: true,
-         maxRows: 0
+  ignoreAliases: false,
+  ignoreSelection: true,
+  maxRows: 0
 };
 
+function findColumnIndexByFieldName(ConfigSheetColumns, fieldName) {
+  return (ConfigSheetColumns || [])
+    .findIndex(f => f === fieldName);
+}
 // end constants to move to another file later
 
 class App extends Component {
@@ -117,32 +135,92 @@ class App extends Component {
       demoType: "tree",
       stepIndex: 1,
       isMissingData: true,
-      highlightOn: undefined
+      highlightOn: [], 
+      filterHash: {}
     };
 
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
-    this.unregisterEventFn = undefined;
 
-    this.clickCallBack = this.clickCallBack.bind(this);
-    this.hoverCallBack = this.hoverCallBack.bind(this);
-    this.filterChanged = this.filterChanged.bind(this);
-    this.marksSelected = this.marksSelected.bind(this);
-    this.getSummaryData = this.getSummaryData.bind(this);
-    this.configCallBack = this.configCallBack.bind(this);
-    this.eraseCallBack = this.eraseCallBack.bind(this);
-    this.customCallBack = this.customCallBack.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.demoChange = this.demoChange.bind(this);
-    this.clearSheet = this.clearSheet.bind(this);
-    this.clearSplash = this.clearSplash.bind(this);
-    this.configure = this.configure.bind(this);
-    this.onNextStep = this.onNextStep.bind(this);
-    this.onPrevStep = this.onPrevStep.bind(this);
+    // interactivity and listeners
+    this.unregisterHandlerFunctions = [];
+    this.applyingMouseActions = false;
+    this.clickCallBack = _.debounce(this.clickCallBack,200);
+    this.hoverCallBack = _.debounce(this.hoverCallBack,200);
+    this.configCallBack = _.debounce(this.configCallBack,200);
+    // this.addEventListeners = _.debounce(this.addEventListeners,500);
+    // this.removeEventListeners = _.debounce(this.removeEventListeners,500);
   }
 
+  addGlobalEventListeners = () => {
+    // Whenever we restore the filters table, remove all save handling functions,
+    // since we add them back later in this function.
+    // provided by tableau extension samples
 
-  onNextStep() {
-    if ( this.state.stepIndex === 4 ) {
+    const localUnregisterHandlerFunctions = [];
+
+    // add filter change event listener with callback to re-query data after change
+    // go through each worksheet and then add a filter change event listener
+    // need to check whether this is being applied more than once
+
+    // add event listener
+    const unregisterFilterHandlerFunction = tableauExt.settings.addEventListener(
+      window.tableau.TableauEventType.SettingsChanged,
+      this.settingsChanged
+    );
+    // provided by tableau extension samples, may need to push this to state for react
+    localUnregisterHandlerFunctions.push(unregisterFilterHandlerFunction);
+    // this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
+  }
+
+  addEventListeners = () => {
+    // Whenever we restore the filters table, remove all save handling functions,
+    // since we add them back later in this function.
+    // provided by tableau extension samples
+
+    this.removeEventListeners();
+
+    const localUnregisterHandlerFunctions = [];
+
+    // add filter change event listener with callback to re-query data after change
+    // go through each worksheet and then add a filter change event listener
+    // need to check whether this is being applied more than once
+    tableauExt.dashboardContent.dashboard.worksheets.forEach((worksheet) => {
+      console.log('adding listners to', worksheet, ' sheet');
+
+      // add event listener
+      const unregisterFilterHandlerFunction = worksheet.addEventListener(
+          window.tableau.TableauEventType.FilterChanged,
+          this.filterChanged
+      );
+      // provided by tableau extension samples, may need to push this to state for react
+      localUnregisterHandlerFunctions.push(unregisterFilterHandlerFunction);
+
+      const unregisterMarkerHandlerFunction = worksheet.addEventListener(
+        window.tableau.TableauEventType.MarkSelectionChanged,
+        this.marksSelected
+      );
+
+      // provided by tableau extension samples, may need to push this to state for react
+      localUnregisterHandlerFunctions.push(unregisterMarkerHandlerFunction);
+    });
+
+    console.log('%c addEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
+    this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
+    // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
+  }
+
+  removeEventListeners = () => {
+    console.log(`%c remove ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: green; color:black');
+
+    this.unregisterHandlerFunctions.forEach(unregisterHandlerFunction => {
+      unregisterHandlerFunction();
+    });
+
+    this.unregisterHandlerFunctions = [];
+  }
+
+  onNextStep = () => {
+    if ( this.state.stepIndex === 5 ) {
       this.customCallBack('configuration');
     } else {
       this.setState((previousState, currentProps) => {
@@ -151,54 +229,84 @@ class App extends Component {
     }
   }
   
-  onPrevStep() {
+  onPrevStep = () => {
     this.setState((previousState, currentProps) => {
       return {stepIndex: previousState.stepIndex - 1}
     });
   }
 
   clickCallBack = d => {
-    log('in on click callback', d);
-    // go through each worksheet and select marks
+    const {clickField, clickAction} = this.state.tableauSettings;
+
+    log(
+      '%c in on click callback',
+      'background: brown',
+      d,
+      // findColumnIndexByFieldName(this.state, clickField),
+      // clickAction
+    );
+
+    // if we are actually hovering on something then we should call this function
     if ( d ) {
-      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        log(`clicked ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigSheet") );
-        // filter
-        if ( worksheet.name !== tableauExt.settings.get("ConfigSheet") ) {
-          // worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then(
-            worksheet.applyFilterAsync(
-              tableauExt.settings.get("ConfigChildField"), 
-              [d.id],
-              window.tableau.FilterUpdateType.Replace
-            ).then(e => log('filter applied response', e)) // response is void per tableau-extensions.js
-          // );
-        }
-      });
+      this.applyMouseActionsToSheets(d, clickAction, clickField);
     }
-    else {
-      // no data clear filter // never gets called because you only call this on node click
-      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        worksheet.clearFilterAsync(tableauExt.settings.get("ConfigChildField")).then();
-      });
-    }
-  }
-  
+  };
+
   hoverCallBack = d => {
-    log('in on hover callback', d);
-      // go through each worksheet and select marks
-    if ( d ) {
-      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-      log(`hovered ${d.id}: in sheet loop`, worksheet.name, worksheet, tableauExt.settings.get("ConfigChildField") );
-      // select marks
-      worksheet.selectMarksByValueAsync(
-        [{
-          'fieldName': tableauExt.settings.get("ConfigChildField"),
-          'value': [d.id],
-        }],
-        window.tableau.SelectionUpdateType.Replace
-      ).then(e => log('select marks response: ' + worksheet.name, e), err => log('select marks err: ' + worksheet.name, err)); // response is void per tableau-extensions.js
-      });
+    const {hoverField, hoverAction} = this.state.tableauSettings;
+
+    log(
+      '%c in on hover callback',
+      'background: OLIVE',
+      d,
+      this.state.ConfigSheetColumns, 
+      hoverField,
+      findColumnIndexByFieldName(this.state.ConfigSheetColumns, hoverField),
+      hoverAction
+    );  
+
+    // if we are actually hovering on something then we should call this function
+    this.applyMouseActionsToSheets(d, hoverAction, hoverField)
+  }
+
+  applyMouseActionsToSheets = (d, action, fieldName) => {
+    if (this.applyingMouseActions) {
+      return;
     }
+
+    const {ConfigSheet} = this.state.tableauSettings;
+    const toHighlight = action === 'Highlight' && (fieldName || 'None') !== 'None';
+    const toFilter = action === 'Filter' && (fieldName || 'None') !== 'None';
+
+    // if no action should be taken
+    if (!toHighlight && !toFilter) {
+      return;
+    }
+
+    // remove EventListeners before apply any async actions
+    this.removeEventListeners();
+    this.applyingMouseActions = true;
+
+    let tasks = [];
+
+    if ( d ) {
+      // select marks or filter
+      const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
+      tasks.push(actionToApply(fieldName, [d[fieldName]], ConfigSheet));
+      // console.log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
+      
+    } else {
+      // clear marks or filer
+      const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
+      tasks.push(actionToApply(fieldName, ConfigSheet));
+    }
+
+    Promise.all(tasks).then(() => {
+      // all selection should be completed
+      // Add event listeners back
+      this.addEventListeners();
+      this.applyingMouseActions = false;
+    });
   }
 
   demoChange = event => {
@@ -206,7 +314,7 @@ class App extends Component {
     log('in demo change', event.target.value, this.state.demoType);
   };
 
-  handleChange (event) {
+  handleChange = event => {
     log('event', event);
     if (TableauSettings.ShouldUse) {
   
@@ -230,7 +338,7 @@ class App extends Component {
     }
   };
 
-  configCallBack (field, columnName) {
+  configCallBack = (field, columnName) => {
     // field = ChoroSheet, sheet = Data
     log('configCallBack', field, columnName);
   
@@ -247,7 +355,40 @@ class App extends Component {
       }, settings => {
         this.setState({
           // ['is' + field]: true,
-          tableauSettings: settings,
+          tableauSettings: settings
+        });
+      });
+  
+    } else {
+      //tableauExt.settings.set('is' + field, true);
+      tableauExt.settings.set(field, columnName);
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          // ['is' + field]: true,
+          tableauSettings: tableauExt.settings.getAll()
+        });
+      });
+    }
+  }
+
+  autoConfigCallBack = (field, columnName) => {
+    // field = ChoroSheet, sheet = Data
+    log('configCallBack', field, columnName);
+  
+    // if we are in config call back from a sheet selection, go get the data
+    // this only works in the #true instance, must use update lifecycle method to catch both
+    // if (field.indexOf("Sheet") >= 0) {
+    //   this.getSummaryData(columnName, field);
+    // }
+  
+    if (TableauSettings.ShouldUse) {
+      TableauSettings.updateAndSave({
+        // ['is' + field]: true,
+        [field]: columnName,
+      }, settings => {
+        this.setState({
+          // ['is' + field]: true,
+          tableauSettings: settings
         });
       });
   
@@ -263,7 +404,7 @@ class App extends Component {
     }
   }
     
-  eraseCallBack (field) {
+  eraseCallBack = field => {
     log("triggered erase", field);
     if (TableauSettings.ShouldUse) {
   
@@ -289,7 +430,7 @@ class App extends Component {
     }
   };
 
-  customCallBack (confSetting) {
+  customCallBack = confSetting => {
     log('in custom call back', confSetting);
     if (TableauSettings.ShouldUse) {
       TableauSettings.updateAndSave({
@@ -320,19 +461,50 @@ class App extends Component {
     }
   }
 
-  // on mark selection highlight the nodes in the hierarchy as well
-  marksSelected (e) {
-    log('mark selected event', e);
+  // find all sheets in array and then call get summary, for now hardcoding
+  settingsChanged = e => {
+    log(
+      '%c ==============Settings have changed',
+      'background: green; color: white',
+      e,
+      tableauExt.settings.getAll()
+    );
+  }
+
+  // find all sheets in array and then call get summary, for now hardcoding
+  filterChanged = e => {
+    const selectedSheet = tableauExt.settings.get('ConfigSheet');
+    if (selectedSheet && selectedSheet === e.worksheet.name) {
+      log(
+        '%c ==============App filter has changed',
+        'background: red; color: white',
+        e
+      );
+      this.getFilteredData(selectedSheet, "ConfigSheet");
+    }
+  }
+  
+  marksSelected = e => {
+    console.log(
+      '%c ==============App Marker selected',
+      'background: red; color: white',
+      this.applyingMouseActions
+    );
+
+    if (this.applyingMouseActions) {
+      return;
+    }
+
+    // remove event listeners
+    this.removeEventListeners();
+
     e.getMarksAsync().then(marks => {
       
       // loop through marks table and adjust the class for opacity
       let marksDataTable = marks.data[0];
       let col_indexes = {};
       let data = [];
-  
-      //console the select marks table
-      log('marks', marksDataTable);
-  
+    
       //write column names to array
       for (let k = 0; k < marksDataTable.columns.length; k++) {
           col_indexes[marksDataTable.columns[k].fieldName] = k;
@@ -342,90 +514,140 @@ class App extends Component {
         //log(this.convertRowToObject(tableauData[j], col_indexes));
         data.push(convertRowToObject(marksDataTable.data[j], col_indexes));
       }
-  
+
       // selected marks is being triggered, but this approach will not work with semiotic
       // now we reconcile marks to hierarchy data and adjust opacity accordingly
-      let annotationsArray = []; 
-      if ( data.length > 0 && this.state.tableauSettings.highlightAnnotation === "true") {
+      let annotationsArray = [];
+
+      if ( data.length > 0 && this.state.tableauSettings.tableauField !== 'None' && this.state.tableauSettings.highlightAnnotation === 'true' ) {
+        annotationsArray.push({
+          type: "desaturation-layer",
+          style: { fill: this.state.tableauSettings.washOutColor || "white", opacity: this.state.tableauSettings.washOutOpacity || 0.6 }
+        });
+
         for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
-        // log('marks data', data, this.state['ConfigSheetData'][l]);
-          if (_.find(data, (o) => { return o[this.state.tableauSettings.ConfigChildField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField]})) {
+          if (_.find(data, o => { return o[this.state.tableauSettings.tableauField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.tableauField]})) {
+            log('marks data found', data, this.state['ConfigSheetData'][l]);
             annotationsArray.push({
               type: "highlight",
-              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField] ,
+              id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
               style: {
-                strokeWidth: 5,
-                strokeOpacity: 1,
-                fillOpacity: 1
+                stroke: this.state.tableauSettings.highlightStrokeColor || "#222222",
+                strokeWidth: this.state.tableauSettings.highlightStrokeWidth || 2,
+                strokeOpacity: this.state.tableauSettings.highlightStrokeOpacity || 1
               }
             })
           }
-          else { // else set to .1
+          else { 
+            // do nothing for now
+            // else set to .1
             // annotationsArray.push({
             //   type: "highlight",
             //   id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
             //   style: {
-            //     fill: "#FFF", 
-            //     storke: "#FFF",
-            //     strokeWidth: 5,
-            //     strokeOpacity: 1,
-            //     fillOpacity: .9
+            //     strokeOpacity: .1,
+            //     fillOpacity: .1
             //   }
             // })
           }
         }
+        // if after all that we only have the desaturation layer, remove it
+        if ( annotationsArray.length === 1 ) {
+          annotationsArray = [];
+        }
       }
-  
+
+      //console the select marks table
+      console.log('marks selected', marksDataTable, col_indexes, data, annotationsArray);
+
       this.setState({
         highlightOn: annotationsArray
-      })
-      log('marks data', annotationsArray, data, this.state['ConfigSheetData']);
+      }, () => this.addEventListeners())
     }, err => {log('marks error', err);}
     );
   }
-
-  // find all sheets in array and then call get summary, for now hardcoding
-  filterChanged (e) {
-    log('filter changed', e.worksheet.name, e);
-    let selectedSheet = tableauExt.settings.get('ConfigSheet');
-    if ( selectedSheet && selectedSheet === e.worksheet.name ) {
-      log('calling summary data sheet');
-      this.getSummaryData(selectedSheet, "ConfigSheet");
-    } //get field3 from Settings
-  }
   
-  getSummaryData (selectedSheet, fieldName) {
-    //clean up event listeners (taken from tableau expample)
-    if (this.unregisterEventFn) {
-      this.unregisterEventFn();
+  getFilteredData = (selectedSheet, fieldName) => {
+    const sheetName = selectedSheet;
+    const sheetObject = tableauExt.dashboardContent.dashboard.worksheets.find(
+      worksheet => worksheet.name === sheetName
+    );
+
+    if (!sheetObject) { 
+      return;
     }
-  
-    log(selectedSheet, fieldName, "in getData");
-  
-    // get sheet information this.state.selectedSheet should be syncronized with settings
-    // can possibly remove the || in the sheetName part
-    let sheetName = selectedSheet;
-    let sheetObject = tableauExt.dashboardContent.dashboard.worksheets.find(worksheet => worksheet.name === sheetName);
-  
-  if (TableauSettings.ShouldUse) {
-    TableauSettings.updateAndSave({
-      isLoading: true
-    }, settings => {
-      this.setState({
-        isLoading: true,
-        tableauSettings: settings,
-      })
-    });
 
-  } else {
-    this.setState({ isLoading: true });
-    tableauExt.settings.set('isLoading', true);
-    tableauExt.settings.saveAsync().then(() => {
+    // clean up event listeners (taken from tableau example)
+    this.removeEventListeners();
+
+    //working here on pulling out summmary data
+    //may want to limit to a single row when getting column names
+    sheetObject.getSummaryDataAsync(options).then((t) => {
+      log('in getData()', t, this.state);
+  
+      let col_indexes = {};
+      let data = [];
+      let filterHash = {};
+  
+      //write column names to array
+      for (let k = 0; k < t.columns.length; k++) {
+        col_indexes[t.columns[k].fieldName] = k;
+      }
+      // log('columns', col_names, col_indexes);
+    
+      for (let j = 0, len = t.data.length; j < len; j++) {
+        //log(this.convertRowToObject(tableauData[j], col_indexes));
+        data.push(convertRowToObject(t.data[j], col_indexes));
+        if ( data[j][this.state.tableauSettings.ConfigChildField] ) {
+          filterHash[data[j][this.state.tableauSettings.ConfigChildField]] = true;
+        }
+      }
+  
+      // log flat data for testing
+      log('filtered data', data, filterHash);
+  
       this.setState({
-        tableauSettings: tableauExt.settings.getAll()
+        filterHash: filterHash
       });
+
+      // trying to add listeners back
+      this.addEventListeners();
     });
   }
+
+  getSummaryData = (selectedSheet, fieldName) => {
+    const sheetName = selectedSheet;
+    const sheetObject = tableauExt.dashboardContent.dashboard.worksheets.find(
+      worksheet => worksheet.name === sheetName
+    );
+
+    if (!sheetObject) {
+      return;
+    }
+
+    // clean up event listeners (taken from tableau example)
+    this.removeEventListeners();
+
+    // this forces the component to completely re-render when data changes
+    // if (TableauSettings.ShouldUse) {
+    //   TableauSettings.updateAndSave({
+    //     isLoading: true
+    //   }, settings => {
+    //     this.setState({
+    //       isLoading: true,
+    //       tableauSettings: settings,
+    //     })
+    //   });
+
+    // } else {
+    //   this.setState({ isLoading: true });
+    //   tableauExt.settings.set('isLoading', true);
+    //   tableauExt.settings.saveAsync().then(() => {
+    //     this.setState({
+    //       tableauSettings: tableauExt.settings.getAll()
+    //     });
+    //   });
+    // }
 
     //working here on pulling out summmary data
     //may want to limit to a single row when getting column names
@@ -440,24 +662,24 @@ class App extends Component {
   
       //write column names to array
       for (let k = 0; k < t.columns.length; k++) {
-          col_indexes[t.columns[k].fieldName] = k;
-  
-          // write named array
-          col_names.push(t.columns[k].fieldName);
-  
-          // write typed arrays as well
-          if (t.columns[k].dataType === 'string') {
-            col_names_S.push(t.columns[k].fieldName);
-          }
-          else if (t.columns[k].dataType === 'int') {
-            col_names_N.push(t.columns[k].fieldName);
-          }
-          else if (t.columns[k].dataType === 'float') {
-            col_names_N.push(t.columns[k].fieldName);
-          }
+        col_indexes[t.columns[k].fieldName] = k;
+
+        // write named array
+        col_names.push(t.columns[k].fieldName);
+
+        // write typed arrays as well
+        if (t.columns[k].dataType === 'string') {
+          col_names_S.push(t.columns[k].fieldName);
+        }
+        else if (t.columns[k].dataType === 'int') {
+          col_names_N.push(t.columns[k].fieldName);
+        }
+        else if (t.columns[k].dataType === 'float') {
+          col_names_N.push(t.columns[k].fieldName);
+        }
       }
       // log('columns', col_names, col_indexes);
-  
+    
       for (let j = 0, len = t.data.length; j < len; j++) {
         //log(this.convertRowToObject(tableauData[j], col_indexes));
         data.push(convertRowToObject(t.data[j], col_indexes));
@@ -466,51 +688,43 @@ class App extends Component {
       // log flat data for testing
       log('flat data', data);
   
-    if (TableauSettings.ShouldUse) {
-      TableauSettings.updateAndSave({
-        isLoading: false
-      }, settings => {
-        this.setState({
-          isLoading: false,
-          [fieldName + 'Columns']: col_names,
-          [fieldName + 'StringColumns']: col_names_S,
-          [fieldName + 'NumberColumns']: col_names_N,
-          [fieldName + 'Data']: data,
-          tableauSettings: settings,
-          isMissingData: false,
+      if (TableauSettings.ShouldUse) {
+        TableauSettings.updateAndSave({
+          isLoading: false
+        }, settings => {
+          this.setState({
+            isLoading: false,
+            [fieldName + 'Columns']: col_names,
+            [fieldName + 'StringColumns']: col_names_S,
+            [fieldName + 'NumberColumns']: col_names_N,
+            [fieldName + 'Data']: data,
+            tableauSettings: settings,
+            isMissingData: false,
+          });
+        }, true);
+
+      } else {
+        this.setState({ isLoading: false });
+        tableauExt.settings.set('isLoading', false);
+        tableauExt.settings.saveAsync().then(() => {
+          this.setState({
+            isLoading: false,
+            [fieldName + 'Columns']: col_names,
+            [fieldName + 'StringColumns']: col_names_S,
+            [fieldName + 'NumberColumns']: col_names_N,
+            [fieldName + 'Data']: data,
+            tableauSettings: tableauExt.settings.getAll()
+          });
         });
-      }, true);
+      }
 
-    } else {
-      this.setState({ isLoading: false });
-      tableauExt.settings.set('isLoading', false);
-      tableauExt.settings.saveAsync().then(() => {
-        this.setState({
-          isLoading: false,
-          [fieldName + 'Columns']: col_names,
-          [fieldName + 'StringColumns']: col_names_S,
-          [fieldName + 'NumberColumns']: col_names_N,
-          [fieldName + 'Data']: data,
-          tableauSettings: tableauExt.settings.getAll()
-        });
-      });
-    }
-    log('getData() state', this.state);
-  });
-
-    this.unregisterEventFn = sheetObject.addEventListener(
-      window.tableau.TableauEventType.FilterChanged,
-      this.filterChanged
-    );
-
-    // Bug - Adding this event listener causes the viz to continuously re-render. 
-    // this.unregisterEventFn = sheetObject.addEventListener(
-    //   window.tableau.TableauEventType.MarkSelectionChanged,
-    //   this.marksSelected
-    // );
-    }
+      // trying to add listeners back
+      this.addEventListeners();
+      console.log('checking on adding listeners back', this.unregisterHandlerFunctions, this.state);
+    });
+  }
   
-  clearSheet () {
+  clearSheet = () => {
     log("triggered erase");
     if (TableauSettings.ShouldUse) {
   
@@ -521,7 +735,7 @@ class App extends Component {
         this.setState({
           tableauSettings: settings,
           configuration: false,
-          isSplash: true,
+          // isSplash: true,
         });
       });
   
@@ -536,20 +750,19 @@ class App extends Component {
         this.setState({
           tableauSettings: tableauExt.settings.getAll(),
           configuration: false,
-          isSplash: true,
+          // isSplash: true,
         });
       });
     }
   };
   
-  
-  clearSplash () {
+  clearSplash = () => {
     this.setState({
       isSplash: false
     });
   };
   
-  configure () {
+  configure = () => {
     this.clearSheet();
     const popUpUrl = window.location.href + '#true';
     const popUpOptions = {
@@ -579,48 +792,36 @@ class App extends Component {
     });
   };  
 
+  resize = () => {
+    this.setState({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+  }
+
   componentWillUnmount() {
-    let _this = this;
-    window.removeEventListener('resize', function() {
-      const thisWidth = window.innerWidth;
-      const thisHeight = window.innerHeight;
-      _this.setState({
-        width: thisWidth,
-        height: thisHeight
-      });
-    }, true);
+    window.removeEventListener('resize', this.resize, true);
   }
   
   componentDidMount () {
-    const thisHeight = window.innerHeight;
-    const thisWidth = window.innerWidth;
-    //log("size", thisHeight, thisWidth);
-  
-    let _this = this;
-    window.addEventListener('resize', function() {
-      const thisWidth = window.innerWidth;
-      const thisHeight = window.innerHeight;
-      _this.setState({
-        width: thisWidth,
-        height: thisHeight
-      });
-    }, true);
+    window.addEventListener('resize', this.resize, true);
+    this.resize();
 
     tableauExt.initializeAsync({'configure': this.configure}).then(() => {
-      let unregisterHandlerFunctions = [];
+      this.addGlobalEventListeners();
 
-    // default tableau settings on initial entry into the extension
-    // we know if we haven't done anything yet when tableauSettings state = []
-    log("did mount", tableauExt.settings.get("ConfigType"));
-    if ( tableauExt.settings.get("ConfigType") === undefined ) {
-      log('defaultSettings triggered', defaultSettings.length, defaultSettings);
-      defaultSettings.defaultKeys.map((defaultSetting, index) => {
-        log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
-        this.configCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
-      })
-    }
+      // default tableau settings on initial entry into the extension
+      // we know if we haven't done anything yet when tableauSettings state = []
+      log("did mount", tableauExt.settings.get("ConfigType"));
+      if ( tableauExt.settings.get("ConfigType") === undefined ) {
+        log('defaultSettings triggered', defaultSettings.length, defaultSettings);
+        defaultSettings.defaultKeys.forEach((defaultSetting, index) => {
+          log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
+          this.autoConfigCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
+        })
+      }
 
-    // this is where the majority of the code is going to go for this extension I think
+      // this is where the majority of the code is going to go for this extension I think
       log("will mount", tableauExt.settings.getAll());
   
       //get sheetNames and dashboard name from workbook
@@ -630,72 +831,52 @@ class App extends Component {
       // Whenever we restore the filters table, remove all save handling functions,
       // since we add them back later in this function.
       // provided by tableau extension samples
-      unregisterHandlerFunctions.forEach(function (unregisterHandlerFunction) {
-        unregisterHandlerFunction();
-      });
-  
-      //add filter change event listener with callback to re-query data after change
-      // go through each worksheet and then add a filter change event listner
-      // need to check whether this is being applied more than once
-      tableauExt.dashboardContent.dashboard.worksheets.map((worksheet) => {
-        log("in sheet loop", worksheet.name, worksheet);
-        // add event listner
-        let unregisterHandlerFunction = worksheet.addEventListener(
-            window.tableau.TableauEventType.FilterChanged,
-            this.filterChanged
-        );
-        // provided by tableau extension samples, may need to push this to state for react
-        unregisterHandlerFunctions.push(unregisterHandlerFunction);
-        log(unregisterHandlerFunctions);
-      });
-  
-      log('checking field in getAll()', tableauExt.settings.getAll());
+      this.addEventListeners();
   
       // Initialize the current saved settings global
       TableauSettings.init();
 
       this.setState({
         isLoading: false,
-        height: thisHeight,
-        width: thisWidth,
+        height: window.innerHeight,
+        width: window.innerWidth,
         sheetNames: sheetNames,
         dashboardName: dashboardName,
         demoType: tableauExt.settings.get("ConfigType") || "tree",
         tableauSettings: tableauExt.settings.getAll()
-      });
-  
-      if (this.state.tableauSettings.configuration && this.state.tableauSettings.configuration === "true") {
-        this.setState({
-          isSplash: false,
-          isConfig: false,
-        });
-      }
-  
+      }, () => {
+        if (this.state.tableauSettings.configuration && this.state.tableauSettings.configuration === "true") {
+          this.setState({
+            isSplash: false,
+            isConfig: false,
+          });
+        }  
+      });  
     });
   }
   
-
   componentWillUpdate(nextProps, nextState) {
     // console log settings to check current status
-    log("will update", this.state, nextState, tableauExt.settings.getAll());
-  
-    //get selectedSheet from Settings
-    //hardcoding this for now because I know i have two possibilities
-    let selectedSheet = tableauExt.settings.get('ConfigSheet');
-    if (selectedSheet && this.state.tableauSettings.ConfigSheet !== nextState.tableauSettings.ConfigSheet) {
-      log('calling summary data sheet');
-      this.getSummaryData(selectedSheet, "ConfigSheet");
-    } //get field3 from Settings
+    // log("will update", this.state, nextState, tableauExt.settings.getAll());
+    if ( tableauExt.settings ) {
+      //get selectedSheet from Settings
+      //hardcoding this for now because I know i have two possibilities
+      console.log('checking settings in will update', tableauExt);
+      let selectedSheet = tableauExt.settings.get('ConfigSheet');
+      if (selectedSheet && this.state.tableauSettings.ConfigSheet !== nextState.tableauSettings.ConfigSheet) {
+        log('calling summary data sheet');
+        this.getSummaryData(selectedSheet, "ConfigSheet");
+      } //get field3 from Settings
+
+    }
   }
 
-// just logging this for now, may be able to remove later
-componentDidUpdate() {
-  log('did update', this.state, tableauExt.settings.getAll());
-}
+  // just logging this for now, may be able to remove later
+  componentDidUpdate() {
+    // log('did update', this.state, tableauExt.settings.getAll());
+  }
 
 render() {
-  const { classes } = this.props;
-
   // create these variables so they are blank if not populated by user
   let configMeasuresObject = {};
 
@@ -712,7 +893,7 @@ render() {
 
     // config screen jsx
     if (this.state.isConfig) {
-      let stepNames = ["Select Graph Type", "Select Sheet", "Drag & Drop Measures", "Customize the Graph"]
+      let stepNames = ["Select Graph Type", "Select Sheet", "Drag & Drop Measures", "Customize the Graph", "Interact with the Graph"]
       
       log(this.state.stepIndex)
 
@@ -902,7 +1083,37 @@ render() {
               handleChange={this.handleChange}
               customCallBack={this.customCallBack}
               field={'configuration'}
+              configType={'customize'}
               tableauSettings={tableauSettingsState}
+            />
+            <StepButtons
+              onNextClick={this.onNextStep}
+              onPrevClick={this.onPrevStep}
+              stepIndex={this.state.stepIndex}
+              maxStepCount={stepNames.length}
+              nextText={this.state.stepIndex !== stepNames.length ? 'Next' : 'Save'}
+              backText="Back"
+            />
+          </React.Fragment>
+        ); 
+      }
+
+      if (this.state.stepIndex === 5) {
+        console.log('checking state in stepIndex 5', this.state);
+        return (
+          <React.Fragment>
+            <Stepper 
+              stepIndex={this.state.stepIndex} 
+              steps={stepNames}
+            />
+            <CustomizeHierarchy
+              configTitle = "Interact with your hierarchy chart"
+              handleChange={this.handleChange}
+              customCallBack={this.customCallBack}
+              field={'configuration'}
+              tableauSettings={tableauSettingsState}
+              configType={'interaction'}
+              configSheetColumns={this.state.ConfigSheetStringColumns || []}
             />
             <StepButtons
               onNextClick={this.onNextStep}
@@ -929,9 +1140,9 @@ render() {
             poweredBy={
               <React.Fragment>
                 <p className="info">Brought to you by: </p>
-                <a href="http://www.datablick.com/" target="_blank"><img src={dbLogo} /></a> <a href="https://starschema.com/" target="_blank"><img src={ssLogo} /></a>
+                <a href="http://www.datablick.com/" target="_blank" rel="noopener noreferrer"><img src={dbLogo} alt="datablick logo"/></a> <a href="https://starschema.com/" target="_blank" rel="noopener noreferrer" ><img src={ssLogo} alt="star schema logo"/></a>
                 <p className="info">Powered by: </p>
-                <a href="https://emeeks.github.io/semiotic/#/" target="_blank"><img src={semLogo} /></a>
+                <a href="https://emeeks.github.io/semiotic/#/" target="_blank" rel="noopener noreferrer"><img src={semLogo} alt="semiotic logo" /></a>
             </React.Fragment>
           }
           />
@@ -952,6 +1163,7 @@ render() {
         //networkTypeProps
         networkType={semioticTypes[tableauSettingsState.ConfigType]}
         networkProjection={tableauSettingsState.networkProjection}
+        filterRenderedNodes={tableauSettingsState.filterDepth === "none" ? undefined : tableauSettingsState.filterDepth}
 
         //render mode props
         nodeSize={tableauSettingsState.nodeSize}
@@ -974,8 +1186,10 @@ render() {
         //nodeWidthField || nodeWidthStroke
       
         //interactivity props
+        filterHash={this.state.filterHash}
         highlightOn={this.state.highlightOn}
         hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
+        highlightAnnotation={tableauSettingsState.highlightAnnotation === "true"}
         clickCallBack={this.clickCallBack}
         hoverCallBack={this.hoverCallBack}
       />

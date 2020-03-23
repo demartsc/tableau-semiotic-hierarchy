@@ -2,17 +2,19 @@ const defaultSettings = {
   defaults: {
     ConfigType: "Tidy Tree",
     networkProjection: "vertical",
-    edgeType: "curve",
+    edgeType: "normal",
     markerMinRadius: 1, 
     markerMaxRadius: 25,
-    colorConfig: "field",
+    colorConfig: "solid",
     hoverAnnotation: true,
+    highlightAnnotation: true,
     nodeSize: 'none', 
     nodeFillOpacity: .35,
     nodeStrokeOpacity: .5, 
-    nodeColor: "#CCCCCC", 
+    nodeColor: "#767676", 
     nodeRender: "normal", 
     edgeRender: "normal",
+    highlightStrokeWidth: 2,
   },
   defaultKeys: [ 
     'ConfigType',
@@ -22,11 +24,13 @@ const defaultSettings = {
     'markerMaxRadius',
     'colorConfig',
     'hoverAnnotation',
+    'highlightAnnotation',
     'nodeSize', 
     'nodeFillOpacity', 
     'nodeColor',
     'nodeRender',
-    'edgeRender'
+    'edgeRender',
+    'highlightStrokeWidth'
   ]
 }
 

@@ -148,12 +148,12 @@ class InteractionScreen extends React.Component {
                 tooltipText="A decimal from 0 to 1 that will control highlight stroke opacity"
               />
               <TextField  
-                id="highlightStorkeOpacity-helper"
-                name="highlightStorkeOpacity"
+                id="highlightStrokeOpacity-helper"
+                name="highlightStrokeOpacity"
                 label="Highlight Stroke Opacity"
                 placeholder="1"
                 className={classes.textField}
-                value={tableauSettings.highlightStorkeOpacity}
+                value={tableauSettings.highlightStrokeOpacity}
                 onChange={handleChange}
                 margin="normal"
               />

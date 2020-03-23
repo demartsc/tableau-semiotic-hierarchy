@@ -206,22 +206,21 @@ class CustomScreen extends React.Component {
                 input={<Input name="filterDepth" id="filterDepth-helper" />}
               >
                  <MenuItem value={"none"}>No Filter</MenuItem>
-                 <MenuItem value={"0"}>0</MenuItem>
-                 <MenuItem value={"1"}>1</MenuItem>
-                 <MenuItem value={"2"}>2</MenuItem>
-                 <MenuItem value={"3"}>3</MenuItem>
-                 <MenuItem value={"4"}>4</MenuItem>
-                 <MenuItem value={"5"}>5</MenuItem>
-                 <MenuItem value={"6"}>6</MenuItem>
-                 <MenuItem value={"7"}>7</MenuItem>
-                 <MenuItem value={"8"}>8</MenuItem>
-                 <MenuItem value={"9"}>9</MenuItem>
-                 <MenuItem value={"10"}>10</MenuItem>
-                 <MenuItem value={"11"}>11</MenuItem>
-                 <MenuItem value={"12"}>12</MenuItem>
-                 <MenuItem value={"13"}>13</MenuItem>
-                 <MenuItem value={"14"}>14</MenuItem>
-                 <MenuItem value={"15"}>15</MenuItem>
+                 <MenuItem value={"0"}>1</MenuItem>
+                 <MenuItem value={"1"}>2</MenuItem>
+                 <MenuItem value={"2"}>3</MenuItem>
+                 <MenuItem value={"3"}>4</MenuItem>
+                 <MenuItem value={"4"}>5</MenuItem>
+                 <MenuItem value={"5"}>6</MenuItem>
+                 <MenuItem value={"6"}>7</MenuItem>
+                 <MenuItem value={"7"}>8</MenuItem>
+                 <MenuItem value={"8"}>9</MenuItem>
+                 <MenuItem value={"9"}>10</MenuItem>
+                 <MenuItem value={"10"}>11</MenuItem>
+                 <MenuItem value={"11"}>12</MenuItem>
+                 <MenuItem value={"12"}>13</MenuItem>
+                 <MenuItem value={"13"}>14</MenuItem>
+                 <MenuItem value={"14"}>15</MenuItem>
               </Select>
             </FormControl>
           </div>

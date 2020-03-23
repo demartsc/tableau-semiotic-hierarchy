@@ -148,7 +148,7 @@ function buildNodeSizeScale(nodeData, markerMinRadius, markerMaxRadius) {
       return () => {};
     }
     function remapper(d) {
-      return parseFloat(d["valueMetric"] || 0) || 0;
+      return parseFloat(d.valueMetric || 0) || 0;
     }
     return d3Scale.scaleSqrt()
       .domain(d3Array.extent(nodeData, remapper))
@@ -163,7 +163,7 @@ function buildNodeColorScale(nodeData, nodeFillColor) {
       return () => {};
     }
     function remapper(d) {
-      return parseFloat(d["valueMetric"] || 0) || 0;
+      return parseFloat(d.valueMetric || 0) || 0;
     }
     return d3Scale.scaleLinear()
       .domain(d3Array.extent(nodeData, remapper))
@@ -218,7 +218,7 @@ class SemioticHierarchy extends React.Component {
         let edgeData = memoized.buildEdgeData(hierarchyDataPreped, root);
 
         let nodeSizeScale = memoized.buildNodeSizeScale(nodeData, tableauSettings.markerMinRadius, tableauSettings.markerMaxRadius);
-        let nodeColorScale = memoized.buildNodeColorScale(nodeData, tableauSettings.nodeFillColor);
+        let nodeColorScale = memoized.buildNodeColorScale(nodeData, tableauSettings.nodeColor);
 
         // create the hoverAnnotation prop for semiotic
         let hoverAnnotationProp = hoverAnnotation && highlightAnnotation ? 
@@ -254,22 +254,22 @@ class SemioticHierarchy extends React.Component {
     }
 
     getColorHex = d => d.colorHex;
-    getValueMetric0 = d => d.valueMetric || 0;
+    getValueMetric0 = d => d.valueMetric || d3Array.min(this.preprocessData().nodeData, d => d.valueMetric);
     getValueMetric1 = d => d.valueMetric || 1;
 
     getNodeSize = d => {
-        let { nodeSizeScale } = this.preprocessData();
+        const { nodeSizeScale } = this.preprocessData();
         return nodeSizeScale(this.getValueMetric0(d));
     }
 
     getNodeColor = d => {
-        let { nodeColorScale } = this.preprocessData();
+        const { nodeColorScale } = this.preprocessData();
         return nodeColorScale(this.getValueMetric0(d));
     }
 
 
     getTargetNodeColor = d => {
-        let { nodeColorScale } = this.preprocessData();
+        const { nodeColorScale } = this.preprocessData();
         return nodeColorScale(d.target.valueMetric || 0);
     }
 

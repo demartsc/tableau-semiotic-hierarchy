@@ -151,6 +151,27 @@ class App extends Component {
     // this.removeEventListeners = _.debounce(this.removeEventListeners,500);
   }
 
+  addGlobalEventListeners = () => {
+    // Whenever we restore the filters table, remove all save handling functions,
+    // since we add them back later in this function.
+    // provided by tableau extension samples
+
+    const localUnregisterHandlerFunctions = [];
+
+    // add filter change event listener with callback to re-query data after change
+    // go through each worksheet and then add a filter change event listener
+    // need to check whether this is being applied more than once
+
+    // add event listener
+    const unregisterFilterHandlerFunction = tableauExt.settings.addEventListener(
+      window.tableau.TableauEventType.SettingsChanged,
+      this.settingsChanged
+    );
+    // provided by tableau extension samples, may need to push this to state for react
+    localUnregisterHandlerFunctions.push(unregisterFilterHandlerFunction);
+    // this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
+  }
+
   addEventListeners = () => {
     // Whenever we restore the filters table, remove all save handling functions,
     // since we add them back later in this function.
@@ -271,13 +292,13 @@ class App extends Component {
     if ( d ) {
       // select marks or filter
       const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
-      tasks = actionToApply(fieldName, [d[fieldName]], ConfigSheet);
+      tasks.push(actionToApply(fieldName, [d[fieldName]], ConfigSheet));
       // console.log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
       
     } else {
       // clear marks or filer
       const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
-      tasks = actionToApply(fieldName, ConfigSheet);
+      tasks.push(actionToApply(fieldName, ConfigSheet));
     }
 
     Promise.all(tasks).then(() => {
@@ -318,6 +339,39 @@ class App extends Component {
   };
 
   configCallBack = (field, columnName) => {
+    // field = ChoroSheet, sheet = Data
+    log('configCallBack', field, columnName);
+  
+    // if we are in config call back from a sheet selection, go get the data
+    // this only works in the #true instance, must use update lifecycle method to catch both
+    // if (field.indexOf("Sheet") >= 0) {
+    //   this.getSummaryData(columnName, field);
+    // }
+  
+    if (TableauSettings.ShouldUse) {
+      TableauSettings.updateAndSave({
+        // ['is' + field]: true,
+        [field]: columnName,
+      }, settings => {
+        this.setState({
+          // ['is' + field]: true,
+          tableauSettings: settings
+        });
+      });
+  
+    } else {
+      //tableauExt.settings.set('is' + field, true);
+      tableauExt.settings.set(field, columnName);
+      tableauExt.settings.saveAsync().then(() => {
+        this.setState({
+          // ['is' + field]: true,
+          tableauSettings: tableauExt.settings.getAll()
+        });
+      });
+    }
+  }
+
+  autoConfigCallBack = (field, columnName) => {
     // field = ChoroSheet, sheet = Data
     log('configCallBack', field, columnName);
   
@@ -405,6 +459,16 @@ class App extends Component {
         }
       });
     }
+  }
+
+  // find all sheets in array and then call get summary, for now hardcoding
+  settingsChanged = e => {
+    log(
+      '%c ==============Settings have changed',
+      'background: green; color: white',
+      e,
+      tableauExt.settings.getAll()
+    );
   }
 
   // find all sheets in array and then call get summary, for now hardcoding
@@ -744,18 +808,20 @@ class App extends Component {
     this.resize();
 
     tableauExt.initializeAsync({'configure': this.configure}).then(() => {
-    // default tableau settings on initial entry into the extension
-    // we know if we haven't done anything yet when tableauSettings state = []
-    log("did mount", tableauExt.settings.get("ConfigType"));
-    if ( tableauExt.settings.get("ConfigType") === undefined ) {
-      log('defaultSettings triggered', defaultSettings.length, defaultSettings);
-      defaultSettings.defaultKeys.forEach((defaultSetting, index) => {
-        log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
-        this.configCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
-      })
-    }
+      this.addGlobalEventListeners();
 
-    // this is where the majority of the code is going to go for this extension I think
+      // default tableau settings on initial entry into the extension
+      // we know if we haven't done anything yet when tableauSettings state = []
+      log("did mount", tableauExt.settings.get("ConfigType"));
+      if ( tableauExt.settings.get("ConfigType") === undefined ) {
+        log('defaultSettings triggered', defaultSettings.length, defaultSettings);
+        defaultSettings.defaultKeys.forEach((defaultSetting, index) => {
+          log('defaultSetting', index, defaultSetting, defaultSettings.defaults[defaultSetting]);
+          this.autoConfigCallBack(defaultSetting, defaultSettings.defaults[defaultSetting]);
+        })
+      }
+
+      // this is where the majority of the code is going to go for this extension I think
       log("will mount", tableauExt.settings.getAll());
   
       //get sheetNames and dashboard name from workbook

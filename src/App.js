@@ -246,10 +246,19 @@ class App extends Component {
       // clickAction
     );
 
-    // if we are actually hovering on something then we should call this function
-    if ( d ) {
-      this.applyMouseActionsToSheets(d, clickAction, clickField);
-    }
+    this.applyMouseActionsToSheets(d, clickAction, clickField);
+  };
+
+  emptyClickCallBack = d => {
+    const {clickField, clickAction} = this.state.tableauSettings;
+
+    log(
+      '%c in on empty click callback',
+      'background: tan',
+      d,
+    );
+
+    this.applyMouseActionsToSheets(undefined, clickAction, clickField);
   };
 
   hoverCallBack = d => {
@@ -527,7 +536,7 @@ class App extends Component {
 
         for (let l = 0, len = this.state['ConfigSheetData'].length; l < len; l++) {
           if (_.find(data, o => { return o[this.state.tableauSettings.tableauField] === this.state['ConfigSheetData'][l][this.state.tableauSettings.tableauField]})) {
-            log('marks data found', data, this.state['ConfigSheetData'][l]);
+            // log('marks data found', data, this.state['ConfigSheetData'][l]);
             annotationsArray.push({
               type: "highlight",
               id: this.state['ConfigSheetData'][l][this.state.tableauSettings.ConfigChildField],
@@ -1191,6 +1200,7 @@ render() {
         hoverAnnotation={tableauSettingsState.hoverAnnotation === "true"}
         highlightAnnotation={tableauSettingsState.highlightAnnotation === "true"}
         clickCallBack={this.clickCallBack}
+        emptyClickCallBack={this.emptyClickCallBack}
         hoverCallBack={this.hoverCallBack}
       />
     );

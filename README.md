@@ -18,9 +18,11 @@ This extension is supported on **Tableau Desktop >= 2018.3** and **Tableau Serve
 Tableau Desktop >= 2018.3 and Tableau Server, sadly not Tableau Public.
 
 ## Quick Start
-#### Step 1: Locate the Semiotic Hierarchy Extension on the [community extensions page](https://tableau.github.io/extensions-api/community/), or download the trex from the public directory of this repo. Either of these methods will allow you to download the .trex file locally on your machine.
+#### Step 1: Find the extensions
+Locate the Semiotic Hierarchy Extension on the [community extensions page](https://tableau.github.io/extensions-api/community/), or download the trex from the public directory of this repo. Either of these methods will allow you to download the .trex file locally on your machine.
 
-#### Step 2: Open your dashboard and load the extension object onto the canvas. If prompted, click ‘Allow’ to permit the extension to run on your dashboard. 
+#### Step 2: Load the dashboard extension
+Open your dashboard and load the extension object onto the canvas. If prompted, click ‘Allow’ to permit the extension to run on your dashboard. 
 
 ![Loading the extension onto your dashboard](./docs/semiotic-hierarchy-2.gif)
 
@@ -57,7 +59,8 @@ child2 | child5 | 100 | green | categoryValue1
 
 **The semiotic hierarchy extension is a client-side app.Your data stays in your Tableau application.**
 
-#### Step 4: Save your Dashboard to persist the selections into your workbook, the updates you have made will not persist until you save the Tableau file. 
+#### Step 4: Save!
+Save your Dashboard to persist the selections into your workbook, the updates you have made will not persist until you save the Tableau file. 
 
 #### Step 5: Re-configure and re-save
 You can continue to adjust your configurations and settings to your delight, just remember to save your updates when you are done. If you want to have some fun, check out the `sketchy` render modes!

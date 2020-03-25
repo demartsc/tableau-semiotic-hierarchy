@@ -30,6 +30,7 @@ Open your dashboard and load the extension object onto the canvas. If prompted, 
 There are several steps you will go through to customize the look, feel and interactivity of your hierarchy chart, our goal is to allow you to make this extension one with your Tableau Dashboard. You start this process by clicking the "Configure" button, or selecting configure from the Tableau menu. These steps include: 
 
 - Select a type of hierarchy visualization
+
 ![Select a type of hierarchy visualization](./docs/semiotic-hierarchy-3.gif)
 
 - Select a sheet that is on your dashboard and contains you hierarchy data. Here is an example table of what is required for hierarchy data for this extension to work correctly. 

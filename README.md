@@ -2,9 +2,9 @@
 
 ## Credits
 These individuals played a key role in making this thing happen, thanks to all of you!
-- Tamas Foldi
-- Abraham Szilagyi
-- Elijah Meeks (Creator of Semiotic)
+- [Tamas Foldi](https://github.com/tfoldi)
+- [Abraham Szilagyi](https://github.com/szilagyiabo)
+- [Elijah Meeks](https://github.com/emeeks) (Creator of Semiotic)
 
 ## Introduction
 

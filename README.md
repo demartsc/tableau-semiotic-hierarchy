@@ -8,7 +8,7 @@ These individuals played a key role in making this thing happen, thanks to all o
 
 ## Introduction
 
-![Semiotic Hierarchy Charts in Tableau](./docs/Semiotic Hierarchy 1.gif)
+![Semiotic Hierarchy Charts in Tableau](./docs/semiotic-hierarchy-1.gif)
 
 This is the semiotic hierarchy tableau extension. It will load a semiotic hierarchy visualization inside your Tableau Desktop, or Server App. We have built an intuitive UI to enable the user to leverage many different configurations that you can pass directly into Semiotic. This includes the ability for your instance of the extension to communicate with your other Tableau charts.
 
@@ -22,13 +22,13 @@ Tableau Desktop >= 2018.3 and Tableau Server, sadly not Tableau Public.
 
 #### Step 2: Open your dashboard and load the extension object onto the canvas. If prompted, click ‘Allow’ to permit the extension to run on your dashboard. 
 
-![Loading the extension onto your dashboard](./docs/Semiotic Hierarchy 2.gif)
+![Loading the extension onto your dashboard](./docs/semiotic-hierarchy-2.gif)
 
 #### Step 3: Customize your hierarchy chart
 There are several steps you will go through to customize the look, feel and interactivity of your hierarchy chart, our goal is to allow you to make this extension one with your Tableau Dashboard. You start this process by clicking the "Configure" button, or selecting configure from the Tableau menu. These steps include: 
 
 - Select a type of hierarchy visualization
-![Select a type of hierarchy visualization](./docs/Semiotic Hierarchy 3.gif)
+![Select a type of hierarchy visualization](./docs/semiotic-hierarchy-3.gif)
 
 - Select a sheet that is on your dashboard and contains you hierarchy data. Here is an example table of what is required for hierarchy data for this extension to work correctly. 
 
@@ -45,28 +45,27 @@ child2 | child5 | 100 | green | categoryValue1
 
 - Drag & Drop the fields identified from your source sheet to their corresponding role of your hierarchy. 
 
-![Drag and drop your fields](./docs/Semiotic Hierarchy 4.gif)
+![Drag and drop your fields](./docs/semiotic-hierarchy-4.gif)
 
 - Customize how your semiotic hierarchy chart will look and feel.
 
-![Customize look and feel](./docs/Semiotic Hierarchy 5.png)
+![Customize look and feel](./docs/semiotic-hierarchy-5.png)
 
 - Determine how your semiotic hierarchy chart will interact with your Tableau dashboard.
 
-![Customize look and feel](./docs/Semiotic Hierarchy 6.png)
+![Customize your interactivity](./docs/semiotic-hierarchy-6.png)
 
-**The semiotic hierarchy extension is a client-side app. Your data stays in your Tableau application.**
+**The semiotic hierarchy extension is a client-side app.Your data stays in your Tableau application.**
 
-![Tableau Dashboard 4](./docs/Picture4.png)
+#### Step 4: Save your Dashboard to persist the selections into your workbook, the updates you have made will not persist until you save the Tableau file. 
 
-#### Step 4: Interact with your map in kepler.gl.
+#### Step 5: Re-configure and re-save
+You can continue to adjust your configurations and settings to your delight, just remember to save your updates when you are done. If you want to have some fun, check out the `sketchy` render modes!
 
-![Tableau Dashboard 5](./docs/Picture5.gif)
-
-#### Step 5: Save and reload
-No action is needed to save your map. kepler.gl will automatically save it to your Tableau session.
+![Sketchy fun](./docs/semiotic-hierarchy-7.png)
 
 #### Step 6: Submit Feedback and Help us Test!
+You can log any feedback, feature requests and/or issues you come across directly on our [github issues](https://github.com/demartsc/tableau-semiotic-hierarchy/issues) page. What else do you want to do with this thing? Let us know!
 
 ## Local Development Setup
 For a development installation (requires npm, node and yarn):
@@ -79,13 +78,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### Start local app
 ##### 1. Clone repo
 ```sh
-git clone git@github.com:uber/kepler.gl-tableau.git
+git clone git@github.com:demartsc/tableau-semiotic-hierarchy.git
 ```
 
 ##### 2. Install
 ```sh
-yarn --ignore-engines
+yarn
+# or
+npm install
 ```
+
 
 ##### 3. Start local app session
 ```sh
@@ -97,17 +99,17 @@ npm start
 ### Setup local extension in Tableau Desktop
 ##### 1. Launch Tableau
 open tableau workbook (get it from public folder of this repo)
-- NOTE: if you want to enable remote debugging, use this command in terminal to open tableau
+- NOTE: if you want to enable remote debugging, use this command in terminal to open tableau (be sure to update the tableau version number)
 
 ```sh
 open /Applications/Tableau\ Desktop\ 2020\.1.app --args --remote-debugging-port=8696
 ```
 
-A debug session will be available in browser http://localhost:8696
+A debug session will be available in browser http://localhost:8696 or chrome://inspect#devices
 
 ##### 2. Execute extension in tableau
 
-- copy the `datablick-kepler-gl.trex` file (inside the `public` folder) into your `extensions` folder of the `My Tableau Repository` (likely in your `Documents` folder).
+- copy the `datablick-semiotic-hierarchy-local.trex` file (inside the `public` folder) into your `extensions` folder of the `My Tableau Repository` (likely in your `Documents` folder).
 
 - Go to the Tableau window that opened when running the above command.
 
@@ -117,12 +119,9 @@ A debug session will be available in browser http://localhost:8696
 ](https://tableau.github.io/extensions-api/docs/trex_getstarted.html)
 
 ### Deploy
-Deploy local app to uber.github.io, this will be the app that Tableau extension loads from
 ```sh
 npm run deploy
 ```
 
 ## Links
-- [kepler.gl Support Policy](https://kepler.gl/policy)
-- [Privacy Policy](https://lfprojects.org/policies/privacy-policy/)
-- [Term of Use](https://lfprojects.org/policies/terms-of-use/)
+- [Semiotic documentation](https://semiotic.nteract.io/)

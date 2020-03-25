@@ -15,6 +15,7 @@
     "react-dom": "^16.3.2",
     "react-scripts": "1.1.4",
     "react-spinkit": "^3.0.0",
+    "roughjs": "^4.0.4",
     "semiotic": "^2.0.0",
     "styled-components": "^3.4.9",
     "typeface-roboto": "^0.0.54",

@@ -31,6 +31,9 @@ import * as d3Array from "d3-array";
 //lodash
 import _ from 'lodash';
 
+//roughjs
+import roughjs from 'roughjs/bundled/rough.esm';
+
 //material ui
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -355,13 +358,28 @@ class SemioticHierarchy extends React.Component {
             );
         }
     }
+
+    foregroundGraphic = () => {
+        const {
+            height,
+            width
+        } = this.props;
+        return (
+            <rect 
+                width={width}
+                height={height}
+                style={{ opacity: 0, pointerEvents: "all" }}
+                onClick={this.props.emptyClickCallBack}
+            />
+        );
+    }
     
     componentDidMount() {
         log('component mounted');
     }
   
     render() {
-        //log('semitoic component', this.props);
+        log('semitoic component', this.props, roughjs);
         const {
             height,
             width,
@@ -397,6 +415,7 @@ class SemioticHierarchy extends React.Component {
                         :   tableauSettings.ConfigValueField === "None" ? undefined
                         :   this.getNodeSize
                     }
+                    sketchyRenderingEngine={roughjs}
                     nodeRenderMode={nodeRender}
                     edgeRenderMode={edgeRender}
                     edgeType={edgeType}
@@ -425,6 +444,7 @@ class SemioticHierarchy extends React.Component {
                     annotations={this.props.highlightOn}
 
                     // interactivity
+                    foregroundGraphics={this.foregroundGraphic}
                     hoverAnnotation={hoverAnnotationProp}
                     tooltipContent={this.popOver}
                     customClickBehavior={this.props.clickCallBack}

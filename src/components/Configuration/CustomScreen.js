@@ -86,7 +86,6 @@ class CustomScreen extends React.Component {
               >
                  <MenuItem value={"normal"}>Normal</MenuItem>
                  <MenuItem value={"sketchy"}>Sketchy</MenuItem>
-                 <MenuItem value={"painty"}>Painty</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
@@ -101,7 +100,6 @@ class CustomScreen extends React.Component {
               >
                  <MenuItem value={"normal"}>Normal</MenuItem>
                  <MenuItem value={"sketchy"}>Sketchy</MenuItem>
-                 <MenuItem value={"painty"}>Painty</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>

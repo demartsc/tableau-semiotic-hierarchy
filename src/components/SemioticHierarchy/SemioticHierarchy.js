@@ -32,7 +32,7 @@ import * as d3Array from "d3-array";
 import _ from 'lodash';
 
 //roughjs
-import roughjs from 'roughjs/bundled/rough.esm';
+import roughjs from 'roughjs-es5';
 
 //material ui
 import Typography from '@material-ui/core/Typography';

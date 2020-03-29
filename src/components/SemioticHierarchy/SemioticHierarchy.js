@@ -43,6 +43,10 @@ import {
     log
   } from '../../utils';
   
+// variables/constants
+import { 
+    sketchyTypes
+} from '../../variables';
 
 // Minimum and maximum fallback sizes for markers
 const MIN_MARKER_RADIUS = 1;
@@ -187,16 +191,16 @@ let memoized = {
 };
 
 class SemioticHierarchy extends React.Component {
-    constructor (props) {
-      super(props);
-      this.state = {
-        root: "",
-        edgeData: [],
-        nodeData: [],
-        nodeSizeScale: undefined,
-        nodeColorScale: undefined
-      }  
-    }
+    // constructor (props) {
+    //   super(props);
+    //   this.state = {
+    //     root: "",
+    //     edgeData: [],
+    //     nodeData: [],
+    //     nodeSizeScale: undefined,
+    //     nodeColorScale: undefined
+    //   }  
+    // }
 
   // Previously in componentDidMount, this prepares our data if possible,
   // and returns a dict that corresponds to the old componentDidMount() state changes
@@ -229,7 +233,7 @@ class SemioticHierarchy extends React.Component {
                 type: 'highlight',
                 style : {
                     stroke: tableauSettings.highlightStrokeColor || "#222222",
-                    strokeWidth: tableauSettings.highlightStrokeWidth || 2,
+                    strokeWidth: tableauSettings.highlightStrokeWidth || 3,
                     strokeOpacity: tableauSettings.highlightStrokeOpacity || 1
                 }    
             }, { type: "frame-hover" }
@@ -240,7 +244,7 @@ class SemioticHierarchy extends React.Component {
                         type: 'highlight',
                         style : {
                             stroke: tableauSettings.highlightStrokeColor || "#222222",
-                            strokeWidth: tableauSettings.highlightStrokeWidth || 2,
+                            strokeWidth: tableauSettings.highlightStrokeWidth || 3,
                             strokeOpacity: tableauSettings.highlightStrokeOpacity || 1
                         }
                     }]
@@ -325,8 +329,10 @@ class SemioticHierarchy extends React.Component {
     }
 
     getNodeRenderMode = _ => {
-        const { nodeRender } = this.props
-        return nodeRender === "sketchy" ?  "sketchy" : "normal"; // { renderMode: "sketchy", hachureGap: 8, fillWeight: 1, fillStyle: "dots" } : "normal"; //roughness: 3.2, bowing: 4, hachureAngle: 215, hachureGap: 4, fillWeight: 1
+        const { nodeRender, nodeRenderAngle } = this.props;
+        const newSketchyObject = isNaN(nodeRenderAngle) ? sketchyTypes[nodeRender] : { ...sketchyTypes[nodeRender], "hachureAngle": parseFloat(nodeRenderAngle) }
+        // console.log( 'checking in render mode', nodeRender, nodeRenderAngle, sketchyTypes[nodeRender], newSketchyObject);
+        return sketchyTypes[nodeRender] ? newSketchyObject : "normal";
     }
 
     getEdgeRenderMode = _ => {
@@ -401,7 +407,7 @@ class SemioticHierarchy extends React.Component {
         
         // pull in memoized stuff for use in render function
         let {
-            hierarchyDataPreped, 
+            // hierarchyDataPreped, 
             edgeData,
             hoverAnnotationProp
         } = this.preprocessData();

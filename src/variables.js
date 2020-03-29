@@ -47,3 +47,21 @@ export const semioticTypes = {
   "Treemap": "treemap",
   "Partition": "partition",
 }
+
+export const sketchyTypes = {
+    "normal": { renderMode: "normal" },
+    "solid-fill": { renderMode: "sketchy", fillStyle: "solid" },
+    "hachure-thin": { renderMode: "sketchy", hachureGap: 3, fillWeight: 1, fillStyle: "hachure" },
+    "hachure-thin-fill": { renderMode: "sketchy", hachureGap: 1.5, fillWeight: 1, fillStyle: "hachure" },
+    "hachure-thick": { renderMode: "sketchy", hachureGap: 4, fillWeight: 2, fillStyle: "hachure" },
+    "hachure-thick-fill": { renderMode: "sketchy", hachureGap: 2.5, fillWeight: 2, fillStyle: "hachure" },
+    "dots": { renderMode: "sketchy", hachureGap: 5, fillWeight: 1, fillStyle: "dots" },
+    "dots-fill": { renderMode: "sketchy", hachureGap: 2.5, fillWeight: 1, fillStyle: "dots" },
+    "dashed": { renderMode: "sketchy", hachureGap: 3, dashGap: 2, fillWeight: 1, fillStyle: "dashed" },
+    "dashed-fill": { renderMode: "sketchy", hachureGap: 1, dashGap: 2, fillWeight: 1, fillStyle: "dashed" },
+    "cross-hatch": { renderMode: "sketchy", hachureGap: 4, fillStyle: "cross-hatch" },
+    "cross-hatch-fill": { renderMode: "sketchy", hachureGap: 2, fillStyle: "cross-hatch" },
+    "zigzag": { renderMode: "sketchy", hachureGap: 5, fillWeight: 2, fillStyle: "zigzag" },
+    "zigzag-fill": { renderMode: "sketchy", hachureGap: 4, fillWeight: 2, fillStyle: "zigzag" },
+    "zigzag-line": { renderMode: "sketchy", hachureGap: 3, fillWeight: 1.5, fillStyle: "zigzag-line" }
+}

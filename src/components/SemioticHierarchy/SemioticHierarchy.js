@@ -301,11 +301,14 @@ class SemioticHierarchy extends React.Component {
     }
 
     getEdgeStyle = d => {
-        const { tableauSettings, edgeFillColor, edgeFillOpacity, nodeStrokeColor, nodeStrokeOpacity } = this.props;
+        const { tableauSettings, nodeStrokeColor, nodeStrokeOpacity } = this.props;
         return (
             { 
-                fill: edgeFillColor,
-                fillOpacity: edgeFillOpacity,
+                fill: tableauSettings.colorConfig === "solid" ? _.split(nodeStrokeColor,',')[0]
+                : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getTargetNodeColor(d)
+                : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getTargetColorHex(d)
+                : _.split(nodeStrokeColor,',')[0],
+                fillOpacity: nodeStrokeOpacity,
                 stroke: tableauSettings.colorConfig === "solid" ? _.split(nodeStrokeColor,',')[0]
                     : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getTargetNodeColor(d)
                     : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getTargetColorHex(d)
@@ -336,8 +339,9 @@ class SemioticHierarchy extends React.Component {
     }
 
     getEdgeRenderMode = _ => {
-        const { edgeRender } = this.props
-        return edgeRender === "sketchy" ?  "sketchy" : "normal"; 
+        const { edgeRender, nodeRenderAngle } = this.props
+        const newSketchyObject = isNaN(nodeRenderAngle) ? sketchyTypes[edgeRender] : { ...sketchyTypes[edgeRender], "hachureAngle": parseFloat(nodeRenderAngle) }
+        return sketchyTypes[edgeRender] ? newSketchyObject : "normal";
     }
 
     // create the custom tooltip for semiotic

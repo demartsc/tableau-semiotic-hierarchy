@@ -1177,6 +1177,7 @@ render() {
         //render mode props
         nodeSize={tableauSettingsState.nodeSize}
         nodeRender={tableauSettingsState.nodeRender}
+        nodeRenderAngle={tableauSettingsState.nodeRenderAngle}
         edgeRender={tableauSettingsState.edgeRender}
         edgeType={tableauSettingsState.edgeType}
 

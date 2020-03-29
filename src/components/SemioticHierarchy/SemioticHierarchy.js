@@ -32,7 +32,7 @@ import * as d3Array from "d3-array";
 import _ from 'lodash';
 
 //roughjs
-import roughjs from 'roughjs-es5';
+import roughjs from 'roughjs/dist/rough.es5.umd';
 
 //material ui
 import Typography from '@material-ui/core/Typography';
@@ -324,6 +324,16 @@ class SemioticHierarchy extends React.Component {
         }
     }
 
+    getNodeRenderMode = _ => {
+        const { nodeRender } = this.props
+        return nodeRender === "sketchy" ?  "sketchy" : "normal"; // { renderMode: "sketchy", hachureGap: 8, fillWeight: 1, fillStyle: "dots" } : "normal"; //roughness: 3.2, bowing: 4, hachureAngle: 215, hachureGap: 4, fillWeight: 1
+    }
+
+    getEdgeRenderMode = _ => {
+        const { edgeRender } = this.props
+        return edgeRender === "sketchy" ?  "sketchy" : "normal"; 
+    }
+
     // create the custom tooltip for semiotic
     popOver = d => {
         const {tableauSettings} = this.props;
@@ -383,8 +393,6 @@ class SemioticHierarchy extends React.Component {
         const {
             height,
             width,
-            nodeRender,
-            edgeRender,
             edgeType,
             networkType,
             networkProjection, 
@@ -398,7 +406,7 @@ class SemioticHierarchy extends React.Component {
             hoverAnnotationProp
         } = this.preprocessData();
 
-        log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData);
+        // log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData, this.getNodeRenderMode());
 
         // log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
         return (
@@ -416,8 +424,8 @@ class SemioticHierarchy extends React.Component {
                         :   this.getNodeSize
                     }
                     sketchyRenderingEngine={roughjs}
-                    nodeRenderMode={nodeRender}
-                    edgeRenderMode={edgeRender}
+                    nodeRenderMode={this.getNodeRenderMode}
+                    edgeRenderMode={this.getEdgeRenderMode}
                     edgeType={edgeType}
                     nodeStyle={this.getNodeStyle}
                     edgeStyle={this.getEdgeStyle}

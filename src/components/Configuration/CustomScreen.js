@@ -85,7 +85,20 @@ class CustomScreen extends React.Component {
                 input={<Input name="edgeRender" id="edgeRender-helper" />}
               >
                  <MenuItem value={"normal"}>Normal</MenuItem>
-                 <MenuItem value={"sketchy"}>Sketchy</MenuItem>
+                 <MenuItem value={"solid-fill"}>Solid Filled</MenuItem>
+                 <MenuItem value={"hachure-thin"}>Hachure Thin</MenuItem>
+                 <MenuItem value={"hachure-thin-fill"}>Hachure Thin Filled</MenuItem>
+                 <MenuItem value={"hachure-thick"}>Hachure Thick</MenuItem>
+                 <MenuItem value={"hachure-thick-fill"}>Hachure Thick Filled</MenuItem>
+                 <MenuItem value={"dots"}>Dots</MenuItem>
+                 <MenuItem value={"dots-fill"}>Dots Filled</MenuItem>
+                 <MenuItem value={"dashed"}>Dashed</MenuItem>
+                 <MenuItem value={"dashed-fill"}>Dashed Fill</MenuItem>
+                 <MenuItem value={"cross-hatch"}>Cross Hatch</MenuItem>
+                 <MenuItem value={"cross-hatch-fill"}>Cross Hatch Filled</MenuItem>
+                 <MenuItem value={"zigzag"}>Zigzag</MenuItem>
+                 <MenuItem value={"zigzag-line"}>Zigzig Line</MenuItem>
+                 <MenuItem value={"zigzag-fill"}>Zigzag Filled</MenuItem>
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>

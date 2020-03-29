@@ -494,13 +494,15 @@ class App extends Component {
   }
   
   marksSelected = e => {
+    const tableauField = tableauExt.settings.get('tableauField');
+
     log(
       '%c ==============App Marker selected',
       'background: red; color: white',
       this.applyingMouseActions
     );
 
-    if (this.applyingMouseActions) {
+    if (this.applyingMouseActions || tableauField === "None") {
       return;
     }
 
@@ -1182,10 +1184,10 @@ render() {
         edgeType={tableauSettingsState.edgeType}
 
         //edge styling props
-        edgeFillColor={DataBlick[2]}
-        edgeFillOpacity={0}
-        edgeStrokeColor={DataBlick[2]}
-        edgeStrokeOpacity={.25}
+        // edgeFillColor={DataBlick[2]}
+        // edgeFillOpacity={0}
+        // edgeStrokeColor={DataBlick[2]}
+        // edgeStrokeOpacity={.25}
         //edgeWidthField || edgeWidthStroke
 
         //node styling props

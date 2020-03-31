@@ -274,7 +274,6 @@ class SemioticHierarchy extends React.Component {
         return nodeColorScale(this.getValueMetric0(d));
     }
 
-
     getTargetNodeColor = d => {
         const { nodeColorScale } = this.preprocessData();
         return nodeColorScale(d.target.valueMetric || 0);
@@ -301,19 +300,19 @@ class SemioticHierarchy extends React.Component {
     }
 
     getEdgeStyle = d => {
-        const { tableauSettings, nodeStrokeColor, nodeStrokeOpacity } = this.props;
+        const { tableauSettings, nodeStrokeColor, nodeStrokeOpacity, edgeRender } = this.props;
         return (
             { 
                 fill: tableauSettings.colorConfig === "solid" ? _.split(nodeStrokeColor,',')[0]
                 : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getTargetNodeColor(d)
                 : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getTargetColorHex(d)
                 : _.split(nodeStrokeColor,',')[0],
-                fillOpacity: nodeStrokeOpacity,
+                fillOpacity: edgeRender === "normal" ? 0 : nodeStrokeOpacity * .5,
                 stroke: tableauSettings.colorConfig === "solid" ? _.split(nodeStrokeColor,',')[0]
                     : tableauSettings.colorConfig === "scale" && tableauSettings.ConfigValueField !== "None" ? this.getTargetNodeColor(d)
                     : tableauSettings.colorConfig === "field" && tableauSettings.ConfigColorField !== "None" ? this.getTargetColorHex(d)
                     : _.split(nodeStrokeColor,',')[0],
-                strokeOpacity: nodeStrokeOpacity*.5
+                strokeOpacity: edgeRender === "normal" ? nodeStrokeOpacity : nodeStrokeOpacity * .5,
             }
         );
     }

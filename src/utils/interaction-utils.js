@@ -20,6 +20,20 @@
 
 const tableauExt = window.tableau.extensions;
 
+export function getConfigFieldInternalName(fieldName, tableauSettings) {
+  return tableauSettings.ConfigParentField === fieldName 
+    ? 'name'
+    : tableauSettings.ConfigChildField === fieldName
+      ? 'child'
+      : tableauSettings.ConfigLabelField === fieldName
+        ? 'label'
+        : tableauSettings.ConfigColorField === fieldName
+          ? 'colorHex'
+          : tableauSettings.ConfigValueField === fieldName
+            ? 'valueMetric'
+            : fieldName;
+}
+
 export function selectMarksByField(fieldName, fieldValues, ConfigSheet) {
   const marksValue = [{
     fieldName,

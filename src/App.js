@@ -71,6 +71,7 @@ import {
   log
 } from './utils';
 import {
+  getConfigFieldInternalName,
   selectMarksByField,
   applyFilterByField,
   clearMarksByField,
@@ -142,7 +143,8 @@ class App extends Component {
     TableauSettings.setEnvName(this.props.isConfig ? "CONFIG" : "EXTENSION");
 
     // interactivity and listeners
-    this.unregisterHandlerFunctions = [];
+    this.unregisterSelectionHandlerFunctions = [];
+    this.unregisterFilterHandlerFunctions = [];
     this.applyingMouseActions = false;
     this.clickCallBack = _.debounce(this.clickCallBack,200);
     this.hoverCallBack = _.debounce(this.hoverCallBack,200);
@@ -172,12 +174,12 @@ class App extends Component {
     // this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
   }
 
-  addEventListeners = () => {
+  addFilterEventListeners = () => {
     // Whenever we restore the filters table, remove all save handling functions,
     // since we add them back later in this function.
     // provided by tableau extension samples
 
-    this.removeEventListeners();
+    this.removeEventListeners("Filter");
 
     const localUnregisterHandlerFunctions = [];
 
@@ -194,6 +196,27 @@ class App extends Component {
       );
       // provided by tableau extension samples, may need to push this to state for react
       localUnregisterHandlerFunctions.push(unregisterFilterHandlerFunction);
+    });
+
+    log('%c addFilterEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
+    this.unregisterFilterHandlerFunctions = localUnregisterHandlerFunctions;
+    // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
+  }
+
+  addSelectionEventListeners = () => {
+    // Whenever we restore the filters table, remove all save handling functions,
+    // since we add them back later in this function.
+    // provided by tableau extension samples
+
+    this.removeEventListeners("Selection");
+
+    const localUnregisterHandlerFunctions = [];
+
+    // add filter change event listener with callback to re-query data after change
+    // go through each worksheet and then add a filter change event listener
+    // need to check whether this is being applied more than once
+    tableauExt.dashboardContent.dashboard.worksheets.forEach((worksheet) => {
+      log('adding selection listners to', worksheet, ' sheet');
 
       const unregisterMarkerHandlerFunction = worksheet.addEventListener(
         window.tableau.TableauEventType.MarkSelectionChanged,
@@ -204,19 +227,29 @@ class App extends Component {
       localUnregisterHandlerFunctions.push(unregisterMarkerHandlerFunction);
     });
 
-    log('%c addEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
-    this.unregisterHandlerFunctions = localUnregisterHandlerFunctions;
+    log('%c addSelectionEventListeners', 'background: purple; color:yellow', localUnregisterHandlerFunctions, tableauExt.dashboardContent.dashboard.worksheets);
+    this.unregisterSelectionHandlerFunctions = localUnregisterHandlerFunctions;
     // log(`%c added ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: purple, color:yellow');
   }
 
-  removeEventListeners = () => {
-    log(`%c remove ${this.unregisterHandlerFunctions.length} EventListeners`, 'background: green; color:black');
+  removeEventListeners = (listenerType) => {
+    if ( listenerType === "All" || listenerType === "Filter") {
+      log(`%c remove ${this.unregisterFilterHandlerFunctions.length} Filter EventListeners`, 'background: green; color:black');
+      this.unregisterFilterHandlerFunctions.forEach(unregisterHandlerFunction => {
+        unregisterHandlerFunction();
+      });
+  
+      this.unregisterFilterHandlerFunctions = [];  
+    }
 
-    this.unregisterHandlerFunctions.forEach(unregisterHandlerFunction => {
-      unregisterHandlerFunction();
-    });
-
-    this.unregisterHandlerFunctions = [];
+    if ( listenerType === "All" || listenerType === "Selection") {
+      log(`%c remove ${this.unregisterSelectionHandlerFunctions.length} Selection EventListeners`, 'background: olive; color:black');
+      this.unregisterSelectionHandlerFunctions.forEach(unregisterHandlerFunction => {
+        unregisterHandlerFunction();
+      });
+  
+      this.unregisterSelectionHandlerFunctions = [];  
+    }
   }
 
   onNextStep = () => {
@@ -246,7 +279,7 @@ class App extends Component {
       // clickAction
     );
 
-    this.applyMouseActionsToSheets(d, clickAction, clickField);
+    this.applyMouseActionsToSheets(d, clickAction, getConfigFieldInternalName(clickField, this.state.tableauSettings));
   };
 
   emptyClickCallBack = d => {
@@ -258,7 +291,7 @@ class App extends Component {
       d,
     );
 
-    this.applyMouseActionsToSheets(undefined, clickAction, clickField);
+    this.applyMouseActionsToSheets(undefined, clickAction, getConfigFieldInternalName(clickField, this.state.tableauSettings));
   };
 
   hoverCallBack = d => {
@@ -275,7 +308,7 @@ class App extends Component {
     );  
 
     // if we are actually hovering on something then we should call this function
-    this.applyMouseActionsToSheets(d, hoverAction, hoverField)
+    this.applyMouseActionsToSheets(d, hoverAction, getConfigFieldInternalName(hoverField, this.state.tableauSettings));
   }
 
   applyMouseActionsToSheets = (d, action, fieldName) => {
@@ -286,6 +319,7 @@ class App extends Component {
     const {ConfigSheet} = this.state.tableauSettings;
     const toHighlight = action === 'Highlight' && (fieldName || 'None') !== 'None';
     const toFilter = action === 'Filter' && (fieldName || 'None') !== 'None';
+    const mappedFieldName = getConfigFieldInternalName(fieldName, this.state.tableauSettings);
 
     // if no action should be taken
     if (!toHighlight && !toFilter) {
@@ -293,7 +327,7 @@ class App extends Component {
     }
 
     // remove EventListeners before apply any async actions
-    this.removeEventListeners();
+    this.removeEventListeners("All");
     this.applyingMouseActions = true;
 
     let tasks = [];
@@ -301,19 +335,20 @@ class App extends Component {
     if ( d ) {
       // select marks or filter
       const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
-      tasks.push(actionToApply(fieldName, [d[fieldName]], ConfigSheet));
+      tasks.push(actionToApply(mappedFieldName, [d[mappedFieldName]], ConfigSheet));
       // log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
       
     } else {
       // clear marks or filer
       const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
-      tasks.push(actionToApply(fieldName, ConfigSheet));
+      tasks.push(actionToApply(mappedFieldName, ConfigSheet));
     }
 
     Promise.all(tasks).then(() => {
       // all selection should be completed
       // Add event listeners back
-      this.addEventListeners();
+      this.addFilterEventListeners();
+      this.addSelectionEventListeners();
       this.applyingMouseActions = false;
     });
   }
@@ -507,7 +542,7 @@ class App extends Component {
     }
 
     // remove event listeners
-    this.removeEventListeners();
+    this.removeEventListeners("Selection");
 
     e.getMarksAsync().then(marks => {
       
@@ -573,7 +608,7 @@ class App extends Component {
 
       this.setState({
         highlightOn: annotationsArray
-      }, () => this.addEventListeners())
+      }, () => this.addSelectionEventListeners())
     }, err => {log('marks error', err);}
     );
   }
@@ -589,7 +624,7 @@ class App extends Component {
     }
 
     // clean up event listeners (taken from tableau example)
-    this.removeEventListeners();
+    this.removeEventListeners("Filter");
 
     //working here on pulling out summmary data
     //may want to limit to a single row when getting column names
@@ -622,7 +657,7 @@ class App extends Component {
       });
 
       // trying to add listeners back
-      this.addEventListeners();
+      this.addFilterEventListeners();
     });
   }
 
@@ -637,7 +672,7 @@ class App extends Component {
     }
 
     // clean up event listeners (taken from tableau example)
-    this.removeEventListeners();
+    this.removeEventListeners("All");
 
     // this forces the component to completely re-render when data changes
     // if (TableauSettings.ShouldUse) {
@@ -730,8 +765,9 @@ class App extends Component {
       }
 
       // trying to add listeners back
-      this.addEventListeners();
-      log('checking on adding listeners back', this.unregisterHandlerFunctions, this.state);
+      this.addFilterEventListeners();
+      this.addSelectionEventListeners();
+      log('checking on adding listeners back', this.state);
     });
   }
   
@@ -842,7 +878,8 @@ class App extends Component {
       // Whenever we restore the filters table, remove all save handling functions,
       // since we add them back later in this function.
       // provided by tableau extension samples
-      this.addEventListeners();
+      this.addFilterEventListeners();
+      this.addSelectionEventListeners();
   
       // Initialize the current saved settings global
       TableauSettings.init();
@@ -1019,6 +1056,7 @@ render() {
         let selectedFields = {
           ConfigParentField: tableauSettingsState.ConfigParentField,
           ConfigChildField: tableauSettingsState.ConfigChildField,
+          ConfigLabelField: tableauSettingsState.ConfigLabelField,
           ConfigColorField: tableauSettingsState.ConfigColorField,
           ConfigValueField: tableauSettingsState.ConfigValueField,
         }
@@ -1174,7 +1212,7 @@ render() {
         //networkTypeProps
         networkType={semioticTypes[tableauSettingsState.ConfigType]}
         networkProjection={tableauSettingsState.networkProjection}
-        filterRenderedNodes={tableauSettingsState.filterDepth === "none" ? undefined : tableauSettingsState.filterDepth}
+        filterRenderedDepth={tableauSettingsState.filterDepth === "none" ? undefined : tableauSettingsState.filterDepth}
 
         //render mode props
         nodeSize={tableauSettingsState.nodeSize}

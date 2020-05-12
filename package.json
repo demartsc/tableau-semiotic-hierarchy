@@ -10,6 +10,7 @@
     "d3-shape": "^1.2.0",
     "gh-pages": "^2.0.1",
     "react": "^16.3.2",
+    "react-app-polyfill": "^1.0.6",
     "react-beautiful-dnd": "^9.0.2",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.3.2",

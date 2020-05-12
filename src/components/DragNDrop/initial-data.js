@@ -17,7 +17,7 @@ const initialData = {
       id: 'config_options',
       title: 'Hierarchy Fields',
       type: 'options',
-      areaIds: ['ConfigParentField', 'ConfigChildField', 'ConfigColorField', 'ConfigValueField']
+      areaIds: ['ConfigParentField', 'ConfigChildField', 'ConfigLabelField', 'ConfigColorField', 'ConfigValueField']
     }
   },
   drop_area: {
@@ -34,6 +34,14 @@ const initialData = {
       title: 'Child',
       type: 'single_drop',
       icon: 'ChildIcon',
+      measureId: null, 
+      required: true
+    },
+    ConfigLabelField: {
+      id: 'ConfigLabelField',
+      title: 'Label',
+      type: 'single_drop',
+      icon: 'GeoNameIcon',
       measureId: null, 
       required: true
     },

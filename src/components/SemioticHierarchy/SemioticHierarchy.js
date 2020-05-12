@@ -76,13 +76,14 @@ function unflatten ( array, parent, seed, tree ) {
 // hierarchyDataPreped
 // (the original code contained a bug which would result
 // in worldDataMissing always being an empty array)
-function buildhierarchyDataPreped(hierarchyData, ConfigParentField, ConfigChildField, ConfigColorField, ConfigValueField) {
+function buildhierarchyDataPreped(hierarchyData, ConfigParentField, ConfigChildField, ConfigLabelField, ConfigColorField, ConfigValueField) {
     const hierarchyDataPreped = _.cloneDeep(hierarchyData);
 
     //now that we are in here we can rename fields as we need to in order avoid errors
     _.forEach(hierarchyDataPreped, (a) => {
         a['ConfigParentField'] = ConfigParentField;
         a['ConfigChildField'] = ConfigChildField;
+        a['ConfigLabelField'] = ConfigLabelField;
         a['ConfigColorField'] = ConfigColorField;
         a['ConfigValueField'] = ConfigValueField;
 
@@ -96,6 +97,11 @@ function buildhierarchyDataPreped(hierarchyData, ConfigParentField, ConfigChildF
             delete a[ConfigChildField];
         }
         
+        if (ConfigLabelField !== "label") {
+            a['label'] = a[ConfigLabelField];
+            delete a[ConfigLabelField];
+        }
+
         if (ConfigColorField !== "colorHex") {
             a['colorHex'] = a[ConfigColorField];
             delete a[ConfigColorField];
@@ -216,6 +222,7 @@ class SemioticHierarchy extends React.Component {
             hierarchyData, 
             tableauSettings.ConfigParentField, 
             tableauSettings.ConfigChildField, 
+            tableauSettings.ConfigLabelField,
             tableauSettings.ConfigColorField, 
             tableauSettings.ConfigValueField
         );
@@ -281,6 +288,32 @@ class SemioticHierarchy extends React.Component {
 
     getTargetColorHex = d => d.target.colorHex;
 
+    // borrowed from semiotic docs
+    getNodeLabel = d => {
+        // const { tableauSettings, nodeFillColor, nodeStrokeColor, nodeFillOpacity, nodeStrokeOpacity } = this.props;
+        // removed from <g> transform="translate(0,10)"
+        return d.ConfigLabelField ? (
+            <g>
+                <text
+                    fontSize="12"
+                    textAnchor="middle"
+                    strokeWidth={2}
+                    stroke="white"
+                    fill="white"
+                >
+                    {d.label}
+                </text>
+                <text 
+                    fontSize="12"
+                    textAnchor="middle"
+                    fill={this.getNodeStyle(d).fill}
+                >
+                    {d.label}
+                </text>
+            </g>
+        ) : null;
+    }
+
     getNodeStyle = d => {
         const { tableauSettings, nodeFillColor, nodeStrokeColor, nodeFillOpacity, nodeStrokeOpacity } = this.props;
         return (
@@ -319,14 +352,15 @@ class SemioticHierarchy extends React.Component {
 
     evaluateNodesToRender = d => {
         const {
-            filterRenderedNodes, 
+            filterRenderedDepth, 
             filterHash
         } = this.props;
         
         if ( Object.keys(filterHash).length > 0 ) {
+            console.log('we are in nodes to render', filterHash, filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true);
             return filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true
         } else {
-            return d.depth > parseInt(filterRenderedNodes || -1, 10);
+            return d.depth > parseInt(filterRenderedDepth || -1, 10);
         }
     }
 
@@ -398,14 +432,15 @@ class SemioticHierarchy extends React.Component {
     }
   
     render() {
-        log('semitoic component', this.props, roughjs);
         const {
             height,
             width,
             edgeType,
             networkType,
             networkProjection, 
-            tableauSettings
+            tableauSettings,
+            filterHash,
+            filterRenderedDepth
         } = this.props;
         
         // pull in memoized stuff for use in render function
@@ -415,6 +450,7 @@ class SemioticHierarchy extends React.Component {
             hoverAnnotationProp
         } = this.preprocessData();
 
+        log('semitoic component', this.props, filterHash, edgeData);
         // log('hierarchy Data in sub component', [width, height], hierarchyDataPreped, edgeData, this.getNodeRenderMode());
 
         // log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
@@ -436,6 +472,7 @@ class SemioticHierarchy extends React.Component {
                     nodeRenderMode={this.getNodeRenderMode}
                     edgeRenderMode={this.getEdgeRenderMode}
                     edgeType={edgeType}
+                    nodeLabels={tableauSettings.ConfigLabelField ? this.getNodeLabel : null}
                     nodeStyle={this.getNodeStyle}
                     edgeStyle={this.getEdgeStyle}
                     edgeWidthAccessor={this.getValueMetric1}

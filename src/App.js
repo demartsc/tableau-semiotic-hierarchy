@@ -279,7 +279,7 @@ class App extends Component {
       // clickAction
     );
 
-    this.applyMouseActionsToSheets(d, clickAction, getConfigFieldInternalName(clickField, this.state.tableauSettings));
+    this.applyMouseActionsToSheets(d, clickAction, clickField);
   };
 
   emptyClickCallBack = d => {
@@ -291,7 +291,7 @@ class App extends Component {
       d,
     );
 
-    this.applyMouseActionsToSheets(undefined, clickAction, getConfigFieldInternalName(clickField, this.state.tableauSettings));
+    this.applyMouseActionsToSheets(undefined, clickAction, clickField);
   };
 
   hoverCallBack = d => {
@@ -308,7 +308,7 @@ class App extends Component {
     );  
 
     // if we are actually hovering on something then we should call this function
-    this.applyMouseActionsToSheets(d, hoverAction, getConfigFieldInternalName(hoverField, this.state.tableauSettings));
+    this.applyMouseActionsToSheets(d, hoverAction, hoverField);
   }
 
   applyMouseActionsToSheets = (d, action, fieldName) => {
@@ -335,13 +335,13 @@ class App extends Component {
     if ( d ) {
       // select marks or filter
       const actionToApply = toHighlight ? selectMarksByField : applyFilterByField;
-      tasks.push(actionToApply(mappedFieldName, [d[mappedFieldName]], ConfigSheet));
-      // log('we are applyMouseActionsToSheets', d, action, fieldName, ConfigSheet, toHighlight, toFilter, d[fieldName], actionToApply);
+      tasks.push(actionToApply(fieldName, [d[mappedFieldName]], ConfigSheet));
+      // log('we are applyMouseActionsToSheets', d, action, fieldName, mappedFieldName, ConfigSheet, toHighlight, toFilter, d[mappedFieldName], actionToApply);
       
     } else {
       // clear marks or filer
       const actionToApply = toHighlight ? clearMarksByField : clearFilterByField;
-      tasks.push(actionToApply(mappedFieldName, ConfigSheet));
+      tasks.push(actionToApply(fieldName, ConfigSheet));
     }
 
     Promise.all(tasks).then(() => {

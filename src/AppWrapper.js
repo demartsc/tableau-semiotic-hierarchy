@@ -1,20 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 import App from './App';
-import parse from 'url-parse';
+// import parse from 'url-parse';
 
-class AppWrapper extends Component {
-
-  render() {
-    const configState = parse(window.location.href).hash === '#true';
-
-    return(
-      <App
-        isConfig = {configState}
-      >
-      </App>
-    );
-  }
-
+const AppWrapper = props => {
+  console.log('in appWrapper', props);
+  return(
+    <App
+      isConfig = {props.configState}
+    >
+    </App>
+  );
 }
 
 export default (AppWrapper);

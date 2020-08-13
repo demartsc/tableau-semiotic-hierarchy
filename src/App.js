@@ -107,6 +107,11 @@ const styles = theme => ({
 
 const tableauExt = window.tableau.extensions;
 
+// obtained from https://github.com/tableau/extension-data-driven-parameters/blob/master/sandboxed/src/DataDrivenParameter.tsx
+// Switches base URL based on where extension is being hosted
+const baseURL = window.location.origin.includes('localhost:3000') ? window.location.origin : '.';
+console.log('checking baseURL', baseURL, process.env);
+
 //tableau get summary data options
 const options = {
   ignoreAliases: false,
@@ -123,10 +128,11 @@ function findColumnIndexByFieldName(ConfigSheetColumns, fieldName) {
 class App extends Component {
   constructor (props) {
     super(props);
+    console.log('checking in app', this.props);
     this.state = {
       isConfig: this.props.isConfig || false,
-      isLoading: true,
-      isSplash: true,
+      isLoading: !this.props.isConfig,
+      isSplash: !this.props.isConfig,
       configuration: false,
       height: 300,
       width: 300,
@@ -811,7 +817,8 @@ class App extends Component {
   
   configure = () => {
     this.clearSheet();
-    const popUpUrl = window.location.href + '#true';
+    // const popUpUrl = window.location.href + '#true';
+    const popUpUrl = `${baseURL}/config.html`;
     const popUpOptions = {
       height: 625,
       width: 720,
@@ -859,7 +866,7 @@ class App extends Component {
 
       // default tableau settings on initial entry into the extension
       // we know if we haven't done anything yet when tableauSettings state = []
-      log("did mount", tableauExt.settings.get("ConfigType"));
+      log("did mount", tableauExt.settings.get("ConfigType"), this.state);
       if ( tableauExt.settings.get("ConfigType") === undefined ) {
         log('defaultSettings triggered', defaultSettings.length, defaultSettings);
         defaultSettings.defaultKeys.forEach((defaultSetting, index) => {

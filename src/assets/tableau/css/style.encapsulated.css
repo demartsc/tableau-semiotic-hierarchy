@@ -1,70 +1,70 @@
 @font-face {
   font-family: 'Benton Sans Thin';
   src: local("Benton Sans Thin");
-  src: url("https://www.tableau.com/sites/all/fonts/bentonsans-thin.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/bentonsans-thin.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/bentonsans-thin.woff") format("woff");
+  src: url("../fonts/bentonsans-thin.eot#iefix") format("embedded-opentype"), url("../fonts/bentonsans-thin.woff2") format("woff2"), url("../fonts/bentonsans-thin.woff") format("woff");
   font-style: normal;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Benton Sans Light';
   src: local("Benton Sans Light");
-  src: url("https://www.tableau.com/sites/all/fonts/bentonsans-light.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/bentonsans-light.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/bentonsans-light.woff") format("woff");
+  src: url("../fonts/bentonsans-light.eot#iefix") format("embedded-opentype"), url("../fonts/bentonsans-light.woff2") format("woff2"), url("../fonts/bentonsans-light.woff") format("woff");
   font-style: normal;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Benton Sans Book';
   src: local("Benton Sans Book");
-  src: url("https://www.tableau.com/sites/all/fonts/bentonsans-book.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/bentonsans-book.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/bentonsans-book.woff") format("woff");
+  src: url("../fonts/bentonsans-book.eot#iefix") format("embedded-opentype"), url("../fonts/bentonsans-book.woff2") format("woff2"), url("../fonts/bentonsans-book.woff") format("woff");
   font-style: normal;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Benton Sans Medium';
   src: local("Benton Sans Medium");
-  src: url("https://www.tableau.com/sites/all/fonts/bentonsans-medium.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/bentonsans-medium.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/bentonsans-medium.woff") format("woff");
+  src: url("../fonts/bentonsans-medium.eot#iefix") format("embedded-opentype"), url("../fonts/bentonsans-medium.woff2") format("woff2"), url("../fonts/bentonsans-medium.woff") format("woff");
   font-style: normal;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Benton Sans Bold';
   src: local("Benton Sans Bold");
-  src: url("https://www.tableau.com/sites/all/fonts/bentonsans-bold.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/bentonsans-bold.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/bentonsans-bold.woff") format("woff");
+  src: url("../fonts/bentonsans-bold.eot#iefix") format("embedded-opentype"), url("../fonts/bentonsans-bold.woff2") format("woff2"), url("../fonts/bentonsans-bold.woff") format("woff");
   font-style: normal;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Merriweather';
   src: local("Merriweather");
-  src: url("https://www.tableau.com/sites/all/fonts/merriweather-light.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/merriweather-light.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/merriweather-light.woff") format("woff");
+  src: url("../fonts/merriweather-light.eot#iefix") format("embedded-opentype"), url("../fonts/merriweather-light.woff2") format("woff2"), url("../fonts/merriweather-light.woff") format("woff");
   font-style: normal;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Merriweather';
   src: local("Merriweather");
-  src: url("https://www.tableau.com/sites/all/fonts/merriweather-bold.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/merriweather-bold.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/merriweather-bold.woff") format("woff");
+  src: url("../fonts/merriweather-bold.eot#iefix") format("embedded-opentype"), url("../fonts/merriweather-bold.woff2") format("woff2"), url("../fonts/merriweather-bold.woff") format("woff");
   font-style: normal;
   font-weight: 700; }
 
 @font-face {
   font-family: 'Benton Sans Book';
   src: local("Benton Sans Book");
-  src: url("https://www.tableau.com/sites/all/fonts/bentonsans-book-italic.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/bentonsans-book-italic.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/bentonsans-book-italic.woff") format("woff");
+  src: url("../fonts/bentonsans-book-italic.eot#iefix") format("embedded-opentype"), url("../fonts/bentonsans-book-italic.woff2") format("woff2"), url("../fonts/bentonsans-book-italic.woff") format("woff");
   font-style: italic;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Merriweather';
   src: local("Merriweather");
-  src: url("https://www.tableau.com/sites/all/fonts/merriweather-light-italic.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/merriweather-light-italic.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/merriweather-light-italic.woff") format("woff");
+  src: url("../fonts/merriweather-light-italic.eot#iefix") format("embedded-opentype"), url("../fonts/merriweather-light-italic.woff2") format("woff2"), url("../fonts/merriweather-light-italic.woff") format("woff");
   font-style: italic;
   font-weight: normal; }
 
 @font-face {
   font-family: 'Merriweather';
   src: local("Merriweather");
-  src: url("https://www.tableau.com/sites/all/fonts/merriweather-bold-italic.eot#iefix") format("embedded-opentype"), url("https://www.tableau.com/sites/all/fonts/merriweather-bold-italic.woff2") format("woff2"), url("https://www.tableau.com/sites/all/fonts/merriweather-bold-italic.woff") format("woff");
+  src: url("../fonts/merriweather-bold-italic.eot#iefix") format("embedded-opentype"), url("../fonts/merriweather-bold-italic.woff2") format("woff2"), url("../fonts/merriweather-bold-italic.woff") format("woff");
   font-style: italic;
   font-weight: 700; }
 

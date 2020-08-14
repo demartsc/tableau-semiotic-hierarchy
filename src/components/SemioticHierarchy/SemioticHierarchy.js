@@ -22,7 +22,7 @@ import React from 'react';
 // import PropTypes from 'prop-types';
 
 //semiotic
-import { ResponsiveNetworkFrame } from 'semiotic';
+import { NetworkFrame } from 'semiotic';
 
 //d3
 import * as d3Scale from "d3-scale";
@@ -357,7 +357,7 @@ class SemioticHierarchy extends React.Component {
         } = this.props;
         
         if ( Object.keys(filterHash).length > 0 ) {
-            console.log('we are in nodes to render', filterHash, filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true);
+            // console.log('we are in nodes to render', filterHash, filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true);
             return filterHash[d.child] || filterHash[d.parent ? d.parent.child : null] ? true : d.parent ? d.parent.ancestors().find(childD => filterHash[childD.child]) : true
         } else {
             return d.depth > parseInt(filterRenderedDepth || -1, 10);
@@ -456,12 +456,13 @@ class SemioticHierarchy extends React.Component {
         // log('renderProps', nodeSizeScale(0), nodeData[0], (nodeData[0] ? nodeSizeScale(nodeData[0].valueMetric || 0) : null) );
         return (
             <div className="semiotic-hierarchy" style={{ padding: '1%', height: height, width: width, float: 'none', margin: '0 auto' }}>
-                <ResponsiveNetworkFrame
-                    responsiveWidth
-                    responsiveHeight
+                <NetworkFrame
+                    size={[width, height]}
+                    // responsiveWidth
+                    // responsiveHeight
                     edges={edgeData}
                     nodeIDAccessor={"child"}
-                    nodeSizeAccessor={                
+                    nodeSizeAccessor={        
                             tableauSettings.nodeSize === "none" ? undefined
                         :   tableauSettings.ConfigType === "Circlepack" ? undefined 
                         :   tableauSettings.ConfigType === "Treemap" ? undefined

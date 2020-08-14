@@ -23,7 +23,7 @@ import PropTypes from 'prop-types';
 import './App.css';
 
 //semiotic
-import { ResponsiveNetworkFrame } from 'semiotic';
+import { NetworkFrame } from 'semiotic';
 import { flareData } from './data/flare.js';
 
 //lodash
@@ -110,7 +110,6 @@ const tableauExt = window.tableau.extensions;
 // obtained from https://github.com/tableau/extension-data-driven-parameters/blob/master/sandboxed/src/DataDrivenParameter.tsx
 // Switches base URL based on where extension is being hosted
 const baseURL = window.location.origin.includes('localhost:3000') ? window.location.origin : '.';
-console.log('checking baseURL', baseURL, process.env);
 
 //tableau get summary data options
 const options = {
@@ -128,7 +127,6 @@ function findColumnIndexByFieldName(ConfigSheetColumns, fieldName) {
 class App extends Component {
   constructor (props) {
     super(props);
-    console.log('checking in app', this.props);
     this.state = {
       isConfig: this.props.isConfig || false,
       isLoading: !this.props.isConfig,
@@ -959,9 +957,8 @@ render() {
 
         const semioticHelp = 
         <div style={{ paddingTop: 20, height: 350*.95, width: 350*.95, float: 'none', margin: '0 auto' }}>
-          <ResponsiveNetworkFrame
-              responsiveWidth
-              responsiveHeight
+          <NetworkFrame
+              size={[350*.95, 350*.95]}
               edges={flareDataParsed}
               edgeType='curve'
               nodeIDAccessor={"name"}

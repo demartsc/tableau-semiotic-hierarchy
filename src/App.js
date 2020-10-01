@@ -52,7 +52,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 // Tableau Styles and Tableau
 import './assets/tableau/vendor/slick.js/slick/slick.css';
-import './assets/tableau/css/style.min.css';
+import './assets/tableau/css/style.css';
 import { tableau } from './tableau-extensions-1.latest'; // eslint-disable-line  no-unused-vars
 
 // tableau settings handler
